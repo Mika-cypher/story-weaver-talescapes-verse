@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { 
@@ -13,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { ImageIcon, Music, Volume2, VolumeX } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-// Define the background options
 const backgroundOptions = [
   { id: "forest", name: "Forest", url: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843" },
   { id: "night", name: "Starry Night", url: "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb" },
@@ -22,7 +20,6 @@ const backgroundOptions = [
   { id: "sunset", name: "Sunset", url: "https://images.unsplash.com/photo-1500673922987-e212871fec22" },
 ];
 
-// Define the ambient sound options
 const ambientSoundOptions = [
   { id: "forest", name: "Forest Sounds", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
   { id: "rain", name: "Rainfall", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
@@ -45,7 +42,12 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
-  // Toggle visual background
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = ambientSoundVolume;
+    }
+  }, [ambientSoundVolume]);
+
   const toggleVisualBackground = (enabled: boolean) => {
     setVisualBackgroundEnabled(enabled);
     
@@ -62,7 +64,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
     });
   };
 
-  // Toggle ambient sound
   const toggleAmbientSound = (enabled: boolean) => {
     setAmbientSoundEnabled(enabled);
     
@@ -79,7 +80,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
     });
   };
 
-  // Change visual background
   const changeBackground = (backgroundId: string) => {
     setSelectedBackground(backgroundId);
     
@@ -93,7 +93,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
     }
   };
 
-  // Change ambient sound
   const changeAmbientSound = (soundId: string) => {
     setSelectedAmbientSound(soundId);
     
@@ -108,7 +107,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
     }
   };
 
-  // Apply background to the story container
   const applyBackground = (backgroundId: string) => {
     const backgroundUrl = getBackgroundUrl(backgroundId);
     const storyContainer = document.getElementById(`story-card-${storyId}`);
@@ -124,7 +122,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
     }
   };
 
-  // Remove background from the story container
   const removeBackground = () => {
     const storyContainer = document.getElementById(`story-card-${storyId}`);
     
@@ -135,28 +132,24 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
     }
   };
 
-  // Get background URL from ID
   const getBackgroundUrl = (backgroundId: string | null): string => {
     if (!backgroundId) return '';
     const background = backgroundOptions.find(bg => bg.id === backgroundId);
     return background ? background.url : '';
   };
 
-  // Get ambient sound URL from ID
   const getAmbientSoundUrl = (soundId: string | null): string => {
     if (!soundId) return '';
     const sound = ambientSoundOptions.find(s => s.id === soundId);
     return sound ? sound.url : '';
   };
 
-  // Get background name from ID
   const getBackgroundName = (backgroundId: string | null): string => {
     if (!backgroundId) return 'None';
     const background = backgroundOptions.find(bg => bg.id === backgroundId);
     return background ? background.name : 'Unknown';
   };
 
-  // Get ambient sound name from ID
   const getAmbientSoundName = (soundId: string | null): string => {
     if (!soundId) return 'None';
     const sound = ambientSoundOptions.find(s => s.id === soundId);
@@ -168,7 +161,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
       <h3 className="text-lg font-medium">Reading Experience</h3>
       
       <div className="space-y-4">
-        {/* Visual Background Controls */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <ImageIcon size={16} />
@@ -181,7 +173,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
           />
         </div>
         
-        {/* Background Selector */}
         <div className={`transition-opacity duration-300 ${visualBackgroundEnabled ? 'opacity-100' : 'opacity-50'}`}>
           <Label htmlFor={`bg-select-${storyId}`} className="mb-1 block">Select Background</Label>
           <Select 
@@ -200,7 +191,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
           </Select>
         </div>
         
-        {/* Ambient Sound Controls */}
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center space-x-2">
             <Music size={16} />
@@ -213,7 +203,6 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
           />
         </div>
         
-        {/* Sound Selector */}
         <div className={`transition-opacity duration-300 ${ambientSoundEnabled ? 'opacity-100' : 'opacity-50'}`}>
           <Label htmlFor={`sound-select-${storyId}`} className="mb-1 block">Select Sound</Label>
           <Select 
@@ -233,13 +222,11 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
         </div>
       </div>
 
-      {/* Hidden audio element for ambient sounds */}
       <audio
         ref={audioRef}
         src={getAmbientSoundUrl(selectedAmbientSound)}
         loop
         preload="auto"
-        volume={ambientSoundVolume}
       />
     </div>
   );
