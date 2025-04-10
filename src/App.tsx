@@ -9,7 +9,9 @@ import Index from "./pages/Index";
 import Explore from "./pages/Explore";
 import Create from "./pages/Create";
 import NotFound from "./pages/NotFound";
+import React from "react";
 
+// Create a new QueryClient for tanstack query
 const queryClient = new QueryClient();
 
 // Create a separate component for routes with AnimatePresence
@@ -53,16 +55,28 @@ const AnimatedRoutes = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AnimatedRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+// Root component that wraps the application
+const Root = () => {
+  return (
+    <BrowserRouter>
+      <AnimatedRoutes />
+    </BrowserRouter>
+  );
+};
+
+// Main App component
+const App = () => {
+  return (
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Root />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
+};
 
 export default App;
