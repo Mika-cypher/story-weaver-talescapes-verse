@@ -6,10 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Headphones, Heart, Search, Filter } from "lucide-react";
+import { BookOpen, Headphones, Heart, Search, Filter, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
+import StoryBackgroundControls from "@/components/StoryBackgroundControls";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 // Mock data for stories
 const allStories = [
@@ -79,6 +85,7 @@ const Explore = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeAudioId, setActiveAudioId] = useState<number | null>(null);
+  const [openSettingsId, setOpenSettingsId] = useState<number | null>(null);
 
   const filteredStories = allStories.filter(story => {
     if (selectedCategory !== "All" && story.category !== selectedCategory) {
@@ -98,6 +105,14 @@ const Explore = () => {
       setActiveAudioId(null);
     } else {
       setActiveAudioId(storyId);
+    }
+  };
+
+  const toggleSettings = (storyId: number) => {
+    if (openSettingsId === storyId) {
+      setOpenSettingsId(null);
+    } else {
+      setOpenSettingsId(storyId);
     }
   };
 
@@ -143,7 +158,11 @@ const Explore = () => {
           {filteredStories.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredStories.map((story) => (
-                <Card key={story.id} className="overflow-hidden transition-all duration-300 hover:shadow-lg">
+                <Card 
+                  key={story.id} 
+                  className="overflow-hidden transition-all duration-300 hover:shadow-lg"
+                  id={`story-card-${story.id}`}
+                >
                   <div className="aspect-w-16 aspect-h-9 relative">
                     <img
                       src={story.coverImage}
@@ -160,13 +179,23 @@ const Explore = () => {
                     <CardTitle className="text-xl line-clamp-1">{story.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground line-clamp-2">{story.excerpt}</p>
+                    <p className="text-muted-foreground line-clamp-2 mb-4">{story.excerpt}</p>
                     
                     {activeAudioId === story.id && story.hasAudio && story.audioSrc && (
                       <div className="mt-4">
                         <AudioPlayer audioSrc={story.audioSrc} title={story.title} />
                       </div>
                     )}
+
+                    <Collapsible
+                      open={openSettingsId === story.id}
+                      onOpenChange={() => toggleSettings(story.id)}
+                      className="mt-4"
+                    >
+                      <CollapsibleContent>
+                        <StoryBackgroundControls storyId={story.id} storyTitle={story.title} />
+                      </CollapsibleContent>
+                    </Collapsible>
                   </CardContent>
                   <CardFooter className="flex justify-between">
                     <div className="flex items-center space-x-4 text-muted-foreground">
@@ -184,6 +213,14 @@ const Explore = () => {
                           <Headphones className={`h-4 w-4 ${activeAudioId === story.id ? "text-primary" : ""}`} />
                         </Button>
                       )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="p-0 h-auto"
+                        onClick={() => toggleSettings(story.id)}
+                      >
+                        <Settings className={`h-4 w-4 ${openSettingsId === story.id ? "text-primary" : ""}`} />
+                      </Button>
                     </div>
                     <Button size="sm" variant="outline" asChild>
                       <Link to={`/story/${story.id}`}>
