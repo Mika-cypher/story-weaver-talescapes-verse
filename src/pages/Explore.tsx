@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Headphones, Heart, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import AudioPlayer from "@/components/AudioPlayer";
 
 // Mock data for stories
 const allStories = [
@@ -19,6 +20,7 @@ const allStories = [
     coverImage: "https://images.unsplash.com/photo-1633621477511-b1b3fb9a2280?q=80&w=2748&auto=format&fit=crop",
     category: "Fantasy",
     hasAudio: true,
+    audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", // Demo audio URL
     likes: 243,
   },
   {
@@ -28,6 +30,7 @@ const allStories = [
     coverImage: "https://images.unsplash.com/photo-1520034475321-cbe63696469a?q=80&w=3000&auto=format&fit=crop",
     category: "Mystery",
     hasAudio: true,
+    audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", // Demo audio URL
     likes: 178,
   },
   {
@@ -46,6 +49,7 @@ const allStories = [
     coverImage: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=3540&auto=format&fit=crop",
     category: "Fantasy",
     hasAudio: true,
+    audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", // Demo audio URL
     likes: 187,
   },
   {
@@ -64,6 +68,7 @@ const allStories = [
     coverImage: "https://images.unsplash.com/photo-1502675135487-e971002a6adb?q=80&w=3538&auto=format&fit=crop",
     category: "Mystery",
     hasAudio: true,
+    audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", // Demo audio URL
     likes: 201,
   },
 ];
@@ -73,6 +78,7 @@ const categories = ["All", "Fantasy", "Mystery", "Sci-Fi", "Historical", "Advent
 const Explore = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [activeAudioId, setActiveAudioId] = useState<number | null>(null);
 
   const filteredStories = allStories.filter(story => {
     if (selectedCategory !== "All" && story.category !== selectedCategory) {
@@ -86,6 +92,14 @@ const Explore = () => {
     
     return true;
   });
+
+  const toggleAudio = (storyId: number) => {
+    if (activeAudioId === storyId) {
+      setActiveAudioId(null);
+    } else {
+      setActiveAudioId(storyId);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -147,6 +161,12 @@ const Explore = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground line-clamp-2">{story.excerpt}</p>
+                    
+                    {activeAudioId === story.id && story.hasAudio && story.audioSrc && (
+                      <div className="mt-4">
+                        <AudioPlayer audioSrc={story.audioSrc} title={story.title} />
+                      </div>
+                    )}
                   </CardContent>
                   <CardFooter className="flex justify-between">
                     <div className="flex items-center space-x-4 text-muted-foreground">
@@ -155,9 +175,14 @@ const Explore = () => {
                         <span className="text-sm">{story.likes}</span>
                       </div>
                       {story.hasAudio && (
-                        <div>
-                          <Headphones className="h-4 w-4" />
-                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="p-0 h-auto"
+                          onClick={() => toggleAudio(story.id)}
+                        >
+                          <Headphones className={`h-4 w-4 ${activeAudioId === story.id ? "text-primary" : ""}`} />
+                        </Button>
                       )}
                     </div>
                     <Button size="sm" variant="outline" asChild>
