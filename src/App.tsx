@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Explore from "./pages/Explore";
 import Create from "./pages/Create";
@@ -58,9 +59,11 @@ const AnimatedRoutes = () => {
 // Root component that wraps the application
 const Root = () => {
   return (
-    <BrowserRouter>
-      <AnimatedRoutes />
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <AnimatedRoutes />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 

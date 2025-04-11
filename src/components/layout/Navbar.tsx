@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Menu, X, BookOpen, PenSquare, Headphones } from "lucide-react";
 import { useState } from "react";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +45,8 @@ const Navbar = () => {
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <div className="ml-3 relative">
+            <div className="ml-3 relative flex items-center space-x-2">
+              <ThemeToggle />
               <div className="flex space-x-2">
                 <Button variant="outline">Sign In</Button>
                 <Button>Sign Up</Button>
@@ -52,6 +54,7 @@ const Navbar = () => {
             </div>
           </div>
           <div className="-mr-2 flex items-center sm:hidden">
+            <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
