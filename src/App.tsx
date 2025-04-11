@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import Explore from "./pages/Explore";
 import Create from "./pages/Create";
+import Archive from "./pages/Archive";
 import NotFound from "./pages/NotFound";
 import React from "react";
 
@@ -49,6 +50,16 @@ const AnimatedRoutes = () => {
           transition={{ duration: 0.3 }}
         >
           <Create />
+        </motion.div>
+      } />
+      <Route path="/archive" element={
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Archive />
         </motion.div>
       } />
       <Route path="*" element={<NotFound />} />

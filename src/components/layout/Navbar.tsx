@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, PenSquare, Headphones } from "lucide-react";
+import { Menu, X, BookOpen, PenSquare, Headphones, Archive } from "lucide-react";
 import { useState } from "react";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 
@@ -34,6 +34,13 @@ const Navbar = () => {
               >
                 <PenSquare className="mr-2 h-4 w-4" />
                 Create Story
+              </Link>
+              <Link
+                to="/archive"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                <Archive className="mr-2 h-4 w-4" />
+                Cultural Archive
               </Link>
               <Link
                 to="/library"
@@ -89,6 +96,13 @@ const Navbar = () => {
             >
               <PenSquare className="inline-block mr-2 h-4 w-4" />
               Create Story
+            </Link>
+            <Link
+              to="/archive"
+              className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
+            >
+              <Archive className="inline-block mr-2 h-4 w-4" />
+              Cultural Archive
             </Link>
             <Link
               to="/library"
