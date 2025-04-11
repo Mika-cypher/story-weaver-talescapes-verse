@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Cube, VrHeadset, Tablet, Laptop } from "lucide-react";
+import { Box, Headset, Tablet, Laptop } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ImmersiveExperience: React.FC = () => {
@@ -20,7 +20,7 @@ const ImmersiveExperience: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="bg-primary/10 h-10 w-10 rounded-full flex items-center justify-center mt-1">
-                  <VrHeadset className="h-5 w-5 text-primary" />
+                  <Headset className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-medium">Virtual Reality Journeys</h3>
@@ -60,7 +60,7 @@ const ImmersiveExperience: React.FC = () => {
             
             <div className="mt-8">
               <Button>
-                <Cube className="h-4 w-4 mr-2" />
+                <Box className="h-4 w-4 mr-2" />
                 Explore Immersive Experiences
               </Button>
             </div>
