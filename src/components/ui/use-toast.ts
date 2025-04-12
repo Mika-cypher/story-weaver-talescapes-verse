@@ -1,5 +1,6 @@
 
-// This file should just re-export from the hooks directory
-import { useToast, toast } from "@/hooks/use-toast";
+// Directly export from the hooks directory
+import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export { useToast, toast };

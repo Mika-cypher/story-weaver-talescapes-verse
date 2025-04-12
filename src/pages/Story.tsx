@@ -6,7 +6,7 @@ import { storyService } from "@/services/storyService";
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const Story: React.FC = () => {
   const { id } = useParams<{ id: string }>();

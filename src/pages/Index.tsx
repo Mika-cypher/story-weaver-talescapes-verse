@@ -6,7 +6,7 @@ import HowItWorks from "@/components/home/HowItWorks";
 import CallToAction from "@/components/home/CallToAction";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
 
 const Index = () => {
