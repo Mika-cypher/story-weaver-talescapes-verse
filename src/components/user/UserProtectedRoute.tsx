@@ -9,8 +9,11 @@ interface UserProtectedRouteProps {
 
 export const UserProtectedRoute: React.FC<UserProtectedRouteProps> = ({ children }) => {
   const { isLoggedIn } = useAuth();
+  
+  console.log("UserProtectedRoute - isLoggedIn:", isLoggedIn);
 
   if (!isLoggedIn) {
+    console.log("Redirecting to login page from UserProtectedRoute");
     return <Navigate to="/login" replace />;
   }
 

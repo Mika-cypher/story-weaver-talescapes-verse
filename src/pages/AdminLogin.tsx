@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -9,21 +9,32 @@ import { useToast } from "@/hooks/use-toast";
 
 const AdminLogin: React.FC = () => {
   const [password, setPassword] = useState("");
-  const { adminLogin } = useAuth();
+  const { adminLogin, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if already logged in as admin
+  useEffect(() => {
+    if (isAdmin) {
+      navigate("/admin/dashboard");
+    }
+  }, [isAdmin, navigate]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Attempting admin login with password");
+    
     const success = adminLogin(password);
     
     if (success) {
+      console.log("Admin login successful");
       toast({
         title: "Login successful",
         description: "Welcome to the admin dashboard",
       });
       navigate("/admin/dashboard");
     } else {
+      console.log("Admin login failed");
       toast({
         title: "Login failed",
         description: "Invalid password",
@@ -49,6 +60,7 @@ const AdminLogin: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <p className="text-xs text-muted-foreground">Default password is: admin123</p>
             </div>
           </CardContent>
           <CardFooter>

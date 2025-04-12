@@ -9,8 +9,11 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAdmin } = useAuth();
+  
+  console.log("AdminProtectedRoute - isAdmin:", isAdmin);
 
   if (!isAdmin) {
+    console.log("Redirecting to admin login page from ProtectedRoute");
     return <Navigate to="/admin/login" replace />;
   }
 
