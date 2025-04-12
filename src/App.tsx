@@ -6,11 +6,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import Index from "./pages/Index";
 import Explore from "./pages/Explore";
 import Create from "./pages/Create";
 import Archive from "./pages/Archive";
 import NotFound from "./pages/NotFound";
+import Story from "./pages/Story";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminStories from "./pages/AdminStories";
+import { StoryEditor } from "./components/admin/StoryEditor";
+import StoryPreview from "./pages/StoryPreview";
 import React from "react";
 
 // Create a new QueryClient for tanstack query
@@ -22,6 +30,7 @@ const AnimatedRoutes = () => {
   
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={
         <motion.div
           initial={{ opacity: 0 }}
@@ -62,6 +71,37 @@ const AnimatedRoutes = () => {
           <Archive />
         </motion.div>
       } />
+      <Route path="/story/:id" element={<Story />} />
+
+      {/* Admin Routes */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/dashboard" element={
+        <ProtectedRoute>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/stories" element={
+        <ProtectedRoute>
+          <AdminStories />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/stories/new" element={
+        <ProtectedRoute>
+          <StoryEditor />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/stories/:id/edit" element={
+        <ProtectedRoute>
+          <StoryEditor />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/stories/:id/preview" element={
+        <ProtectedRoute>
+          <StoryPreview />
+        </ProtectedRoute>
+      } />
+
+      {/* Not Found Route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -72,7 +112,9 @@ const Root = () => {
   return (
     <ThemeProvider>
       <BrowserRouter>
-        <AnimatedRoutes />
+        <AuthProvider>
+          <AnimatedRoutes />
+        </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
   );
