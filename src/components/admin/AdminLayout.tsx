@@ -1,6 +1,6 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { 
@@ -16,7 +16,17 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent
 } from "@/components/ui/sidebar";
-import { BookText, Plus, LayoutDashboard, LogOut } from "lucide-react";
+import { 
+  BookText, 
+  Plus, 
+  LayoutDashboard, 
+  LogOut, 
+  Settings, 
+  FileText, 
+  Users, 
+  Tag, 
+  GalleryHorizontal
+} from "lucide-react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -25,6 +35,15 @@ interface AdminLayoutProps {
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  const isDashboardActive = () => {
+    return location.pathname === "/admin/dashboard" || location.pathname.startsWith("/admin/dashboard/");
+  };
 
   return (
     <SidebarProvider>
@@ -35,22 +54,41 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </SidebarHeader>
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Management</SidebarGroupLabel>
+              <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton 
                       onClick={() => navigate("/admin/dashboard")}
                       tooltip="Dashboard"
+                      active={isDashboardActive()}
                     >
                       <LayoutDashboard />
                       <span>Dashboard</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel>Content</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      onClick={() => navigate("/admin/dashboard?tab=content")}
+                      tooltip="Content Management"
+                    >
+                      <FileText />
+                      <span>Content</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton 
                       onClick={() => navigate("/admin/stories")}
                       tooltip="All Stories"
+                      active={isActive("/admin/stories")}
                     >
                       <BookText />
                       <span>Stories</span>
@@ -60,9 +98,36 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     <SidebarMenuButton 
                       onClick={() => navigate("/admin/stories/new")}
                       tooltip="Create New Story"
+                      active={isActive("/admin/stories/new")}
                     >
                       <Plus />
                       <span>Create New</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel>Management</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      onClick={() => navigate("/admin/dashboard?tab=submissions")}
+                      tooltip="User Submissions"
+                    >
+                      <Users />
+                      <span>Submissions</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      onClick={() => navigate("/admin/dashboard?tab=categories")}
+                      tooltip="Categories & Visuals"
+                    >
+                      <Tag />
+                      <span>Categories</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
