@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -44,16 +43,6 @@ import {
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-// We'll mock uuid for now since we can't install it in this environment
-const uuid = {
-  v4: function() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
-};
-
 interface StoryFormData {
   title: string;
   description: string;
@@ -68,7 +57,7 @@ export const StoryEditor: React.FC = () => {
   const { toast } = useToast();
   
   const [story, setStory] = useState<Story>({
-    id: isNewStory ? uuid.v4() : id || "",
+    id: isNewStory ? uuidv4() : id || "",
     title: "",
     description: "",
     coverImage: "",
@@ -105,7 +94,6 @@ export const StoryEditor: React.FC = () => {
           author: existingStory.author
         });
         
-        // Set current scene to the start scene if it exists
         if (existingStory.startSceneId && existingStory.scenes.length > 0) {
           setCurrentSceneId(existingStory.startSceneId);
         }
@@ -118,8 +106,7 @@ export const StoryEditor: React.FC = () => {
         navigate("/admin/stories");
       }
     } else if (isNewStory) {
-      // Create first scene for new story
-      const firstSceneId = uuid.v4();
+      const firstSceneId = uuidv4();
       const newScene: StoryScene = {
         id: firstSceneId,
         title: "First Scene",
@@ -138,7 +125,6 @@ export const StoryEditor: React.FC = () => {
     }
   }, [id, isNewStory]);
 
-  // Get current scene
   const currentScene = story.scenes.find(scene => scene.id === currentSceneId);
 
   const saveStory = async (formData: StoryFormData) => {
@@ -175,7 +161,7 @@ export const StoryEditor: React.FC = () => {
   };
 
   const addScene = () => {
-    const newSceneId = uuid.v4();
+    const newSceneId = uuidv4();
     const newScene: StoryScene = {
       id: newSceneId,
       title: `Scene ${story.scenes.length + 1}`,
@@ -202,7 +188,6 @@ export const StoryEditor: React.FC = () => {
       return;
     }
     
-    // Check if it's the start scene
     if (sceneId === story.startSceneId) {
       toast({
         title: "Cannot delete start scene",
@@ -212,7 +197,6 @@ export const StoryEditor: React.FC = () => {
       return;
     }
     
-    // Update any choices that point to this scene
     const updatedScenes = story.scenes.map(scene => {
       if (scene.id !== sceneId) {
         const updatedChoices = scene.choices.filter(choice => choice.nextSceneId !== sceneId);
@@ -229,7 +213,6 @@ export const StoryEditor: React.FC = () => {
       scenes: updatedScenes
     }));
     
-    // If we're deleting the current scene, switch to another one
     if (sceneId === currentSceneId) {
       setCurrentSceneId(updatedScenes[0]?.id || "");
     }
@@ -308,7 +291,7 @@ export const StoryEditor: React.FC = () => {
     if (!currentSceneId) return;
     
     const newChoice: StoryChoice = {
-      id: uuid.v4(),
+      id: uuidv4(),
       text: "New choice",
       nextSceneId: ""
     };
@@ -360,9 +343,7 @@ export const StoryEditor: React.FC = () => {
   };
 
   const previewStory = () => {
-    // First save the story
     saveStory(form.getValues());
-    // Then navigate to preview
     navigate(`/admin/stories/${story.id}/preview`);
   };
 
