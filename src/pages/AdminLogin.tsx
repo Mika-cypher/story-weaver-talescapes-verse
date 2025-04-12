@@ -9,13 +9,13 @@ import { useToast } from "@/hooks/use-toast";
 
 const AdminLogin: React.FC = () => {
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { adminLogin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(password);
+    const success = adminLogin(password);
     
     if (success) {
       toast({

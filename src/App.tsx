@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
+import { UserProtectedRoute } from "@/components/user/UserProtectedRoute";
 import Index from "./pages/Index";
 import Explore from "./pages/Explore";
 import Create from "./pages/Create";
@@ -19,6 +20,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminStories from "./pages/AdminStories";
 import { StoryEditor } from "./components/admin/StoryEditor";
 import StoryPreview from "./pages/StoryPreview";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import React from "react";
 
 // Create a new QueryClient for tanstack query
@@ -72,6 +76,17 @@ const AnimatedRoutes = () => {
         </motion.div>
       } />
       <Route path="/story/:id" element={<Story />} />
+      
+      {/* Auth Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      
+      {/* User Protected Routes */}
+      <Route path="/profile" element={
+        <UserProtectedRoute>
+          <Profile />
+        </UserProtectedRoute>
+      } />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />

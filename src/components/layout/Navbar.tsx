@@ -1,12 +1,26 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, PenSquare, Headphones, Archive } from "lucide-react";
+import { Menu, X, BookOpen, PenSquare, Headphones, Archive, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import ThemeToggle from "@/components/theme/ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isLoggedIn, logout } = useAuth();
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
 
   return (
     <nav className="fixed w-full bg-background/80 backdrop-blur-md z-50 border-b">
@@ -54,10 +68,39 @@ const Navbar = () => {
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <div className="ml-3 relative flex items-center space-x-2">
               <ThemeToggle />
-              <div className="flex space-x-2">
-                <Button variant="outline">Sign In</Button>
-                <Button>Sign Up</Button>
-              </div>
+              {isLoggedIn ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>{user?.username ? getInitials(user.username) : "U"}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Link to="/profile" className="flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>My Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <div className="flex space-x-2">
+                  <Button variant="outline" asChild>
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           <div className="-mr-2 flex items-center sm:hidden">
@@ -111,13 +154,43 @@ const Navbar = () => {
               <Headphones className="inline-block mr-2 h-4 w-4" />
               Audio Library
             </Link>
+            {isLoggedIn && (
+              <Link
+                to="/profile"
+                className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
+              >
+                <User className="inline-block mr-2 h-4 w-4" />
+                My Profile
+              </Link>
+            )}
           </div>
           <div className="pt-4 pb-3 border-t border-border">
             <div className="flex items-center px-4">
-              <div className="flex space-x-2">
-                <Button variant="outline" className="w-full">Sign In</Button>
-                <Button className="w-full">Sign Up</Button>
-              </div>
+              {isLoggedIn ? (
+                <>
+                  <div className="flex-shrink-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{user?.username ? getInitials(user.username) : "U"}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div className="ml-3">
+                    <div className="text-base font-medium">{user?.username}</div>
+                    <div className="text-sm text-muted-foreground">{user?.email}</div>
+                  </div>
+                  <Button variant="ghost" className="ml-auto" onClick={logout}>
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                <div className="flex space-x-2 w-full">
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                  <Button className="w-full" asChild>
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
