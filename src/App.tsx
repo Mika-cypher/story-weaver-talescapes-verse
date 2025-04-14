@@ -1,5 +1,4 @@
 
-import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -23,6 +22,7 @@ import StoryPreview from "./pages/StoryPreview";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import React from "react";
 
 // Create a new QueryClient for tanstack query
 const queryClient = new QueryClient();
@@ -122,28 +122,30 @@ const AnimatedRoutes = () => {
   );
 };
 
-// Root component that wraps the application with necessary providers
+// Root component that wraps the application
 const Root = () => {
   return (
-    <BrowserRouter>
-      <ThemeProvider>
+    <ThemeProvider>
+      <BrowserRouter>
         <AuthProvider>
           <AnimatedRoutes />
         </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
 // Main App component
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Root />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Root />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 }
 

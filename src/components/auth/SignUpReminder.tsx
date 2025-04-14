@@ -27,18 +27,14 @@ const SignUpReminder: React.FC<SignUpReminderProps> = ({ open, onOpenChange }) =
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="bg-background border-border">
         <AlertDialogHeader>
-          <div className="flex items-center justify-between">
-            <AlertDialogTitle className="text-foreground">Join Talescapes Beta!</AlertDialogTitle>
-            <span className="beta-badge">BETA</span>
-          </div>
+          <AlertDialogTitle className="text-foreground">Join Talescapes Today!</AlertDialogTitle>
           <AlertDialogDescription className="text-muted-foreground">
-            Sign up now to be part of our beta test and unlock features like:
+            Sign up to unlock features like:
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>Like and save your favorite stories</li>
-              <li>Create and share your own interactive tales</li>
-              <li>Connect with our community of storytellers</li>
-              <li>Get early access to new beta features</li>
-              <li>Help shape the future of Talescapes</li>
+              <li>Create and share your own stories</li>
+              <li>Interact with other storytellers</li>
+              <li>Build your personalized profile</li>
             </ul>
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -48,7 +44,7 @@ const SignUpReminder: React.FC<SignUpReminderProps> = ({ open, onOpenChange }) =
           </AlertDialogCancel>
           <AlertDialogAction asChild>
             <Link to="/signup" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Join Beta
+              Sign Up Now
             </Link>
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -32,23 +32,18 @@ const StoryFilters: React.FC<StoryFiltersProps> = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
           <Input
             placeholder="Search stories..."
-            className="pl-10 bg-background border-input text-foreground"
+            className="pl-10 bg-background text-foreground"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <div className="relative">
+        <div className="flex items-center gap-2">
+          <Filter size={18} className="text-muted-foreground" />
           <Select value={selectedCategory} onValueChange={onCategoryChange}>
-            <SelectTrigger className="w-[180px] bg-background border-input text-foreground">
-              <div className="flex items-center">
-                <Filter size={16} className="mr-2 text-muted-foreground" />
-                <SelectValue placeholder="Select category" />
-              </div>
+            <SelectTrigger className="w-[180px] bg-background text-foreground">
+              <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent className="bg-background border-border">
-              <div className="py-1 px-2 text-xs font-medium text-muted-foreground">
-                Categories
-              </div>
               {categories.map((category) => (
                 <SelectItem key={category} value={category} className="text-foreground">
                   {category}
