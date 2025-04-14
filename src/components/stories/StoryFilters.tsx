@@ -1,8 +1,14 @@
 
 import React from "react";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface StoryFiltersProps {
   searchTerm: string;
@@ -26,23 +32,25 @@ const StoryFilters: React.FC<StoryFiltersProps> = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
           <Input
             placeholder="Search stories..."
-            className="pl-10"
+            className="pl-10 bg-background text-foreground"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <div className="flex space-x-2 items-center">
+        <div className="flex items-center gap-2">
           <Filter size={18} className="text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Filter:</span>
-          <Tabs defaultValue={selectedCategory} className="w-[300px]" onValueChange={onCategoryChange}>
-            <TabsList className="w-full overflow-x-auto">
+          <Select value={selectedCategory} onValueChange={onCategoryChange}>
+            <SelectTrigger className="w-[180px] bg-background text-foreground">
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent className="bg-background border-border">
               {categories.map((category) => (
-                <TabsTrigger key={category} value={category} className="text-xs sm:text-sm">
+                <SelectItem key={category} value={category} className="text-foreground">
                   {category}
-                </TabsTrigger>
+                </SelectItem>
               ))}
-            </TabsList>
-          </Tabs>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>

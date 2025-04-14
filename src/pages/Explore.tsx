@@ -1,16 +1,30 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import StoryFilters from "@/components/stories/StoryFilters";
 import StoryList from "@/components/stories/StoryList";
+import SignUpReminder from "@/components/auth/SignUpReminder";
 import { allStories, categories } from "@/data/mockStories";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Explore: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeAudioId, setActiveAudioId] = useState<number | null>(null);
   const [openSettingsId, setOpenSettingsId] = useState<number | null>(null);
+  const [showSignUpReminder, setShowSignUpReminder] = useState(false);
+  const { isLoggedIn } = useAuth();
+
+  useEffect(() => {
+    // Show sign-up reminder after 30 seconds if not logged in
+    if (!isLoggedIn) {
+      const timer = setTimeout(() => {
+        setShowSignUpReminder(true);
+      }, 30000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoggedIn]);
 
   const filteredStories = allStories.filter(story => {
     if (selectedCategory !== "All" && story.category !== selectedCategory) {
@@ -42,9 +56,9 @@ const Explore: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
-      <main className="flex-grow pt-24 pb-16 bg-background">
+      <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">Explore Stories</h1>
@@ -71,6 +85,11 @@ const Explore: React.FC = () => {
         </div>
       </main>
       <Footer />
+      
+      <SignUpReminder 
+        open={showSignUpReminder} 
+        onOpenChange={setShowSignUpReminder}
+      />
     </div>
   );
 };
