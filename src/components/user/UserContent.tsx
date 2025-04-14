@@ -14,7 +14,7 @@ interface ContentItem {
   id: string;
   title: string;
   url?: string;
-  date: string;
+  date: string;  // This is the required property
   status?: string;
   duration?: string;
   type?: string;

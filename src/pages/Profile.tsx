@@ -88,10 +88,11 @@ const Profile: React.FC = () => {
     { id: "aud2", title: "Ocean Waves", url: "/sounds/ocean.mp3", duration: "3:20", date: "2023-06-22", status: "pending" }
   ];
 
+  // Fix the userSubmissions array by adding the required 'date' property
   const userSubmissions = [
-    { id: "sub1", title: "Traditional Folk Song", type: "Audio", submittedDate: "2023-07-15", status: "approved" },
-    { id: "sub2", title: "Cultural Artifact Photo", type: "Image", submittedDate: "2023-08-02", status: "pending" },
-    { id: "sub3", title: "Local Legend", type: "Story", submittedDate: "2023-09-10", status: "rejected" }
+    { id: "sub1", title: "Traditional Folk Song", type: "Audio", submittedDate: "2023-07-15", date: "2023-07-15", status: "approved" },
+    { id: "sub2", title: "Cultural Artifact Photo", type: "Image", submittedDate: "2023-08-02", date: "2023-08-02", status: "pending" },
+    { id: "sub3", title: "Local Legend", type: "Story", submittedDate: "2023-09-10", date: "2023-09-10", status: "rejected" }
   ];
   
   const handleToggleAudio = (storyId: number) => {
