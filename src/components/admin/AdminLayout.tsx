@@ -61,7 +61,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     <SidebarMenuButton 
                       onClick={() => navigate("/admin/dashboard")}
                       tooltip="Dashboard"
-                      active={isDashboardActive()}
+                      isActive={isDashboardActive()}
                     >
                       <LayoutDashboard />
                       <span>Dashboard</span>
@@ -88,7 +88,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     <SidebarMenuButton 
                       onClick={() => navigate("/admin/stories")}
                       tooltip="All Stories"
-                      active={isActive("/admin/stories")}
+                      isActive={isActive("/admin/stories")}
                     >
                       <BookText />
                       <span>Stories</span>
@@ -98,7 +98,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     <SidebarMenuButton 
                       onClick={() => navigate("/admin/stories/new")}
                       tooltip="Create New Story"
-                      active={isActive("/admin/stories/new")}
+                      isActive={isActive("/admin/stories/new")}
                     >
                       <Plus />
                       <span>Create New</span>

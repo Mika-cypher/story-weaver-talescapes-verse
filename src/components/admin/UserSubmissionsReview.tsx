@@ -14,8 +14,17 @@ import { Check, X, Eye, User } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Mock data for user submissions
-const mockSubmissions = [
+interface Submission {
+  id: string;
+  title: string;
+  author: string;
+  date: string;
+  status: "pending" | "approved" | "rejected";
+  excerpt: string;
+}
+
+// Mock data for user submissions with properly typed status values
+const mockSubmissions: Submission[] = [
   {
     id: "sub-1",
     title: "The Lost City",
@@ -41,15 +50,6 @@ const mockSubmissions = [
     excerpt: "A mystery unfolds in a small town where nothing is as it seems...",
   },
 ];
-
-interface Submission {
-  id: string;
-  title: string;
-  author: string;
-  date: string;
-  status: "pending" | "approved" | "rejected";
-  excerpt: string;
-}
 
 export const UserSubmissionsReview: React.FC = () => {
   const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions);
