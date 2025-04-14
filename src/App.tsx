@@ -136,7 +136,7 @@ const Root = () => {
 };
 
 // Main App component
-const App = () => {
+function App() {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -147,6 +147,6 @@ const App = () => {
       </QueryClientProvider>
     </React.StrictMode>
   );
-};
+}
 
 export default App;
