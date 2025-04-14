@@ -15,13 +15,13 @@ const Index = () => {
   useEffect(() => {
     // Welcome toast when landing on the home page
     toast({
-      title: (
+      title: "Welcome to Talescapes!",
+      description: (
         <div className="flex items-center gap-2">
-          Welcome to Talescapes!
+          Explore and create immersive interactive stories in our beta version.
           <span className="beta-badge text-xs">BETA</span>
         </div>
       ),
-      description: "Explore and create immersive interactive stories in our beta version.",
       duration: 6000,
     });
   }, [toast]);
