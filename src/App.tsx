@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -85,6 +86,7 @@ const AnimatedRoutes = () => {
           <Profile />
         </UserProtectedRoute>
       } />
+      <Route path="/profile/:username" element={<Profile />} />
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />

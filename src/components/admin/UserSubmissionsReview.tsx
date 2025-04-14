@@ -9,10 +9,12 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { Check, X, Eye, User } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Check, X, Eye, User, FileImage, FileAudio, BookText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Submission {
   id: string;
@@ -21,6 +23,9 @@ interface Submission {
   date: string;
   status: "pending" | "approved" | "rejected";
   excerpt: string;
+  type?: string;
+  contentType?: string;
+  previewUrl?: string;
 }
 
 // Mock data for user submissions with properly typed status values
@@ -32,6 +37,7 @@ const mockSubmissions: Submission[] = [
     date: "2023-05-15",
     status: "pending",
     excerpt: "A tale of adventure and discovery in the heart of the Amazon rainforest...",
+    type: "story"
   },
   {
     id: "sub-2",
@@ -40,6 +46,7 @@ const mockSubmissions: Submission[] = [
     date: "2023-05-14",
     status: "pending",
     excerpt: "When the past and future collide, one woman must navigate the consequences...",
+    type: "story"
   },
   {
     id: "sub-3",
@@ -48,7 +55,36 @@ const mockSubmissions: Submission[] = [
     date: "2023-05-12",
     status: "pending",
     excerpt: "A mystery unfolds in a small town where nothing is as it seems...",
+    type: "story"
   },
+  {
+    id: "sub-4",
+    title: "Mountain Landscape",
+    author: "Emily Chen",
+    date: "2023-06-18",
+    status: "pending",
+    excerpt: "A stunning photograph of mountain ranges at sunset from my home region.",
+    type: "image",
+    previewUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+  },
+  {
+    id: "sub-5",
+    title: "Traditional Folk Song",
+    author: "David Kim",
+    date: "2023-06-20",
+    status: "pending",
+    excerpt: "A recording of a traditional folk song passed down through generations in my family.",
+    type: "audio"
+  },
+  {
+    id: "sub-6",
+    title: "Cultural Festival Dance",
+    author: "Maria Garcia",
+    date: "2023-06-22",
+    status: "pending",
+    excerpt: "Video footage of a cultural dance performed at our local heritage festival.",
+    type: "video"
+  }
 ];
 
 export const UserSubmissionsReview: React.FC = () => {
@@ -91,6 +127,21 @@ export const UserSubmissionsReview: React.FC = () => {
     }
   };
 
+  const getSubmissionTypeIcon = (type?: string) => {
+    switch (type) {
+      case 'story':
+        return <BookText className="h-4 w-4 text-blue-500" />;
+      case 'image':
+        return <FileImage className="h-4 w-4 text-green-500" />;
+      case 'audio':
+        return <FileAudio className="h-4 w-4 text-purple-500" />;
+      case 'video':
+        return <FileAudio className="h-4 w-4 text-red-500" />;
+      default:
+        return <FileAudio className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
   const filteredSubmissions = submissions.filter(sub => sub.status === tabValue);
 
   return (
@@ -110,6 +161,7 @@ export const UserSubmissionsReview: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Type</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Author</TableHead>
                     <TableHead>Date</TableHead>
@@ -120,6 +172,7 @@ export const UserSubmissionsReview: React.FC = () => {
                   {filteredSubmissions.length > 0 ? (
                     filteredSubmissions.map((submission) => (
                       <TableRow key={submission.id}>
+                        <TableCell>{getSubmissionTypeIcon(submission.type)}</TableCell>
                         <TableCell className="font-medium">{submission.title}</TableCell>
                         <TableCell>{submission.author}</TableCell>
                         <TableCell>{new Date(submission.date).toLocaleDateString()}</TableCell>
@@ -162,7 +215,7 @@ export const UserSubmissionsReview: React.FC = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                      <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
                         No {tabValue} submissions found.
                       </TableCell>
                     </TableRow>
@@ -177,15 +230,31 @@ export const UserSubmissionsReview: React.FC = () => {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle>{selectedSubmission.title}</CardTitle>
-                        <CardDescription>
+                        <CardTitle className="flex items-center">
+                          {getSubmissionTypeIcon(selectedSubmission.type)}
+                          <span className="ml-2">{selectedSubmission.title}</span>
+                        </CardTitle>
+                        <CardDescription className="flex items-center mt-2">
+                          <Avatar className="h-5 w-5 mr-2">
+                            <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedSubmission.author}`} />
+                            <AvatarFallback>{selectedSubmission.author.substring(0, 2).toUpperCase()}</AvatarFallback>
+                          </Avatar>
                           Submitted by {selectedSubmission.author} on {new Date(selectedSubmission.date).toLocaleDateString()}
                         </CardDescription>
                       </div>
-                      <User className="h-5 w-5 text-muted-foreground" />
                     </div>
                   </CardHeader>
                   <CardContent>
+                    {selectedSubmission.previewUrl && selectedSubmission.type === 'image' && (
+                      <div className="mb-4 rounded-md overflow-hidden">
+                        <img 
+                          src={selectedSubmission.previewUrl} 
+                          alt={selectedSubmission.title}
+                          className="w-full h-auto"
+                        />
+                      </div>
+                    )}
+                    
                     <p className="text-sm">{selectedSubmission.excerpt}</p>
                     <div className="mt-4">
                       <span

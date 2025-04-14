@@ -24,6 +24,14 @@ type AuthContextType = {
   saveStory: (storyId: string) => void;
   unsaveStory: (storyId: string) => void;
   isStorySaved: (storyId: string) => boolean;
+  followUser: (userId: string) => void;
+  unfollowUser: (userId: string) => void;
+  isFollowingUser: (userId: string) => boolean;
+  likeContent: (contentId: string, contentType: string) => void;
+  unlikeContent: (contentId: string, contentType: string) => void;
+  isContentLiked: (contentId: string) => boolean;
+  getUserSubmissions: () => any[];
+  submitContent: (content: any) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,11 +43,16 @@ const ADMIN_PASSWORD = "admin123"; // You should change this to a secure passwor
 // Mock users database
 const MOCK_USERS_KEY = "talescapes_users";
 const SAVED_STORIES_KEY = "talescapes_saved_stories";
+const LIKED_CONTENT_KEY = "talescapes_liked_content";
+const FOLLOWING_KEY = "talescapes_following";
+const SUBMISSIONS_KEY = "talescapes_submissions";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [savedStories, setSavedStories] = useState<string[]>([]);
+  const [likedContent, setLikedContent] = useState<string[]>([]);
+  const [following, setFollowing] = useState<string[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -56,6 +69,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedStoriesData = localStorage.getItem(`${SAVED_STORIES_KEY}_${userData.id}`);
       if (savedStoriesData) {
         setSavedStories(JSON.parse(savedStoriesData));
+      }
+      
+      // Load liked content for the user
+      const likedContentData = localStorage.getItem(`${LIKED_CONTENT_KEY}_${userData.id}`);
+      if (likedContentData) {
+        setLikedContent(JSON.parse(likedContentData));
+      }
+      
+      // Load following data for the user
+      const followingData = localStorage.getItem(`${FOLLOWING_KEY}_${userData.id}`);
+      if (followingData) {
+        setFollowing(JSON.parse(followingData));
       }
     }
     
@@ -79,6 +104,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedStoriesData = localStorage.getItem(`${SAVED_STORIES_KEY}_${foundUser.id}`);
       if (savedStoriesData) {
         setSavedStories(JSON.parse(savedStoriesData));
+      }
+      
+      // Load liked content for the user
+      const likedContentData = localStorage.getItem(`${LIKED_CONTENT_KEY}_${foundUser.id}`);
+      if (likedContentData) {
+        setLikedContent(JSON.parse(likedContentData));
+      }
+      
+      // Load following data for the user
+      const followingData = localStorage.getItem(`${FOLLOWING_KEY}_${foundUser.id}`);
+      if (followingData) {
+        setFollowing(JSON.parse(followingData));
       }
       
       toast({
@@ -188,6 +225,89 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isStorySaved = (storyId: string) => {
     return savedStories.includes(storyId);
   };
+  
+  // New functions for user social features
+  
+  const followUser = (userId: string) => {
+    if (!user) return;
+    
+    if (!following.includes(userId)) {
+      const updatedFollowing = [...following, userId];
+      setFollowing(updatedFollowing);
+      localStorage.setItem(`${FOLLOWING_KEY}_${user.id}`, JSON.stringify(updatedFollowing));
+    }
+  };
+  
+  const unfollowUser = (userId: string) => {
+    if (!user) return;
+    
+    const updatedFollowing = following.filter(id => id !== userId);
+    setFollowing(updatedFollowing);
+    localStorage.setItem(`${FOLLOWING_KEY}_${user.id}`, JSON.stringify(updatedFollowing));
+  };
+  
+  const isFollowingUser = (userId: string) => {
+    return following.includes(userId);
+  };
+  
+  const likeContent = (contentId: string, contentType: string) => {
+    if (!user) return;
+    
+    const likeId = `${contentType}_${contentId}`;
+    if (!likedContent.includes(likeId)) {
+      const updatedLikedContent = [...likedContent, likeId];
+      setLikedContent(updatedLikedContent);
+      localStorage.setItem(`${LIKED_CONTENT_KEY}_${user.id}`, JSON.stringify(updatedLikedContent));
+    }
+  };
+  
+  const unlikeContent = (contentId: string, contentType: string) => {
+    if (!user) return;
+    
+    const likeId = `${contentType}_${contentId}`;
+    const updatedLikedContent = likedContent.filter(id => id !== likeId);
+    setLikedContent(updatedLikedContent);
+    localStorage.setItem(`${LIKED_CONTENT_KEY}_${user.id}`, JSON.stringify(updatedLikedContent));
+  };
+  
+  const isContentLiked = (contentId: string) => {
+    return likedContent.some(id => id.includes(contentId));
+  };
+  
+  // Functions for user submissions
+  
+  const getUserSubmissions = () => {
+    if (!user) return [];
+    
+    const submissions = localStorage.getItem(`${SUBMISSIONS_KEY}_${user.id}`);
+    return submissions ? JSON.parse(submissions) : [];
+  };
+  
+  const submitContent = async (content: any): Promise<boolean> => {
+    if (!user) return false;
+    
+    const submission = {
+      ...content,
+      id: `sub_${Date.now()}`,
+      userId: user.id,
+      userName: user.username,
+      submittedAt: new Date().toISOString(),
+      status: "pending",
+    };
+    
+    const userSubmissions = getUserSubmissions();
+    const updatedSubmissions = [...userSubmissions, submission];
+    
+    localStorage.setItem(`${SUBMISSIONS_KEY}_${user.id}`, JSON.stringify(updatedSubmissions));
+    
+    // Also add to global submissions for admin to review
+    const allSubmissions = localStorage.getItem(SUBMISSIONS_KEY) || "[]";
+    const parsedSubmissions = JSON.parse(allSubmissions);
+    parsedSubmissions.push(submission);
+    localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(parsedSubmissions));
+    
+    return true;
+  };
 
   return (
     <AuthContext.Provider 
@@ -202,7 +322,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         savedStories,
         saveStory,
         unsaveStory,
-        isStorySaved
+        isStorySaved,
+        followUser,
+        unfollowUser,
+        isFollowingUser,
+        likeContent,
+        unlikeContent,
+        isContentLiked,
+        getUserSubmissions,
+        submitContent
       }}
     >
       {children}

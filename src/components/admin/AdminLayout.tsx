@@ -25,7 +25,8 @@ import {
   FileText, 
   Users, 
   Tag, 
-  GalleryHorizontal
+  GalleryHorizontal,
+  Archive 
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -128,6 +129,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                     >
                       <Tag />
                       <span>Categories</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      onClick={() => navigate("/admin/dashboard?tab=archive")}
+                      tooltip="Cultural Archive"
+                    >
+                      <Archive />
+                      <span>Archive</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
