@@ -17,11 +17,11 @@ const Explore: React.FC = () => {
   const { isLoggedIn } = useAuth();
 
   useEffect(() => {
-    // Show sign-up reminder after 30 seconds if not logged in
+    // Show sign-up reminder after 20 seconds if not logged in (reduced from 30 seconds)
     if (!isLoggedIn) {
       const timer = setTimeout(() => {
         setShowSignUpReminder(true);
-      }, 30000);
+      }, 20000);
       return () => clearTimeout(timer);
     }
   }, [isLoggedIn]);
@@ -75,13 +75,19 @@ const Explore: React.FC = () => {
             onCategoryChange={setSelectedCategory}
           />
 
-          <StoryList 
-            stories={filteredStories}
-            activeAudioId={activeAudioId}
-            openSettingsId={openSettingsId}
-            onToggleAudio={toggleAudio}
-            onToggleSettings={toggleSettings}
-          />
+          {filteredStories.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">No stories found matching your criteria.</p>
+            </div>
+          ) : (
+            <StoryList 
+              stories={filteredStories}
+              activeAudioId={activeAudioId}
+              openSettingsId={openSettingsId}
+              onToggleAudio={toggleAudio}
+              onToggleSettings={toggleSettings}
+            />
+          )}
         </div>
       </main>
       <Footer />
