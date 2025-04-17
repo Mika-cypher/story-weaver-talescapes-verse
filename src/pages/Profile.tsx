@@ -4,20 +4,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { storyService } from "@/services/storyService";
-import { User, LogOut, BookmarkPlus, PenSquare, FileImage, FileAudio, History, Send, Heart, BookOpen, Eye, MessageSquare, Share2, UserPlus, Copy, Settings } from "lucide-react";
-import StoryList from "@/components/stories/StoryList";
-import { UserContent } from "@/components/user/UserContent";
-import { SubmissionForm } from "@/components/user/SubmissionForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { SubmissionForm } from "@/components/user/SubmissionForm";
 import { AccountSettings } from "@/components/user/AccountSettings";
+
+// Import newly created components
+import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { StoriesTab } from "@/components/profile/StoriesTab";
+import { SavedStoriesTab } from "@/components/profile/SavedStoriesTab";
+import { MediaTab } from "@/components/profile/MediaTab";
+import { ContributionsTab } from "@/components/profile/ContributionsTab";
 
 const Profile: React.FC = () => {
   const { user, logout, savedStories, isLoggedIn } = useAuth();
@@ -89,7 +88,6 @@ const Profile: React.FC = () => {
     { id: "aud2", title: "Ocean Waves", url: "/sounds/ocean.mp3", duration: "3:20", date: "2023-06-22", status: "pending" }
   ];
 
-  // Fix the userSubmissions array by adding the required 'date' property
   const userSubmissions = [
     { id: "sub1", title: "Traditional Folk Song", type: "Audio", submittedDate: "2023-07-15", date: "2023-07-15", status: "approved" },
     { id: "sub2", title: "Cultural Artifact Photo", type: "Image", submittedDate: "2023-08-02", date: "2023-08-02", status: "pending" },
@@ -127,72 +125,14 @@ const Profile: React.FC = () => {
       <main className="flex-grow pt-24 pb-16 bg-background">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-primary/10">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${displayName}`} alt={displayName} />
-                      <AvatarFallback>{displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <CardTitle>{displayName}</CardTitle>
-                        <Badge className="ml-2">Storyteller</Badge>
-                      </div>
-                      {!isOwnProfile && user && (
-                        <Button 
-                          variant={isFollowing ? "outline" : "default"} 
-                          size="sm"
-                          onClick={handleFollow}
-                          className="mt-2"
-                        >
-                          {isFollowing ? (
-                            <>
-                              <UserPlus className="h-4 w-4 mr-2" />
-                              Following
-                            </>
-                          ) : (
-                            <>
-                              <UserPlus className="h-4 w-4 mr-2" />
-                              Follow
-                            </>
-                          )}
-                        </Button>
-                      )}
-                      {isOwnProfile && user && (
-                        <CardDescription>{user.email}</CardDescription>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" onClick={handleShareProfile} title="Share Profile">
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                    {isOwnProfile && (
-                      <Button variant="outline" onClick={logout}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Sign Out
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-6 mt-4">
-                  <div className="text-center">
-                    <p className="text-xl font-bold">{userPublishedStories.length}</p>
-                    <p className="text-sm text-muted-foreground">Stories</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xl font-bold">142</p>
-                    <p className="text-sm text-muted-foreground">Followers</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xl font-bold">38</p>
-                    <p className="text-sm text-muted-foreground">Following</p>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
+            <ProfileHeader 
+              displayName={displayName}
+              isOwnProfile={isOwnProfile}
+              isFollowing={isFollowing}
+              handleFollow={handleFollow}
+              handleShareProfile={handleShareProfile}
+              publishedStoriesCount={userPublishedStories.length}
+            />
           </div>
 
           <Tabs defaultValue="stories" className="mt-8">
@@ -206,183 +146,45 @@ const Profile: React.FC = () => {
             </TabsList>
             
             <TabsContent value="stories" className="mt-6">
-              {isOwnProfile && (
-                <div className="flex items-center space-x-2 mb-4">
-                  <Switch 
-                    id="show-drafts" 
-                    checked={showDrafts} 
-                    onCheckedChange={setShowDrafts} 
-                  />
-                  <Label htmlFor="show-drafts">Show drafts</Label>
-                </div>
-              )}
-              
-              {userPublishedStories.length > 0 ? (
-                <>
-                  <div className="mb-6">
-                    <h3 className="text-lg font-medium mb-4">
-                      {isOwnProfile ? "Your Stories" : `${displayName}'s Stories`}
-                    </h3>
-                    <StoryList 
-                      stories={userPublishedStories.filter(story => 
-                        showDrafts ? true : story.status === "published"
-                      )}
-                      activeAudioId={activeAudioId}
-                      openSettingsId={openSettingsId}
-                      onToggleAudio={handleToggleAudio}
-                      onToggleSettings={handleToggleSettings}
-                    />
-                  </div>
-                  
-                  {isOwnProfile && (
-                    <Button 
-                      className="mt-2" 
-                      onClick={() => navigate("/create")}
-                    >
-                      <PenSquare className="h-4 w-4 mr-2" />
-                      Create New Story
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <Card>
-                  <CardContent className="pt-6 text-center">
-                    <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <CardTitle className="text-xl mb-2">
-                      {isOwnProfile ? "No stories yet" : `${displayName} hasn't published any stories yet`}
-                    </CardTitle>
-                    <CardDescription>
-                      {isOwnProfile 
-                        ? "Start creating your own interactive stories"
-                        : "Check back later for new content"}
-                    </CardDescription>
-                    {isOwnProfile && (
-                      <Button className="mt-4" onClick={() => navigate("/create")}>
-                        Create New Story
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
+              <StoriesTab 
+                isOwnProfile={isOwnProfile}
+                showDrafts={showDrafts}
+                setShowDrafts={setShowDrafts}
+                userPublishedStories={userPublishedStories}
+                displayName={displayName}
+                activeAudioId={activeAudioId}
+                openSettingsId={openSettingsId}
+                handleToggleAudio={handleToggleAudio}
+                handleToggleSettings={handleToggleSettings}
+              />
             </TabsContent>
             
             <TabsContent value="saved" className="mt-6">
-              {isOwnProfile ? (
-                userSavedStories.length > 0 ? (
-                  <StoryList 
-                    stories={userSavedStories}
-                    activeAudioId={activeAudioId}
-                    openSettingsId={openSettingsId}
-                    onToggleAudio={handleToggleAudio}
-                    onToggleSettings={handleToggleSettings}
-                  />
-                ) : (
-                  <Card>
-                    <CardContent className="pt-6 text-center">
-                      <BookmarkPlus className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <CardTitle className="text-xl mb-2">No saved stories yet</CardTitle>
-                      <CardDescription>
-                        Explore stories and bookmark the ones you like to see them here
-                      </CardDescription>
-                      <Button className="mt-4" onClick={() => navigate("/explore")}>
-                        Explore Stories
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )
-              ) : (
-                <Card>
-                  <CardContent className="pt-6 text-center">
-                    <CardTitle className="text-xl mb-2">Saved stories are private</CardTitle>
-                    <CardDescription>
-                      Users can only see their own saved stories
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              )}
+              <SavedStoriesTab 
+                isOwnProfile={isOwnProfile}
+                userSavedStories={userSavedStories}
+                activeAudioId={activeAudioId}
+                openSettingsId={openSettingsId}
+                handleToggleAudio={handleToggleAudio}
+                handleToggleSettings={handleToggleSettings}
+              />
             </TabsContent>
             
             <TabsContent value="media" className="mt-6">
-              <Tabs defaultValue="images">
-                <TabsList>
-                  <TabsTrigger value="images">Images</TabsTrigger>
-                  <TabsTrigger value="audio">Audio</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="images" className="mt-4">
-                  {(isOwnProfile || userImages.some(img => img.status === "published")) ? (
-                    <UserContent 
-                      items={userImages.filter(img => isOwnProfile ? true : img.status === "published")}
-                      type="image"
-                      isOwner={isOwnProfile}
-                    />
-                  ) : (
-                    <Card>
-                      <CardContent className="pt-6 text-center">
-                        <FileImage className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <CardTitle className="text-xl mb-2">
-                          {`${displayName} hasn't uploaded any images yet`}
-                        </CardTitle>
-                      </CardContent>
-                    </Card>
-                  )}
-                </TabsContent>
-                
-                <TabsContent value="audio" className="mt-4">
-                  {(isOwnProfile || userAudios.some(audio => audio.status === "published")) ? (
-                    <UserContent 
-                      items={userAudios.filter(audio => isOwnProfile ? true : audio.status === "published")}
-                      type="audio"
-                      isOwner={isOwnProfile}
-                    />
-                  ) : (
-                    <Card>
-                      <CardContent className="pt-6 text-center">
-                        <FileAudio className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <CardTitle className="text-xl mb-2">
-                          {`${displayName} hasn't uploaded any audio yet`}
-                        </CardTitle>
-                      </CardContent>
-                    </Card>
-                  )}
-                </TabsContent>
-              </Tabs>
+              <MediaTab 
+                isOwnProfile={isOwnProfile}
+                displayName={displayName}
+                userImages={userImages}
+                userAudios={userAudios}
+              />
             </TabsContent>
             
             <TabsContent value="contributions" className="mt-6">
-              {(isOwnProfile || userSubmissions.some(sub => sub.status === "approved")) ? (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">
-                    {isOwnProfile ? "Your Contributions" : `${displayName}'s Contributions`}
-                  </h3>
-                  <UserContent 
-                    items={userSubmissions.filter(sub => 
-                      isOwnProfile ? true : sub.status === "approved"
-                    )}
-                    type="submission"
-                    isOwner={isOwnProfile}
-                  />
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="pt-6 text-center">
-                    <History className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <CardTitle className="text-xl mb-2">
-                      {isOwnProfile 
-                        ? "You haven't made any contributions yet" 
-                        : `${displayName} hasn't made any contributions yet`}
-                    </CardTitle>
-                    <CardDescription>
-                      Cultural Heritage contributions help preserve stories, music, and art
-                    </CardDescription>
-                    {isOwnProfile && (
-                      <Button className="mt-4" onClick={() => navigate("/profile?tab=submit")}>
-                        Submit to Cultural Heritage Archive
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
+              <ContributionsTab 
+                isOwnProfile={isOwnProfile}
+                displayName={displayName}
+                userSubmissions={userSubmissions}
+              />
             </TabsContent>
             
             {isOwnProfile && (
