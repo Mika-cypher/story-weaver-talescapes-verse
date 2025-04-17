@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -11,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { FileImage, FileAudio, Save, Eye, Upload, Plus, FlowChart, Play } from "lucide-react";
+import { FileImage, FileAudio, Save, Eye, Upload, Plus, GitBranch, Play } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Story, StoryScene, StoryChoice } from "@/types/story";
 import { storyService } from "@/services/storyService";
@@ -293,7 +292,7 @@ const Create = () => {
                       Add Scene
                     </Button>
                     <Button variant="outline" size="sm" onClick={addChoice} disabled={!currentSceneId}>
-                      <FlowChart className="h-4 w-4 mr-2" />
+                      <GitBranch className="h-4 w-4 mr-2" />
                       Add Choice
                     </Button>
                   </div>
