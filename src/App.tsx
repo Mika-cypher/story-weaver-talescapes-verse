@@ -21,6 +21,7 @@ import { StoryEditor } from "./components/admin/StoryEditor";
 import StoryPreview from "./pages/StoryPreview";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import React from "react";
 
@@ -79,6 +80,7 @@ const AnimatedRoutes = () => {
       {/* Auth Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       
       {/* User Protected Routes */}
       <Route path="/profile" element={

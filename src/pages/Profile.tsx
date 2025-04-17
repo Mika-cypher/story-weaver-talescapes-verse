@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { storyService } from "@/services/storyService";
-import { User, LogOut, BookmarkPlus, PenSquare, FileImage, FileAudio, History, Send, Heart, BookOpen, Eye, MessageSquare, Share2, UserPlus, Copy } from "lucide-react";
+import { User, LogOut, BookmarkPlus, PenSquare, FileImage, FileAudio, History, Send, Heart, BookOpen, Eye, MessageSquare, Share2, UserPlus, Copy, Settings } from "lucide-react";
 import StoryList from "@/components/stories/StoryList";
 import { UserContent } from "@/components/user/UserContent";
 import { SubmissionForm } from "@/components/user/SubmissionForm";
@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { AccountSettings } from "@/components/user/AccountSettings";
 
 const Profile: React.FC = () => {
   const { user, logout, savedStories, isLoggedIn } = useAuth();
@@ -195,12 +196,13 @@ const Profile: React.FC = () => {
           </div>
 
           <Tabs defaultValue="stories" className="mt-8">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="stories">Stories</TabsTrigger>
               <TabsTrigger value="saved">Saved</TabsTrigger>
               <TabsTrigger value="media">Media</TabsTrigger>
               <TabsTrigger value="contributions">Contributions</TabsTrigger>
               {isOwnProfile && <TabsTrigger value="submit">Submit Content</TabsTrigger>}
+              {isOwnProfile && <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-2" />Settings</TabsTrigger>}
             </TabsList>
             
             <TabsContent value="stories" className="mt-6">
@@ -386,6 +388,12 @@ const Profile: React.FC = () => {
             {isOwnProfile && (
               <TabsContent value="submit" className="mt-6">
                 <SubmissionForm />
+              </TabsContent>
+            )}
+            
+            {isOwnProfile && (
+              <TabsContent value="settings" className="mt-6">
+                <AccountSettings />
               </TabsContent>
             )}
           </Tabs>

@@ -8,9 +8,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
+import { useSignUpReminder } from "@/hooks/useSignUpReminder";
+import SignUpReminder from "@/components/auth/SignUpReminder";
 
 const Index = () => {
   const { toast } = useToast();
+  const { showReminder, setShowReminder } = useSignUpReminder(15000); // Show after 15 seconds
 
   useEffect(() => {
     // Welcome toast when landing on the home page
@@ -32,6 +35,12 @@ const Index = () => {
         <CallToAction />
       </main>
       <Footer />
+      
+      {/* Sign Up Reminder Dialog */}
+      <SignUpReminder 
+        open={showReminder} 
+        onOpenChange={setShowReminder} 
+      />
     </div>
   );
 };
