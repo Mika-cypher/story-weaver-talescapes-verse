@@ -9,7 +9,338 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      background_presets: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          type: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          type?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      choices: {
+        Row: {
+          created_at: string
+          id: string
+          next_scene_id: string | null
+          scene_id: string
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          next_scene_id?: string | null
+          scene_id: string
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          next_scene_id?: string | null
+          scene_id?: string
+          text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "choices_next_scene_id_fkey"
+            columns: ["next_scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "choices_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          type: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          type: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          type?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      saved_stories: {
+        Row: {
+          created_at: string
+          id: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_stories_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_stories_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scenes: {
+        Row: {
+          audio_url: string | null
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_ending: boolean
+          story_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_url?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_ending?: boolean
+          story_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_ending?: boolean
+          story_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scenes_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stories: {
+        Row: {
+          author_id: string
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          featured: boolean
+          id: string
+          start_scene_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean
+          id?: string
+          start_scene_id?: string | null
+          status: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean
+          id?: string
+          start_scene_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_story_settings: {
+        Row: {
+          ambient_sound_id: string | null
+          audio_enabled: boolean
+          background_opacity: number
+          created_at: string
+          id: string
+          sound_volume: number
+          story_id: string
+          updated_at: string
+          user_id: string
+          visual_background_id: string | null
+          visual_enabled: boolean
+        }
+        Insert: {
+          ambient_sound_id?: string | null
+          audio_enabled?: boolean
+          background_opacity?: number
+          created_at?: string
+          id?: string
+          sound_volume?: number
+          story_id: string
+          updated_at?: string
+          user_id: string
+          visual_background_id?: string | null
+          visual_enabled?: boolean
+        }
+        Update: {
+          ambient_sound_id?: string | null
+          audio_enabled?: boolean
+          background_opacity?: number
+          created_at?: string
+          id?: string
+          sound_volume?: number
+          story_id?: string
+          updated_at?: string
+          user_id?: string
+          visual_background_id?: string | null
+          visual_enabled?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_story_settings_ambient_sound_id_fkey"
+            columns: ["ambient_sound_id"]
+            isOneToOne: false
+            referencedRelation: "background_presets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_story_settings_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_story_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_story_settings_visual_background_id_fkey"
+            columns: ["visual_background_id"]
+            isOneToOne: false
+            referencedRelation: "background_presets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
