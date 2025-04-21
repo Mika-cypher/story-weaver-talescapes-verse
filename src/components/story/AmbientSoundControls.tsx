@@ -58,32 +58,48 @@ const AmbientSoundControls: React.FC<AmbientSoundControlsProps> = ({
   }, [selectedAmbientSound, ambientSoundEnabled]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" aria-label="Ambient Sound Controls">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Music size={16} />
-          <Label htmlFor={`ambient-sound-${storyId}`}>Ambient Sound</Label>
+          <Music size={16} aria-hidden="true" />
+          <Label htmlFor={`ambient-sound-${storyId}`} className="sr-only">Ambient Sound Toggle</Label>
+          <span className="font-medium">Ambient Sound</span>
         </div>
         <Switch 
           id={`ambient-sound-${storyId}`}
           checked={ambientSoundEnabled}
           onCheckedChange={toggleAmbientSound}
+          aria-checked={ambientSoundEnabled}
+          aria-label="Toggle ambient sound"
         />
       </div>
       
-      <div className={`transition-opacity duration-300 ${ambientSoundEnabled ? 'opacity-100' : 'opacity-50'}`}>
+      <div 
+        className={`transition-opacity duration-300 ${ambientSoundEnabled ? 'opacity-100' : 'opacity-50'}`}
+        aria-disabled={!ambientSoundEnabled}
+      >
         <Label htmlFor={`sound-select-${storyId}`} className="mb-1 block">Select Sound</Label>
         <Select 
           disabled={!ambientSoundEnabled} 
           value={selectedAmbientSound || ''} 
           onValueChange={changeAmbientSound}
+          aria-label="Select ambient sound"
         >
           <SelectTrigger id={`sound-select-${storyId}`}>
             <SelectValue placeholder="Choose a sound" />
           </SelectTrigger>
           <SelectContent>
             {ambientSoundOptions.map(sound => (
-              <SelectItem key={sound.id} value={sound.id}>{sound.name}</SelectItem>
+              <SelectItem 
+                key={sound.id} 
+                value={sound.id}
+                aria-label={sound.name}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="inline-block w-5 h-5 rounded-full bg-muted" />
+                  {sound.name}
+                </span>
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -94,9 +110,12 @@ const AmbientSoundControls: React.FC<AmbientSoundControlsProps> = ({
         src={getAmbientSoundUrl(selectedAmbientSound)}
         loop
         preload="auto"
+        aria-label="Ambient Story Audio"
+        tabIndex={-1}
       />
     </div>
   );
 };
 
 export default AmbientSoundControls;
+

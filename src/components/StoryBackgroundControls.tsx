@@ -25,7 +25,7 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
   } = useStoryBackground({ storyId, storyTitle });
 
   return (
-    <div className="p-4 space-y-4 bg-muted/20 rounded-md">
+    <div className="p-4 space-y-4 bg-muted/20 rounded-md" aria-label={`Reading Experience Controls for ${storyTitle}`} role="region">
       <h3 className="text-lg font-medium">Reading Experience</h3>
       
       <div className="space-y-4">
@@ -52,3 +52,4 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
 };
 
 export default StoryBackgroundControls;
+
