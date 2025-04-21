@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from "uuid";
 
 interface StoryBuilderProps {
   scenes: StoryScene[];
-  setScenes: (scenes: StoryScene[]) => void;
+  setScenes: React.Dispatch<React.SetStateAction<StoryScene[]>>;
   currentSceneId: string | null;
   setCurrentSceneId: (id: string | null) => void;
   activeTab: string;
