@@ -42,6 +42,9 @@ import {
   ExternalLink
 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { SceneSidebar } from "./SceneSidebar";
+import { StoryDetailsForm } from "./StoryDetailsForm";
+import { SceneEditorPanel } from "./SceneEditorPanel";
 
 interface StoryFormData {
   title: string;
@@ -385,59 +388,15 @@ export const StoryEditor: React.FC = () => {
 
       <div className="grid gap-6 lg:grid-cols-4">
         <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Scenes</CardTitle>
-              <CardDescription>Manage your story scenes</CardDescription>
-            </CardHeader>
-            <CardContent className="max-h-[600px] overflow-y-auto">
-              <div className="space-y-2">
-                {story.scenes.map(scene => (
-                  <div 
-                    key={scene.id} 
-                    className={`flex items-center justify-between p-2 rounded-md cursor-pointer ${
-                      scene.id === currentSceneId 
-                        ? "bg-primary text-primary-foreground" 
-                        : "hover:bg-muted"
-                    } ${
-                      scene.id === story.startSceneId 
-                        ? "border-l-4 border-accent" 
-                        : ""
-                    }`}
-                    onClick={() => setCurrentSceneId(scene.id)}
-                  >
-                    <div className="truncate">
-                      {scene.title || "Untitled Scene"}
-                      {scene.isEnding && (
-                        <span className="ml-2 text-xs bg-accent px-1 py-0.5 rounded">
-                          ENDING
-                        </span>
-                      )}
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="size-6 shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteScene(scene.id);
-                      }}
-                    >
-                      <Trash className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={addScene} className="w-full">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Scene
-              </Button>
-            </CardFooter>
-          </Card>
+          <SceneSidebar
+            scenes={story.scenes}
+            startSceneId={story.startSceneId}
+            currentSceneId={currentSceneId}
+            setCurrentSceneId={setCurrentSceneId}
+            deleteScene={deleteScene}
+            addScene={addScene}
+          />
         </div>
-
         <div className="lg:col-span-3">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(saveStory)}>
@@ -448,244 +407,26 @@ export const StoryEditor: React.FC = () => {
                     <TabsTrigger value="scene-editor">Scene Editor</TabsTrigger>
                   )}
                 </TabsList>
-
                 <TabsContent value="story-details" className="space-y-4 mt-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Story Information</CardTitle>
-                      <CardDescription>
-                        Basic information about your interactive story
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Title</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Enter the story title" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                              <Textarea 
-                                placeholder="Enter a short description of the story" 
-                                className="resize-none"
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="coverImage"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Cover Image URL</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder="https://example.com/image.jpg" 
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="author"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Author</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Author name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
+                  <StoryDetailsForm form={form} />
                 </TabsContent>
-
                 {currentScene && (
                   <TabsContent value="scene-editor" className="space-y-4 mt-4">
-                    <Card>
-                      <CardHeader className="flex flex-row items-center space-y-0">
-                        <div className="flex-1">
-                          <CardTitle>Scene Editor</CardTitle>
-                          <CardDescription>
-                            Edit the content and choices for this scene
-                          </CardDescription>
-                        </div>
-                        <div className="space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={setAsStartScene}
-                            disabled={currentSceneId === story.startSceneId}
-                          >
-                            <Play className="mr-2 h-4 w-4" />
-                            Set as Start
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={toggleSceneEnding}
-                          >
-                            {currentScene.isEnding 
-                              ? "Remove Ending Flag" 
-                              : "Mark as Ending"}
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <FormLabel>Scene Title</FormLabel>
-                          <Input 
-                            placeholder="Enter a title for this scene" 
-                            value={currentScene.title}
-                            onChange={(e) => updateSceneTitle(e.target.value)}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <FormLabel>Scene Content</FormLabel>
-                          <Textarea 
-                            placeholder="Write the story content for this scene..." 
-                            className="min-h-[150px]"
-                            value={currentScene.content}
-                            onChange={(e) => updateSceneContent(e.target.value)}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <FormLabel>Scene Image URL</FormLabel>
-                            <div className="flex space-x-2">
-                              <Input 
-                                placeholder="https://example.com/image.jpg" 
-                                value={currentScene.image || ""}
-                                onChange={(e) => updateSceneImage(e.target.value)}
-                              />
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                type="button"
-                              >
-                                <ImageIcon className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <FormLabel>Scene Audio URL</FormLabel>
-                            <div className="flex space-x-2">
-                              <Input 
-                                placeholder="https://example.com/audio.mp3" 
-                                value={currentScene.audio || ""}
-                                onChange={(e) => updateSceneAudio(e.target.value)}
-                              />
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                type="button"
-                              >
-                                <Music className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="space-y-4 pt-4">
-                          <div className="flex items-center justify-between">
-                            <FormLabel>Choices</FormLabel>
-                            {!currentScene.isEnding && (
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={addChoice}
-                              >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Choice
-                              </Button>
-                            )}
-                          </div>
-
-                          {currentScene.isEnding ? (
-                            <div className="text-center p-4 bg-muted rounded-md">
-                              <p>This is an ending scene. No choices are available.</p>
-                            </div>
-                          ) : currentScene.choices.length === 0 ? (
-                            <div className="text-center p-4 bg-muted rounded-md">
-                              <p>No choices yet. Add a choice to create a path from this scene.</p>
-                            </div>
-                          ) : (
-                            <div className="space-y-4">
-                              {currentScene.choices.map((choice, index) => (
-                                <Card key={choice.id}>
-                                  <CardContent className="p-4">
-                                    <div className="flex items-center justify-between mb-2">
-                                      <h4 className="font-medium">Choice {index + 1}</h4>
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon"
-                                        onClick={() => deleteChoice(choice.id)}
-                                      >
-                                        <Trash className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                    <div className="grid gap-4">
-                                      <div className="space-y-2">
-                                        <FormLabel>Choice Text</FormLabel>
-                                        <Input 
-                                          placeholder="What the reader will select" 
-                                          value={choice.text}
-                                          onChange={(e) => updateChoice(choice.id, e.target.value, choice.nextSceneId)}
-                                        />
-                                      </div>
-                                      <div className="space-y-2">
-                                        <FormLabel>Next Scene</FormLabel>
-                                        <select 
-                                          className="w-full rounded-md border border-input p-2"
-                                          value={choice.nextSceneId}
-                                          onChange={(e) => updateChoice(choice.id, choice.text, e.target.value)}
-                                        >
-                                          <option value="">Select a scene...</option>
-                                          {story.scenes
-                                            .filter(scene => scene.id !== currentSceneId)
-                                            .map(scene => (
-                                              <option key={scene.id} value={scene.id}>
-                                                {scene.title || "Untitled Scene"}
-                                              </option>
-                                            ))}
-                                        </select>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <SceneEditorPanel
+                      currentScene={currentScene}
+                      scenes={story.scenes}
+                      currentSceneId={currentSceneId}
+                      startSceneId={story.startSceneId}
+                      setAsStartScene={setAsStartScene}
+                      toggleSceneEnding={toggleSceneEnding}
+                      updateSceneTitle={updateSceneTitle}
+                      updateSceneContent={updateSceneContent}
+                      updateSceneImage={updateSceneImage}
+                      updateSceneAudio={updateSceneAudio}
+                      addChoice={addChoice}
+                      updateChoice={updateChoice}
+                      deleteChoice={deleteChoice}
+                    />
                   </TabsContent>
                 )}
               </Tabs>
