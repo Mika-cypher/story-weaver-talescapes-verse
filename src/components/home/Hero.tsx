@@ -59,8 +59,8 @@ const Hero = () => {
                   alt="Storytelling illustration" 
                   className="w-full h-auto rounded"
                 />
-                <div className="absolute -bottom-4 -right-4 bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-lg transform rotate-2 border border-white/30">
-                  <p className="text-sm font-medium text-foreground italic">
+                <div className="absolute -bottom-4 -right-4 bg-white/80 dark:bg-white/20 backdrop-blur-sm p-3 rounded-lg shadow-lg transform rotate-2 border border-white/30 dark:border-white/20">
+                  <p className="text-sm font-medium text-foreground dark:text-gray-200 italic">
                     "The universe is made of stories, not atoms."
                   </p>
                 </div>
@@ -74,3 +74,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
