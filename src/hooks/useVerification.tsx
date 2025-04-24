@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 
 export const useVerification = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   
   // In a real app, this would check actual verification status
   // For this demo, we'll assume all users with an @ in their email are verified
@@ -15,7 +15,7 @@ export const useVerification = () => {
     let completionPoints = 0;
     let totalPoints = 3; // Basic fields: username, email, (avatar would be third in a real app)
     
-    if (user.username) completionPoints += 1;
+    if (profile?.username) completionPoints += 1;
     if (user.email) completionPoints += 1;
     if (isEmailVerified) completionPoints += 1;
     

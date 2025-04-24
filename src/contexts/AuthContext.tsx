@@ -14,8 +14,12 @@ interface Profile {
   role: UserRole;
 }
 
+interface ExtendedUser extends User {
+  username?: string;
+}
+
 type AuthContextType = {
-  user: User | null;
+  user: ExtendedUser | null;
   session: Session | null;
   profile: Profile | null;
   isAdmin: boolean;
@@ -36,12 +40,13 @@ type AuthContextType = {
   isContentLiked: (contentId: string) => boolean;
   getUserSubmissions: () => any[];
   submitContent: (content: any) => Promise<boolean>;
+  adminLogin: (password: string) => boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<ExtendedUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -54,13 +59,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         setSession(currentSession);
-        setUser(currentSession?.user ?? null);
         
         if (currentSession?.user) {
+          const userWithUsername: ExtendedUser = currentSession.user;
+          
+          // This is a workaround to keep backward compatibility
+          if (currentSession.user.user_metadata?.username) {
+            userWithUsername.username = currentSession.user.user_metadata.username;
+          }
+          
+          setUser(userWithUsername);
+          
           setTimeout(() => {
             fetchProfile(currentSession.user.id);
           }, 0);
         } else {
+          setUser(null);
           setProfile(null);
         }
       }
@@ -69,9 +83,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
-      setUser(currentSession?.user ?? null);
       
       if (currentSession?.user) {
+        const userWithUsername: ExtendedUser = currentSession.user;
+        
+        if (currentSession.user.user_metadata?.username) {
+          userWithUsername.username = currentSession.user.user_metadata.username;
+        }
+        
+        setUser(userWithUsername);
         fetchProfile(currentSession.user.id);
       }
     });
@@ -90,7 +110,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      
+      // Ensure role is set (default to "user" if not present)
+      const profileWithRole: Profile = {
+        ...data,
+        role: data.role || "user"
+      };
+      
+      setProfile(profileWithRole);
+      
+      // Set admin status based on role
+      setIsAdmin(profileWithRole.role === "admin");
+      
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -195,6 +226,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const adminLogin = (password: string): boolean => {
+    // Simple admin login for demo purposes
+    // In production, this should be handled securely
+    if (password === "admin123") {
+      setIsAdmin(true);
+      toast({
+        title: "Admin Access Granted",
+        description: "You're now logged in as an admin.",
+      });
+      return true;
+    }
+    return false;
+  };
+
   const saveStory = (storyId: string) => {
     if (!user) return;
     
@@ -226,8 +271,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isStorySaved = (storyId: string) => {
     return savedStories.includes(storyId);
   };
-  
-  // New functions for user social features
   
   const followUser = (userId: string) => {
     if (!user) return;
@@ -274,8 +317,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isContentLiked = (contentId: string) => {
     return likedContent.some(id => id.includes(contentId));
   };
-  
-  // Functions for user submissions
   
   const getUserSubmissions = () => {
     if (!user) return [];
@@ -362,7 +403,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         unlikeContent,
         isContentLiked,
         getUserSubmissions,
-        submitContent
+        submitContent,
+        adminLogin
       }}
     >
       {children}

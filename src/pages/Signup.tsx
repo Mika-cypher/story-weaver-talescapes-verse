@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Mail, KeyRound, User } from "lucide-react";
-import { Loader2 } from "@/components/ui/loader";
+import { Loader } from "@/components/ui/loader";
 
 const signupSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
@@ -157,7 +157,7 @@ const Signup: React.FC = () => {
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
                         Creating account...
                       </>
                     ) : (

@@ -16,11 +16,15 @@ import {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isLoggedIn, logout } = useAuth();
+  const { user, profile, isLoggedIn, logout } = useAuth();
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
+
+  // Get username from profile or user metadata or default to "U"
+  const username = profile?.username || user?.user_metadata?.username || "User";
+  const displayInitials = getInitials(username);
 
   return (
     <nav className="fixed w-full bg-background/80 backdrop-blur-md z-50 border-b">
@@ -73,7 +77,7 @@ const Navbar = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback>{user?.username ? getInitials(user.username) : "U"}</AvatarFallback>
+                        <AvatarFallback>{displayInitials}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
@@ -170,11 +174,11 @@ const Navbar = () => {
                 <>
                   <div className="flex-shrink-0">
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback>{user?.username ? getInitials(user.username) : "U"}</AvatarFallback>
+                      <AvatarFallback>{displayInitials}</AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="ml-3">
-                    <div className="text-base font-medium">{user?.username}</div>
+                    <div className="text-base font-medium">{username}</div>
                     <div className="text-sm text-muted-foreground">{user?.email}</div>
                   </div>
                   <Button variant="ghost" className="ml-auto" onClick={logout}>

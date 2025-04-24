@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -24,19 +23,26 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
-  const { user } = useAuth();
+  const { user, profile, updateProfile } = useAuth();
   const { toast } = useToast();
   
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      username: user?.username || "",
+      username: profile?.username || "",
       email: user?.email || "",
       bio: "",
     },
   });
   
   function onSubmit(data: ProfileFormValues) {
+    if (profile) {
+      updateProfile({
+        username: data.username,
+        // Other fields would go here
+      });
+    }
+    
     toast({
       title: "Profile updated",
       description: "Your profile information has been updated.",
@@ -87,9 +93,13 @@ export function ProfileForm() {
                         placeholder="you@example.com" 
                         className="pl-10" 
                         {...field} 
+                        disabled
                       />
                     </div>
                   </FormControl>
+                  <FormDescription>
+                    Email cannot be changed
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
