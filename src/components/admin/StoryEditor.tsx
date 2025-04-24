@@ -75,6 +75,8 @@ export const StoryEditor: React.FC = () => {
   
   const [currentSceneId, setCurrentSceneId] = useState<string>("");
   const [saving, setSaving] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   
   const form = useForm<StoryFormData>({
     defaultValues: {
@@ -86,47 +88,65 @@ export const StoryEditor: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!isNewStory && id) {
-      const existingStory = storyService.getStoryById(id);
-      if (existingStory) {
-        setStory(existingStory);
-        form.reset({
-          title: existingStory.title,
-          description: existingStory.description,
-          coverImage: existingStory.coverImage || "",
-          author: existingStory.author
-        });
-        
-        if (existingStory.startSceneId && existingStory.scenes.length > 0) {
-          setCurrentSceneId(existingStory.startSceneId);
+    const loadStory = async () => {
+      if (!isNewStory && id) {
+        setLoading(true);
+        try {
+          const existingStory = await storyService.getStoryById(id);
+          if (existingStory) {
+            setStory(existingStory);
+            form.reset({
+              title: existingStory.title,
+              description: existingStory.description,
+              coverImage: existingStory.coverImage || "",
+              author: existingStory.author
+            });
+            
+            if (existingStory.startSceneId && existingStory.scenes.length > 0) {
+              setCurrentSceneId(existingStory.startSceneId);
+            }
+          } else {
+            setError("Story not found");
+            toast({
+              title: "Story not found",
+              description: "The story you're trying to edit doesn't exist",
+              variant: "destructive"
+            });
+            navigate("/admin/stories");
+          }
+        } catch (err) {
+          console.error("Error loading story:", err);
+          setError("Failed to load the story");
+          toast({
+            title: "Error",
+            description: "Failed to load the story",
+            variant: "destructive"
+          });
+        } finally {
+          setLoading(false);
         }
-      } else {
-        toast({
-          title: "Story not found",
-          description: "The story you're trying to edit doesn't exist",
-          variant: "destructive"
-        });
-        navigate("/admin/stories");
+      } else if (isNewStory) {
+        const firstSceneId = uuidv4();
+        const newScene: StoryScene = {
+          id: firstSceneId,
+          title: "First Scene",
+          content: "Start your story here...",
+          choices: [],
+          isEnding: false
+        };
+        
+        setStory(prev => ({
+          ...prev,
+          startSceneId: firstSceneId,
+          scenes: [newScene]
+        }));
+        
+        setCurrentSceneId(firstSceneId);
       }
-    } else if (isNewStory) {
-      const firstSceneId = uuidv4();
-      const newScene: StoryScene = {
-        id: firstSceneId,
-        title: "First Scene",
-        content: "Start your story here...",
-        choices: [],
-        isEnding: false
-      };
-      
-      setStory(prev => ({
-        ...prev,
-        startSceneId: firstSceneId,
-        scenes: [newScene]
-      }));
-      
-      setCurrentSceneId(firstSceneId);
-    }
-  }, [id, isNewStory]);
+    };
+
+    loadStory();
+  }, [id, isNewStory, navigate, toast, form]);
 
   const currentScene = story.scenes.find(scene => scene.id === currentSceneId);
 
@@ -142,7 +162,7 @@ export const StoryEditor: React.FC = () => {
         updatedAt: new Date().toISOString()
       };
       
-      storyService.saveStory(updatedStory);
+      await storyService.saveStory(updatedStory);
       
       toast({
         title: "Story saved",
@@ -153,6 +173,7 @@ export const StoryEditor: React.FC = () => {
         navigate(`/admin/stories/${updatedStory.id}/edit`);
       }
     } catch (error) {
+      console.error("Error saving story:", error);
       toast({
         title: "Error saving story",
         description: "There was an error saving your story",
@@ -163,194 +184,30 @@ export const StoryEditor: React.FC = () => {
     }
   };
 
-  const addScene = () => {
-    const newSceneId = uuidv4();
-    const newScene: StoryScene = {
-      id: newSceneId,
-      title: `Scene ${story.scenes.length + 1}`,
-      content: "",
-      choices: [],
-      isEnding: false
-    };
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: [...prev.scenes, newScene]
-    }));
-    
-    setCurrentSceneId(newSceneId);
-  };
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex justify-center items-center h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="ml-2">Loading story...</p>
+        </div>
+      </AdminLayout>
+    );
+  }
 
-  const deleteScene = (sceneId: string) => {
-    if (story.scenes.length <= 1) {
-      toast({
-        title: "Cannot delete scene",
-        description: "A story must have at least one scene",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (sceneId === story.startSceneId) {
-      toast({
-        title: "Cannot delete start scene",
-        description: "You cannot delete the starting scene. Set another scene as the start scene first.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    const updatedScenes = story.scenes.map(scene => {
-      if (scene.id !== sceneId) {
-        const updatedChoices = scene.choices.filter(choice => choice.nextSceneId !== sceneId);
-        return {
-          ...scene,
-          choices: updatedChoices
-        };
-      }
-      return scene;
-    }).filter(scene => scene.id !== sceneId);
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: updatedScenes
-    }));
-    
-    if (sceneId === currentSceneId) {
-      setCurrentSceneId(updatedScenes[0]?.id || "");
-    }
-  };
-
-  const updateSceneTitle = (title: string) => {
-    if (!currentSceneId) return;
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: prev.scenes.map(scene => 
-        scene.id === currentSceneId ? { ...scene, title } : scene
-      )
-    }));
-  };
-
-  const updateSceneContent = (content: string) => {
-    if (!currentSceneId) return;
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: prev.scenes.map(scene => 
-        scene.id === currentSceneId ? { ...scene, content } : scene
-      )
-    }));
-  };
-
-  const updateSceneImage = (image: string) => {
-    if (!currentSceneId) return;
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: prev.scenes.map(scene => 
-        scene.id === currentSceneId ? { ...scene, image } : scene
-      )
-    }));
-  };
-
-  const updateSceneAudio = (audio: string) => {
-    if (!currentSceneId) return;
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: prev.scenes.map(scene => 
-        scene.id === currentSceneId ? { ...scene, audio } : scene
-      )
-    }));
-  };
-
-  const toggleSceneEnding = () => {
-    if (!currentSceneId) return;
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: prev.scenes.map(scene => 
-        scene.id === currentSceneId ? { ...scene, isEnding: !scene.isEnding } : scene
-      )
-    }));
-  };
-
-  const setAsStartScene = () => {
-    if (!currentSceneId) return;
-    
-    setStory(prev => ({
-      ...prev,
-      startSceneId: currentSceneId
-    }));
-    
-    toast({
-      title: "Start scene set",
-      description: "This scene is now the starting point of your story"
-    });
-  };
-
-  const addChoice = () => {
-    if (!currentSceneId) return;
-    
-    const newChoice: StoryChoice = {
-      id: uuidv4(),
-      text: "New choice",
-      nextSceneId: ""
-    };
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: prev.scenes.map(scene => 
-        scene.id === currentSceneId 
-          ? { ...scene, choices: [...scene.choices, newChoice] } 
-          : scene
-      )
-    }));
-  };
-
-  const updateChoice = (choiceId: string, text: string, nextSceneId: string = "") => {
-    if (!currentSceneId) return;
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: prev.scenes.map(scene => 
-        scene.id === currentSceneId 
-          ? { 
-              ...scene, 
-              choices: scene.choices.map(choice => 
-                choice.id === choiceId 
-                  ? { ...choice, text, nextSceneId } 
-                  : choice
-              ) 
-            } 
-          : scene
-      )
-    }));
-  };
-
-  const deleteChoice = (choiceId: string) => {
-    if (!currentSceneId) return;
-    
-    setStory(prev => ({
-      ...prev,
-      scenes: prev.scenes.map(scene => 
-        scene.id === currentSceneId 
-          ? { 
-              ...scene, 
-              choices: scene.choices.filter(choice => choice.id !== choiceId) 
-            } 
-          : scene
-      )
-    }));
-  };
-
-  const previewStory = () => {
-    saveStory(form.getValues());
-    navigate(`/admin/stories/${story.id}/preview`);
-  };
-
-  if (!story) return <div>Loading...</div>;
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-[60vh]">
+          <h2 className="text-2xl font-bold mb-4">Error</h2>
+          <p className="mb-6">{error}</p>
+          <Button onClick={() => navigate("/admin/stories")}>
+            Back to Stories
+          </Button>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -436,4 +293,191 @@ export const StoryEditor: React.FC = () => {
       </div>
     </AdminLayout>
   );
+
+  function addScene() {
+    const newSceneId = uuidv4();
+    const newScene: StoryScene = {
+      id: newSceneId,
+      title: `Scene ${story.scenes.length + 1}`,
+      content: "",
+      choices: [],
+      isEnding: false
+    };
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: [...prev.scenes, newScene]
+    }));
+    
+    setCurrentSceneId(newSceneId);
+  }
+
+  function deleteScene(sceneId: string) {
+    if (story.scenes.length <= 1) {
+      toast({
+        title: "Cannot delete scene",
+        description: "A story must have at least one scene",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (sceneId === story.startSceneId) {
+      toast({
+        title: "Cannot delete start scene",
+        description: "You cannot delete the starting scene. Set another scene as the start scene first.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const updatedScenes = story.scenes.map(scene => {
+      if (scene.id !== sceneId) {
+        const updatedChoices = scene.choices.filter(choice => choice.nextSceneId !== sceneId);
+        return {
+          ...scene,
+          choices: updatedChoices
+        };
+      }
+      return scene;
+    }).filter(scene => scene.id !== sceneId);
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: updatedScenes
+    }));
+    
+    if (sceneId === currentSceneId) {
+      setCurrentSceneId(updatedScenes[0]?.id || "");
+    }
+  }
+
+  function updateSceneTitle(title: string) {
+    if (!currentSceneId) return;
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: prev.scenes.map(scene => 
+        scene.id === currentSceneId ? { ...scene, title } : scene
+      )
+    }));
+  }
+
+  function updateSceneContent(content: string) {
+    if (!currentSceneId) return;
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: prev.scenes.map(scene => 
+        scene.id === currentSceneId ? { ...scene, content } : scene
+      )
+    }));
+  }
+
+  function updateSceneImage(image: string) {
+    if (!currentSceneId) return;
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: prev.scenes.map(scene => 
+        scene.id === currentSceneId ? { ...scene, image } : scene
+      )
+    }));
+  }
+
+  function updateSceneAudio(audio: string) {
+    if (!currentSceneId) return;
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: prev.scenes.map(scene => 
+        scene.id === currentSceneId ? { ...scene, audio } : scene
+      )
+    }));
+  }
+
+  function toggleSceneEnding() {
+    if (!currentSceneId) return;
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: prev.scenes.map(scene => 
+        scene.id === currentSceneId ? { ...scene, isEnding: !scene.isEnding } : scene
+      )
+    }));
+  }
+
+  function setAsStartScene() {
+    if (!currentSceneId) return;
+    
+    setStory(prev => ({
+      ...prev,
+      startSceneId: currentSceneId
+    }));
+    
+    toast({
+      title: "Start scene set",
+      description: "This scene is now the starting point of your story"
+    });
+  }
+
+  function addChoice() {
+    if (!currentSceneId) return;
+    
+    const newChoice: StoryChoice = {
+      id: uuidv4(),
+      text: "New choice",
+      nextSceneId: ""
+    };
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: prev.scenes.map(scene => 
+        scene.id === currentSceneId 
+          ? { ...scene, choices: [...scene.choices, newChoice] } 
+          : scene
+      )
+    }));
+  }
+
+  function updateChoice(choiceId: string, text: string, nextSceneId: string = "") {
+    if (!currentSceneId) return;
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: prev.scenes.map(scene => 
+        scene.id === currentSceneId 
+          ? { 
+              ...scene, 
+              choices: scene.choices.map(choice => 
+                choice.id === choiceId 
+                  ? { ...choice, text, nextSceneId } 
+                  : choice
+              ) 
+            } 
+          : scene
+      )
+    }));
+  }
+
+  function deleteChoice(choiceId: string) {
+    if (!currentSceneId) return;
+    
+    setStory(prev => ({
+      ...prev,
+      scenes: prev.scenes.map(scene => 
+        scene.id === currentSceneId 
+          ? { 
+              ...scene, 
+              choices: scene.choices.filter(choice => choice.id !== choiceId) 
+            } 
+          : scene
+      )
+    }));
+  }
+
+  function previewStory() {
+    saveStory(form.getValues());
+    navigate(`/admin/stories/${story.id}/preview`);
+  }
 };

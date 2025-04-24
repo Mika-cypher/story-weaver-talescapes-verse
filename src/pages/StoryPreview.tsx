@@ -6,7 +6,7 @@ import { storyService } from "@/services/storyService";
 import { Story, StoryScene } from "@/types/story";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Edit, Home } from "lucide-react";
+import { ArrowLeft, Edit, Home, Loader2 } from "lucide-react";
 
 const StoryPreview: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,24 +15,39 @@ const StoryPreview: React.FC = () => {
   const [story, setStory] = useState<Story | null>(null);
   const [currentScene, setCurrentScene] = useState<StoryScene | null>(null);
   const [history, setHistory] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    if (id) {
-      const loadedStory = storyService.getStoryById(id);
-      if (loadedStory) {
-        setStory(loadedStory);
-        
-        // Set starting scene
-        const startScene = loadedStory.scenes.find(scene => scene.id === loadedStory.startSceneId);
-        if (startScene) {
-          setCurrentScene(startScene);
-          setHistory([startScene.id]);
+    const loadStory = async () => {
+      if (id) {
+        setLoading(true);
+        try {
+          const loadedStory = await storyService.getStoryById(id);
+          if (loadedStory) {
+            setStory(loadedStory);
+            
+            // Set starting scene
+            const startScene = loadedStory.scenes.find(scene => scene.id === loadedStory.startSceneId);
+            if (startScene) {
+              setCurrentScene(startScene);
+              setHistory([startScene.id]);
+            }
+          } else {
+            setError("Story not found");
+            navigate("/admin/stories");
+          }
+        } catch (err) {
+          console.error("Error loading story:", err);
+          setError("Failed to load the story");
+        } finally {
+          setLoading(false);
         }
-      } else {
-        navigate("/admin/stories");
       }
-    }
-  }, [id]);
+    };
+    
+    loadStory();
+  }, [id, navigate]);
 
   const handleChoiceClick = (nextSceneId: string) => {
     if (story) {
@@ -70,11 +85,26 @@ const StoryPreview: React.FC = () => {
     }
   };
 
-  if (!story || !currentScene) {
+  if (loading) {
     return (
       <AdminLayout>
         <div className="flex justify-center items-center h-[60vh]">
-          <p>Loading story...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="ml-2">Loading story...</p>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error || !story || !currentScene) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center h-[60vh]">
+          <h2 className="text-2xl font-bold mb-4">Error</h2>
+          <p className="mb-6">{error || "Story not found"}</p>
+          <Button onClick={() => navigate("/admin/stories")}>
+            Back to Stories
+          </Button>
         </div>
       </AdminLayout>
     );

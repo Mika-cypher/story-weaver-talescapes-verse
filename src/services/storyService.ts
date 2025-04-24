@@ -6,10 +6,21 @@ import { supabase } from "@/integrations/supabase/client";
 
 const STORIES_KEY = "interactive_stories";
 
-function isSupabaseAuthenticated() {
-  // Check Supabase auth user (null if not authenticated)
-  const user = supabase.auth.getUser();
-  return !!user;
+// Helper function to convert Supabase story data to our Story type
+function mapSupabaseStory(data: any): Story {
+  return {
+    id: data.id,
+    title: data.title,
+    description: data.description || "",
+    coverImage: data.cover_image_url,
+    author: data.author_id, // This will be replaced with actual author name in a real app
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    status: data.status,
+    featured: data.featured,
+    startSceneId: data.start_scene_id,
+    scenes: [], // Scenes will be populated separately when needed
+  };
 }
 
 export const storyService = {
@@ -23,15 +34,15 @@ export const storyService = {
       const { data, error } = await supabase
         .from("stories")
         .select(`
-          id, title, description, cover_image_url as coverImage, author_id as author, created_at as createdAt, updated_at as updatedAt, status, featured, start_scene_id as startSceneId
+          id, title, description, cover_image_url, author_id, created_at, updated_at, status, featured, start_scene_id
         `)
         .order("updated_at", { ascending: false });
       if (error) {
         console.error("Supabase story fetch error:", error);
         return [];
       }
-      // Fetch scenes for each story (optional: batch or as needed on demand)
-      return data as unknown as Story[];
+      // Map to our Story type
+      return data.map(item => mapSupabaseStory(item));
     } else {
       // Fallback: localStorage
       const stories = localStorage.getItem(STORIES_KEY);
@@ -46,7 +57,7 @@ export const storyService = {
       const { data, error } = await supabase
         .from("stories")
         .select(`
-          id, title, description, cover_image_url as coverImage, author_id as author, created_at as createdAt, updated_at as updatedAt, status, featured, start_scene_id as startSceneId
+          id, title, description, cover_image_url, author_id, created_at, updated_at, status, featured, start_scene_id
         `)
         .eq("id", id)
         .maybeSingle();
@@ -58,27 +69,41 @@ export const storyService = {
         return undefined;
       }
       // Fetch scenes for story
-      const { data: scenesData } = await supabase
+      const { data: scenesData, error: scenesError } = await supabase
         .from("scenes")
         .select(`
-          id, title, content, image_url as image, audio_url as audio, is_ending as isEnding, 
+          id, title, content, image_url, audio_url, is_ending, 
           choices (
-            id, text, next_scene_id as nextSceneId
+            id, text, next_scene_id
           )
         `)
         .eq("story_id", id)
         .order("created_at", { ascending: true });
 
-      const story: Story = {
-        ...data,
-        scenes: scenesData || [],
-      };
+      if (scenesError) {
+        console.error("Error fetching scenes:", scenesError);
+      }
+
+      // Map to our Story type with scenes
+      const story = mapSupabaseStory(data);
+      story.scenes = (scenesData || []).map(scene => ({
+        id: scene.id,
+        title: scene.title,
+        content: scene.content,
+        image: scene.image_url,
+        audio: scene.audio_url,
+        isEnding: scene.is_ending,
+        choices: scene.choices.map((choice: any) => ({
+          id: choice.id,
+          text: choice.text,
+          nextSceneId: choice.next_scene_id,
+        })),
+      }));
+      
       return story;
     } else {
-      const stories = storyService.getStories();
-      if (stories instanceof Promise) {
-        return stories.then(list => list.find(story => story.id === id));
-      }
+      // Fallback to localStorage
+      const stories = await storyService.getStories();
       return stories.find(story => story.id === id);
     }
   },
@@ -90,7 +115,7 @@ export const storyService = {
       const { data, error } = await supabase
         .from("stories")
         .select(`
-          id, title, description, cover_image_url as coverImage, author_id as author, created_at as createdAt, updated_at as updatedAt, status, featured, start_scene_id as startSceneId
+          id, title, description, cover_image_url, author_id, created_at, updated_at, status, featured, start_scene_id
         `)
         .eq("status", "published")
         .order("updated_at", { ascending: false });
@@ -98,10 +123,9 @@ export const storyService = {
         console.error("Supabase published fetch error:", error);
         return [];
       }
-      return data as unknown as Story[];
+      return data.map(item => mapSupabaseStory(item));
     } else {
-      const stories = storyService.getStories();
-      if (stories instanceof Promise) return stories.then(list => list.filter(story => story.status === "published"));
+      const stories = await storyService.getStories();
       return stories.filter(story => story.status === "published");
     }
   },
@@ -112,7 +136,7 @@ export const storyService = {
       const { data, error } = await supabase
         .from("stories")
         .select(`
-          id, title, description, cover_image_url as coverImage, author_id as author, created_at as createdAt, updated_at as updatedAt, status, featured, start_scene_id as startSceneId
+          id, title, description, cover_image_url, author_id, created_at, updated_at, status, featured, start_scene_id
         `)
         .eq("status", "published")
         .eq("featured", true)
@@ -121,10 +145,9 @@ export const storyService = {
         console.error("Supabase featured fetch error:", error);
         return [];
       }
-      return data as unknown as Story[];
+      return data.map(item => mapSupabaseStory(item));
     } else {
-      const stories = storyService.getStories();
-      if (stories instanceof Promise) return stories.then(list => list.filter(story => story.status === "published" && story.featured));
+      const stories = await storyService.getStories();
       return stories.filter(story => story.status === "published" && story.featured);
     }
   },
@@ -151,11 +174,75 @@ export const storyService = {
         console.error("Supabase story upsert error:", error);
         throw error;
       }
-      // TODO: Upsert scenes and choices
-      // (For now, this is enough for MVP. You may extend this to include scenes in Supabase per story.)
-      return { ...story };
+      
+      // Save scenes if provided
+      if (story.scenes && story.scenes.length > 0) {
+        // First, fetch existing scenes to determine what needs to be updated/created/deleted
+        const { data: existingScenes } = await supabase
+          .from("scenes")
+          .select("id")
+          .eq("story_id", story.id);
+        
+        const existingSceneIds = new Set((existingScenes || []).map((s: any) => s.id));
+        const newSceneIds = new Set(story.scenes.map(s => s.id));
+        
+        // Scenes to delete
+        const scenesToDelete = Array.from(existingSceneIds)
+          .filter(id => !newSceneIds.has(id as string));
+        
+        if (scenesToDelete.length > 0) {
+          await supabase.from("scenes").delete().in("id", scenesToDelete);
+        }
+        
+        // Upsert scenes
+        for (const scene of story.scenes) {
+          const { error: sceneError } = await supabase
+            .from("scenes")
+            .upsert({
+              id: scene.id,
+              story_id: story.id,
+              title: scene.title,
+              content: scene.content,
+              image_url: scene.image,
+              audio_url: scene.audio,
+              is_ending: scene.isEnding || false,
+            });
+          
+          if (sceneError) {
+            console.error("Error saving scene:", sceneError);
+            continue;
+          }
+          
+          // Delete existing choices for this scene
+          await supabase
+            .from("choices")
+            .delete()
+            .eq("scene_id", scene.id);
+          
+          // Insert new choices
+          if (scene.choices && scene.choices.length > 0) {
+            const choicesData = scene.choices.map(choice => ({
+              id: choice.id,
+              scene_id: scene.id,
+              text: choice.text,
+              next_scene_id: choice.nextSceneId,
+            }));
+            
+            const { error: choicesError } = await supabase
+              .from("choices")
+              .insert(choicesData);
+            
+            if (choicesError) {
+              console.error("Error saving choices:", choicesError);
+            }
+          }
+        }
+      }
+      
+      return story;
     } else {
-      const stories = storyService.getStories();
+      // Fallback to localStorage
+      const stories = await storyService.getStories();
       const existingIndex = stories.findIndex(s => s.id === story.id);
 
       if (existingIndex >= 0) {
@@ -186,7 +273,7 @@ export const storyService = {
         console.error("Supabase story delete error:", error);
       }
     } else {
-      const stories = storyService.getStories();
+      const stories = await storyService.getStories();
       const filteredStories = stories.filter(story => story.id !== id);
       localStorage.setItem(STORIES_KEY, JSON.stringify(filteredStories));
     }
@@ -208,9 +295,9 @@ export const storyService = {
         console.error("Supabase story status update error:", error);
         return undefined;
       }
-      return data as Story;
+      return mapSupabaseStory(data);
     } else {
-      const stories = storyService.getStories();
+      const stories = await storyService.getStories();
       const storyIndex = stories.findIndex(story => story.id === id);
 
       if (storyIndex >= 0) {
@@ -240,9 +327,9 @@ export const storyService = {
         console.error("Supabase story featured update error:", error);
         return undefined;
       }
-      return data as Story;
+      return mapSupabaseStory(data);
     } else {
-      const stories = storyService.getStories();
+      const stories = await storyService.getStories();
       const storyIndex = stories.findIndex(story => story.id === id);
 
       if (storyIndex >= 0) {

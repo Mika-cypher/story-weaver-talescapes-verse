@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { StoryPlayer } from "@/components/stories/StoryPlayer";
 import { storyService } from "@/services/storyService";
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkCheck } from "lucide-react";
+import { Bookmark, BookmarkCheck, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -14,28 +14,42 @@ const Story: React.FC = () => {
   const { isLoggedIn, isStorySaved, saveStory, unsaveStory } = useAuth();
   const { toast } = useToast();
   const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    if (!id) {
-      navigate("/explore");
-      return;
-    }
+    const checkStory = async () => {
+      setLoading(true);
+      if (!id) {
+        navigate("/explore");
+        return;
+      }
+      
+      try {
+        const story = await storyService.getStoryById(id);
+        if (!story) {
+          toast({
+            title: "Story not found",
+            description: "The story you're looking for doesn't exist",
+            variant: "destructive",
+          });
+          navigate("/explore");
+          return;
+        }
+        
+        if (isLoggedIn) {
+          setIsSaved(isStorySaved(id));
+        }
+      } catch (err) {
+        console.error("Error checking story:", err);
+        setError("Failed to load the story");
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    const story = storyService.getStoryById(id);
-    if (!story) {
-      toast({
-        title: "Story not found",
-        description: "The story you're looking for doesn't exist",
-        variant: "destructive",
-      });
-      navigate("/explore");
-      return;
-    }
-    
-    if (isLoggedIn) {
-      setIsSaved(isStorySaved(id));
-    }
-  }, [id, isLoggedIn, isStorySaved]);
+    checkStory();
+  }, [id, navigate, isLoggedIn, isStorySaved, toast]);
   
   const handleToggleSave = () => {
     if (!isLoggedIn) {
@@ -57,6 +71,27 @@ const Story: React.FC = () => {
       setIsSaved(true);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2">Loading story...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h2 className="text-2xl font-bold mb-4">Error</h2>
+        <p className="mb-6">{error}</p>
+        <Button onClick={() => navigate("/explore")}>
+          Explore Stories
+        </Button>
+      </div>
+    );
+  }
   
   return (
     <div className="relative">

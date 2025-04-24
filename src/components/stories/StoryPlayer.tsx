@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Story, StoryScene } from "@/types/story";
@@ -15,25 +14,38 @@ export const StoryPlayer: React.FC = () => {
   const [currentScene, setCurrentScene] = useState<StoryScene | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    if (id) {
-      const loadedStory = storyService.getStoryById(id);
-      if (loadedStory && loadedStory.status === "published") {
-        setStory(loadedStory);
-        
-        // Set starting scene
-        const startScene = loadedStory.scenes.find(scene => scene.id === loadedStory.startSceneId);
-        if (startScene) {
-          setCurrentScene(startScene);
-          setHistory([startScene.id]);
+    const loadStory = async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      try {
+        const loadedStory = await storyService.getStoryById(id);
+        if (loadedStory && loadedStory.status === "published") {
+          setStory(loadedStory);
+          
+          // Set starting scene
+          const startScene = loadedStory.scenes.find(scene => scene.id === loadedStory.startSceneId);
+          if (startScene) {
+            setCurrentScene(startScene);
+            setHistory([startScene.id]);
+          }
+        } else {
+          setError("Story not found or not published");
+          navigate("/explore");
         }
-      } else {
-        navigate("/explore");
+      } catch (err) {
+        console.error("Error loading story:", err);
+        setError("Failed to load the story");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }
-  }, [id]);
+    };
+    
+    loadStory();
+  }, [id, navigate]);
 
   const handleChoiceClick = (nextSceneId: string) => {
     if (story) {
@@ -88,11 +100,11 @@ export const StoryPlayer: React.FC = () => {
     );
   }
 
-  if (!story || !currentScene) {
+  if (error || !story || !currentScene) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] max-w-2xl mx-auto text-center">
         <h2 className="text-2xl font-bold mb-4">Story Not Found</h2>
-        <p className="mb-6">The story you're looking for doesn't exist or isn't published yet.</p>
+        <p className="mb-6">{error || "The story you're looking for doesn't exist or isn't published yet."}</p>
         <Button onClick={() => navigate("/explore")}>
           Explore Other Stories
         </Button>

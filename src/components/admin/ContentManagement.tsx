@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Archive, FileText, Edit, Trash2 } from "lucide-react";
+import { Search, Edit, Trash2, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -20,6 +20,7 @@ export const ContentManagement: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStories, setFilteredStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -36,20 +37,41 @@ export const ContentManagement: React.FC = () => {
     );
   }, [searchTerm, stories]);
 
-  const loadStories = () => {
-    const allStories = storyService.getStories();
-    setStories(allStories);
-    setFilteredStories(allStories);
+  const loadStories = async () => {
+    setLoading(true);
+    try {
+      const allStories = await storyService.getStories();
+      setStories(allStories);
+      setFilteredStories(allStories);
+    } catch (error) {
+      console.error("Error loading stories:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load stories",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this story?")) {
-      storyService.deleteStory(id);
-      toast({
-        title: "Content deleted",
-        description: "The story has been successfully deleted",
-      });
-      loadStories();
+      try {
+        await storyService.deleteStory(id);
+        toast({
+          title: "Content deleted",
+          description: "The story has been successfully deleted",
+        });
+        loadStories();
+      } catch (error) {
+        console.error("Error deleting story:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete story",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -72,74 +94,80 @@ export const ContentManagement: React.FC = () => {
         />
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Last Updated</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredStories.length > 0 ? (
-            filteredStories.map((story) => (
-              <TableRow key={story.id}>
-                <TableCell className="font-medium">{story.title}</TableCell>
-                <TableCell>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      story.status === "published"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {story.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {new Date(story.updatedAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate(`/admin/stories/${story.id}/edit`)}
-                      title="Edit"
+      {loading ? (
+        <div className="text-center py-8">
+          <p>Loading stories...</p>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Last Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredStories.length > 0 ? (
+              filteredStories.map((story) => (
+                <TableRow key={story.id}>
+                  <TableCell className="font-medium">{story.title}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        story.status === "published"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
                     >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate(`/admin/stories/${story.id}/preview`)}
-                      title="Preview"
-                    >
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(story.id)}
-                      title="Delete"
-                      className="text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      {story.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(story.updatedAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate(`/admin/stories/${story.id}/edit`)}
+                        title="Edit"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate(`/admin/stories/${story.id}/preview`)}
+                        title="Preview"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(story.id)}
+                        title="Delete"
+                        className="text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                  No content found. {searchTerm ? "Try adjusting your search." : "Add some content!"}
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                No content found. {searchTerm ? "Try adjusting your search." : "Add some content!"}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

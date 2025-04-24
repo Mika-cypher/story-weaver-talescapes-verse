@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { storyService } from "@/services/storyService";
 import { Story } from "@/types/story";
-import { BookText, Star, FilePenLine, Plus } from "lucide-react";
+import { BookText, Star, FilePenLine, Plus, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContentManagement } from "@/components/admin/ContentManagement";
 import { UserSubmissionsReview } from "@/components/admin/UserSubmissionsReview";
@@ -14,6 +14,7 @@ import { CategoriesAndVisualsManagement } from "@/components/admin/CategoriesAnd
 
 const AdminDashboard: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -28,9 +29,16 @@ const AdminDashboard: React.FC = () => {
   }, [tabParam]);
 
   useEffect(() => {
-    const loadStories = () => {
-      const allStories = storyService.getStories();
-      setStories(allStories);
+    const loadStories = async () => {
+      setLoading(true);
+      try {
+        const allStories = await storyService.getStories();
+        setStories(allStories);
+      } catch (error) {
+        console.error("Error loading stories:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadStories();
@@ -67,95 +75,104 @@ const AdminDashboard: React.FC = () => {
         </TabsList>
 
         <TabsContent value="overview">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Stories</CardTitle>
-                <BookText className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stories.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  All your interactive stories
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Published</CardTitle>
-                <FilePenLine className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{publishedCount}</div>
-                <p className="text-xs text-muted-foreground">
-                  {draftCount} in draft mode
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Featured</CardTitle>
-                <Star className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{featuredCount}</div>
-                <p className="text-xs text-muted-foreground">
-                  Stories highlighted on homepage
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="ml-2">Loading dashboard data...</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-4 md:grid-cols-3">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Stories</CardTitle>
+                    <BookText className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stories.length}</div>
+                    <p className="text-xs text-muted-foreground">
+                      All your interactive stories
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Published</CardTitle>
+                    <FilePenLine className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{publishedCount}</div>
+                    <p className="text-xs text-muted-foreground">
+                      {draftCount} in draft mode
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Featured</CardTitle>
+                    <Star className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{featuredCount}</div>
+                    <p className="text-xs text-muted-foreground">
+                      Stories highlighted on homepage
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
 
-          <div className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Stories</CardTitle>
-                <CardDescription>
-                  Your most recently updated stories
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {stories.length > 0 ? (
-                  <div className="space-y-4">
-                    {stories
-                      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-                      .slice(0, 5)
-                      .map(story => (
-                        <div key={story.id} className="flex items-center justify-between border-b pb-4">
-                          <div>
-                            <h3 className="font-medium">{story.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Last updated: {new Date(story.updatedAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {story.featured && <Star className="h-4 w-4 text-yellow-500" />}
-                            <span className={`text-xs px-2 py-1 rounded-full ${
-                              story.status === "published" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                            }`}>
-                              {story.status}
-                            </span>
-                            <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/stories/${story.id}/edit`)}>
-                              Edit
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <p className="text-muted-foreground">No stories yet. Create your first story!</p>
-                    <Button 
-                      className="mt-4" 
-                      onClick={() => navigate("/admin/stories/new")}
-                    >
-                      Create New Story
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+              <div className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Stories</CardTitle>
+                    <CardDescription>
+                      Your most recently updated stories
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {stories.length > 0 ? (
+                      <div className="space-y-4">
+                        {stories
+                          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+                          .slice(0, 5)
+                          .map(story => (
+                            <div key={story.id} className="flex items-center justify-between border-b pb-4">
+                              <div>
+                                <h3 className="font-medium">{story.title}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  Last updated: {new Date(story.updatedAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                {story.featured && <Star className="h-4 w-4 text-yellow-500" />}
+                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                  story.status === "published" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                                }`}>
+                                  {story.status}
+                                </span>
+                                <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/stories/${story.id}/edit`)}>
+                                  Edit
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6">
+                        <p className="text-muted-foreground">No stories yet. Create your first story!</p>
+                        <Button 
+                          className="mt-4" 
+                          onClick={() => navigate("/admin/stories/new")}
+                        >
+                          Create New Story
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="content">

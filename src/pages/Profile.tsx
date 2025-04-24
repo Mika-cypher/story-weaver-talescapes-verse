@@ -1,17 +1,18 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { storyService } from "@/services/storyService";
+import { Story } from "@/types/story"; 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings } from "lucide-react";
+import { Loader2, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SubmissionForm } from "@/components/user/SubmissionForm";
 import { AccountSettings } from "@/components/user/AccountSettings";
 
-// Import newly created components
+// Import components
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { StoriesTab } from "@/components/profile/StoriesTab";
 import { SavedStoriesTab } from "@/components/profile/SavedStoriesTab";
@@ -23,58 +24,83 @@ const Profile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
   const [activeAudioId, setActiveAudioId] = useState<number | null>(null);
   const [openSettingsId, setOpenSettingsId] = useState<number | null>(null);
   const [showDrafts, setShowDrafts] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   
+  const [userPublishedStories, setUserPublishedStories] = useState<any[]>([]);
+  const [userSavedStories, setUserSavedStories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   // Determine if viewing own profile or someone else's
   const isOwnProfile = !username || (user && user.username === username);
   const displayName = isOwnProfile ? (user ? user.username : "") : username;
   
-  if (!isLoggedIn && isOwnProfile) {
-    navigate("/login");
-    return null;
-  }
-  
-  // Get user's stories from the story service
-  const allStories = storyService.getStories();
-  
-  // Get user saved stories
-  const userSavedStories = allStories
-    .filter(story => savedStories.includes(story.id))
-    .map(story => ({
-      id: parseInt(story.id),
-      title: story.title,
-      excerpt: story.description,
-      coverImage: story.coverImage || "/placeholder.svg",
-      category: "Interactive Story",
-      hasAudio: !!story.scenes.some(scene => scene.audio),
-      audioSrc: story.scenes.find(scene => scene.audio)?.audio,
-      likes: 12, // Mock data
-      views: 45, // Mock data
-      date: new Date(story.createdAt).toLocaleDateString()
-    }));
-  
-  // Get user's published stories
-  const userPublishedStories = allStories
-    .filter(story => 
-      (isOwnProfile ? true : story.status === "published") && 
-      story.author === displayName
-    )
-    .map(story => ({
-      id: parseInt(story.id),
-      title: story.title,
-      excerpt: story.description,
-      coverImage: story.coverImage || "/placeholder.svg",
-      category: "Interactive Story",
-      hasAudio: !!story.scenes.some(scene => scene.audio),
-      audioSrc: story.scenes.find(scene => scene.audio)?.audio,
-      likes: 18, // Mock data
-      views: 67, // Mock data
-      date: new Date(story.createdAt).toLocaleDateString(),
-      status: story.status
-    }));
+  useEffect(() => {
+    if (!isLoggedIn && isOwnProfile) {
+      navigate("/login");
+      return;
+    }
+    
+    const loadStories = async () => {
+      setLoading(true);
+      try {
+        // Get all stories
+        const allStories = await storyService.getStories();
+        
+        // Handle saved stories
+        const savedStoriesData = allStories
+          .filter(story => savedStories.includes(story.id))
+          .map(story => ({
+            id: parseInt(story.id),
+            title: story.title,
+            excerpt: story.description,
+            coverImage: story.coverImage || "/placeholder.svg",
+            category: "Interactive Story",
+            hasAudio: !!story.scenes.some(scene => scene.audio),
+            audioSrc: story.scenes.find(scene => scene.audio)?.audio,
+            likes: 12, // Mock data
+            views: 45, // Mock data
+            date: new Date(story.createdAt).toLocaleDateString()
+          }));
+        setUserSavedStories(savedStoriesData);
+        
+        // Handle published stories
+        const publishedStoriesData = allStories
+          .filter(story => 
+            (isOwnProfile ? true : story.status === "published") && 
+            story.author === displayName
+          )
+          .map(story => ({
+            id: parseInt(story.id),
+            title: story.title,
+            excerpt: story.description,
+            coverImage: story.coverImage || "/placeholder.svg",
+            category: "Interactive Story",
+            hasAudio: !!story.scenes.some(scene => scene.audio),
+            audioSrc: story.scenes.find(scene => scene.audio)?.audio,
+            likes: 18, // Mock data
+            views: 67, // Mock data
+            date: new Date(story.createdAt).toLocaleDateString(),
+            status: story.status
+          }));
+        setUserPublishedStories(publishedStoriesData);
+      } catch (error) {
+        console.error("Error loading stories:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load stories",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadStories();
+  }, [isLoggedIn, isOwnProfile, navigate, savedStories, displayName]);
   
   // Mock data for other content types
   const userImages = [
@@ -118,6 +144,19 @@ const Profile: React.FC = () => {
       description: "Profile link has been copied to clipboard",
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow pt-24 pb-16 bg-background flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="ml-2">Loading profile...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
