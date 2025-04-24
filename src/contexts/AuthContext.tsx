@@ -108,13 +108,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
       
+      // Create a complete profile with role (default to "user" if not in database)
       const profileWithRole: Profile = {
-        ...data,
-        role: data.role || "user"
+        id: data.id,
+        username: data.username,
+        display_name: data.display_name,
+        avatar_url: data.avatar_url,
+        role: (data as any).role || "user"  // Cast to any to bypass TypeScript check and provide default
       };
       
       setProfile(profileWithRole);
-      
       setIsAdmin(profileWithRole.role === "admin");
       
     } catch (error) {
