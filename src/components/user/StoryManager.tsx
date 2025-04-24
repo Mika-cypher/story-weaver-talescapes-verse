@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 export function StoryManager() {
   const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState("drafts");
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -19,24 +20,53 @@ export function StoryManager() {
     loadStories();
   }, []);
 
-  const loadStories = () => {
-    const allStories = storyService.getStories();
-    setStories(allStories);
+  const loadStories = async () => {
+    setLoading(true);
+    try {
+      const allStories = await storyService.getStories();
+      setStories(allStories);
+    } catch (error) {
+      console.error("Error loading stories:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load your stories",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteStory = (id: string) => {
+  const handleDeleteStory = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this story?")) {
-      storyService.deleteStory(id);
-      toast({
-        title: "Story deleted",
-        description: "Your story has been successfully deleted."
-      });
-      loadStories();
+      try {
+        await storyService.deleteStory(id);
+        toast({
+          title: "Story deleted",
+          description: "Your story has been successfully deleted."
+        });
+        loadStories();
+      } catch (error) {
+        console.error("Error deleting story:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete your story",
+          variant: "destructive"
+        });
+      }
     }
   };
 
   const drafts = stories.filter(story => story.status === "draft");
   const published = stories.filter(story => story.status === "published");
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p>Loading your stories...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
