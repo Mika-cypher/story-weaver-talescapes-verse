@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Mail, KeyRound, User } from "lucide-react";
+import { Loader2 } from "@/components/ui/loader";
 
 const signupSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
@@ -28,6 +28,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 const Signup: React.FC = () => {
   const { signup } = useAuth();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -39,15 +40,14 @@ const Signup: React.FC = () => {
     },
   });
   
-  const onSubmit = (values: SignupFormValues) => {
-    const success = signup(values.username, values.email, values.password);
-    
-    if (success) {
-      navigate("/");
-    } else {
-      form.setError("email", { 
-        message: "This email is already registered" 
-      });
+  const onSubmit = async (values: SignupFormValues) => {
+    setIsLoading(true);
+    try {
+      await signup(values.username, values.email, values.password);
+    } catch (error) {
+      console.error("Signup error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -150,8 +150,19 @@ const Signup: React.FC = () => {
                   />
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4">
-                  <Button type="submit" className="w-full">
-                    Create Account
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      "Create Account"
+                    )}
                   </Button>
                   <div className="text-center text-sm">
                     Already have an account?{" "}

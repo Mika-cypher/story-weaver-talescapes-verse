@@ -1,25 +1,29 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { User, Session } from '@supabase/supabase-js';
 
 type UserRole = "user" | "admin";
 
-interface User {
+interface Profile {
   id: string;
   username: string;
-  email: string;
+  display_name: string | null;
+  avatar_url: string | null;
   role: UserRole;
 }
 
 type AuthContextType = {
   user: User | null;
+  session: Session | null;
+  profile: Profile | null;
   isAdmin: boolean;
   isLoggedIn: boolean;
-  login: (email: string, password: string) => boolean;
-  adminLogin: (password: string) => boolean;
-  signup: (username: string, email: string, password: string) => boolean;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (username: string, email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  updateProfile: (updates: Partial<Profile>) => Promise<void>;
   savedStories: string[];
   saveStory: (storyId: string) => void;
   unsaveStory: (storyId: string) => void;
@@ -36,161 +40,158 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// This is a simple admin authentication
-// In a real application, you would use a proper authentication system
-const ADMIN_PASSWORD = "admin123"; // You should change this to a secure password
-
-// Mock users database
-const MOCK_USERS_KEY = "talescapes_users";
-const SAVED_STORIES_KEY = "talescapes_saved_stories";
-const LIKED_CONTENT_KEY = "talescapes_liked_content";
-const FOLLOWING_KEY = "talescapes_following";
-const SUBMISSIONS_KEY = "talescapes_submissions";
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [savedStories, setSavedStories] = useState<string[]>([]);
-  const [likedContent, setLikedContent] = useState<string[]>([]);
-  const [following, setFollowing] = useState<string[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
-    const loggedInUser = localStorage.getItem("currentUser");
-    const adminLoggedIn = localStorage.getItem("isAdmin") === "true";
-    
-    if (loggedInUser) {
-      const userData = JSON.parse(loggedInUser);
-      setUser(userData);
-      
-      // Load saved stories for the user
-      const savedStoriesData = localStorage.getItem(`${SAVED_STORIES_KEY}_${userData.id}`);
-      if (savedStoriesData) {
-        setSavedStories(JSON.parse(savedStoriesData));
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user) {
+          setTimeout(() => {
+            fetchProfile(currentSession.user.id);
+          }, 0);
+        } else {
+          setProfile(null);
+        }
       }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
       
-      // Load liked content for the user
-      const likedContentData = localStorage.getItem(`${LIKED_CONTENT_KEY}_${userData.id}`);
-      if (likedContentData) {
-        setLikedContent(JSON.parse(likedContentData));
+      if (currentSession?.user) {
+        fetchProfile(currentSession.user.id);
       }
-      
-      // Load following data for the user
-      const followingData = localStorage.getItem(`${FOLLOWING_KEY}_${userData.id}`);
-      if (followingData) {
-        setFollowing(JSON.parse(followingData));
-      }
-    }
-    
-    setIsAdmin(adminLoggedIn);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const login = (email: string, password: string): boolean => {
-    // Get users from localStorage
-    const usersData = localStorage.getItem(MOCK_USERS_KEY);
-    const users = usersData ? JSON.parse(usersData) : [];
-    
-    const foundUser = users.find((u: any) => u.email === email && u.password === password);
-    
-    if (foundUser) {
-      // Don't store password in the state
-      const { password, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      localStorage.setItem("currentUser", JSON.stringify(userWithoutPassword));
-      
-      // Load saved stories for the user
-      const savedStoriesData = localStorage.getItem(`${SAVED_STORIES_KEY}_${foundUser.id}`);
-      if (savedStoriesData) {
-        setSavedStories(JSON.parse(savedStoriesData));
-      }
-      
-      // Load liked content for the user
-      const likedContentData = localStorage.getItem(`${LIKED_CONTENT_KEY}_${foundUser.id}`);
-      if (likedContentData) {
-        setLikedContent(JSON.parse(likedContentData));
-      }
-      
-      // Load following data for the user
-      const followingData = localStorage.getItem(`${FOLLOWING_KEY}_${foundUser.id}`);
-      if (followingData) {
-        setFollowing(JSON.parse(followingData));
-      }
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      setProfile(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
       
       toast({
         title: "Welcome back!",
-        description: `You're now logged in as ${foundUser.username}`,
-      });
-      
-      return true;
-    }
-    
-    return false;
-  };
-
-  const adminLogin = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      localStorage.setItem("isAdmin", "true");
-      return true;
-    }
-    return false;
-  };
-
-  const signup = (username: string, email: string, password: string): boolean => {
-    // Get users from localStorage
-    const usersData = localStorage.getItem(MOCK_USERS_KEY);
-    const users = usersData ? JSON.parse(usersData) : [];
-    
-    // Check if user already exists
-    const userExists = users.some((u: any) => u.email === email);
-    
-    if (userExists) {
-      return false;
-    }
-    
-    // Create new user
-    const newUser = {
-      id: Date.now().toString(),
-      username,
-      email,
-      password, // In a real app, this would be hashed
-      role: "user" as UserRole
-    };
-    
-    // Save to "database"
-    users.push(newUser);
-    localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
-    
-    // Log in the new user (without the password in state)
-    const { password: _, ...userWithoutPassword } = newUser;
-    setUser(userWithoutPassword);
-    localStorage.setItem("currentUser", JSON.stringify(userWithoutPassword));
-    
-    toast({
-      title: "Account created!",
-      description: `Welcome to Talescapes, ${username}!`,
-    });
-    
-    return true;
-  };
-
-  const logout = () => {
-    setUser(null);
-    setSavedStories([]);
-    localStorage.removeItem("currentUser");
-    
-    if (isAdmin) {
-      setIsAdmin(false);
-      localStorage.removeItem("isAdmin");
-      navigate("/admin/login");
-    } else {
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out",
+        description: "You've successfully logged in.",
       });
       navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const signup = async (username: string, email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+          },
+        },
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Account created",
+        description: "Please check your email to confirm your account.",
+      });
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Signup failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setSavedStories([]);
+      
+      toast({
+        title: "Logged out",
+        description: "You've been successfully logged out.",
+      });
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to log out.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile.",
+        variant: "destructive",
+      });
+      throw error;
     }
   };
 
@@ -309,16 +310,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
+  const FOLLOWING_KEY = "talescapes_following";
+  const LIKED_CONTENT_KEY = "talescapes_liked_content";
+  const SUBMISSIONS_KEY = "talescapes_submissions";
+  const MOCK_USERS_KEY = "talescapes_users";
+  const SAVED_STORIES_KEY = "talescapes_saved_stories";
+  const [likedContent, setLikedContent] = useState<string[]>([]);
+  const [following, setFollowing] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      const savedStoriesData = localStorage.getItem(`${SAVED_STORIES_KEY}_${user.id}`);
+      if (savedStoriesData) {
+        setSavedStories(JSON.parse(savedStoriesData));
+      }
+      
+      // Load liked content for the user
+      const likedContentData = localStorage.getItem(`${LIKED_CONTENT_KEY}_${user.id}`);
+      if (likedContentData) {
+        setLikedContent(JSON.parse(likedContentData));
+      }
+      
+      // Load following data for the user
+      const followingData = localStorage.getItem(`${FOLLOWING_KEY}_${user.id}`);
+      if (followingData) {
+        setFollowing(JSON.parse(followingData));
+      }
+    }
+  }, [user]);
+
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAdmin, 
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        profile,
+        isAdmin,
         isLoggedIn: !!user,
-        login, 
-        adminLogin,
-        signup, 
+        login,
+        signup,
         logout,
+        updateProfile,
         savedStories,
         saveStory,
         unsaveStory,

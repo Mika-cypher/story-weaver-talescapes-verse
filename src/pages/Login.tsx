@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Mail, KeyRound } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -23,6 +23,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -32,15 +33,14 @@ const Login: React.FC = () => {
     },
   });
   
-  const onSubmit = (values: LoginFormValues) => {
-    const success = login(values.email, values.password);
-    
-    if (success) {
-      navigate("/");
-    } else {
-      form.setError("root", { 
-        message: "Invalid email or password" 
-      });
+  const onSubmit = async (values: LoginFormValues) => {
+    setIsLoading(true);
+    try {
+      await login(values.email, values.password);
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,8 +112,19 @@ const Login: React.FC = () => {
                   )}
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4">
-                  <Button type="submit" className="w-full">
-                    Sign In
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      "Sign In"
+                    )}
                   </Button>
                   <div className="text-center text-sm">
                     Don't have an account?{" "}
