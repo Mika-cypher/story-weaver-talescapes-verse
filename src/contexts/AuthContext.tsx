@@ -55,7 +55,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         setSession(currentSession);
@@ -63,7 +62,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (currentSession?.user) {
           const userWithUsername: ExtendedUser = currentSession.user;
           
-          // This is a workaround to keep backward compatibility
           if (currentSession.user.user_metadata?.username) {
             userWithUsername.username = currentSession.user.user_metadata.username;
           }
@@ -80,7 +78,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
       
@@ -111,7 +108,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) throw error;
       
-      // Ensure role is set (default to "user" if not present)
       const profileWithRole: Profile = {
         ...data,
         role: data.role || "user"
@@ -119,7 +115,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setProfile(profileWithRole);
       
-      // Set admin status based on role
       setIsAdmin(profileWithRole.role === "admin");
       
     } catch (error) {
@@ -227,8 +222,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const adminLogin = (password: string): boolean => {
-    // Simple admin login for demo purposes
-    // In production, this should be handled securely
     if (password === "admin123") {
       setIsAdmin(true);
       toast({
@@ -342,7 +335,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     localStorage.setItem(`${SUBMISSIONS_KEY}_${user.id}`, JSON.stringify(updatedSubmissions));
     
-    // Also add to global submissions for admin to review
     const allSubmissions = localStorage.getItem(SUBMISSIONS_KEY) || "[]";
     const parsedSubmissions = JSON.parse(allSubmissions);
     parsedSubmissions.push(submission);
@@ -366,13 +358,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSavedStories(JSON.parse(savedStoriesData));
       }
       
-      // Load liked content for the user
       const likedContentData = localStorage.getItem(`${LIKED_CONTENT_KEY}_${user.id}`);
       if (likedContentData) {
         setLikedContent(JSON.parse(likedContentData));
       }
       
-      // Load following data for the user
       const followingData = localStorage.getItem(`${FOLLOWING_KEY}_${user.id}`);
       if (followingData) {
         setFollowing(JSON.parse(followingData));
