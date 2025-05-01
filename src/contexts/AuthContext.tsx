@@ -1,19 +1,16 @@
+
 import React, { createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { AuthContextType } from "@/types/auth";
 import { useAuthState } from "@/hooks/useAuthState";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { authService, AuthError } from "@/services/authService";
+import { socialService, SocialError } from "@/services/socialService";
+import { submissionService, SubmissionError } from "@/services/submissionService";
 
 // Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Local storage keys
-const FOLLOWING_KEY = "talescapes_following";
-const LIKED_CONTENT_KEY = "talescapes_liked_content";
-const SUBMISSIONS_KEY = "talescapes_submissions";
-const SAVED_STORIES_KEY = "talescapes_saved_stories";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -135,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Social features handlers
+  // Social features - integrated with socialService
   const saveStory = (storyId: string) => {
     if (!user) {
       toast({
@@ -147,30 +144,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      if (!storyId) {
-        throw new Error("Invalid story ID");
-      }
+      const updatedSavedStories = socialService.saveStory(user.id, storyId, savedStories);
+      setSavedStories(updatedSavedStories);
       
-      if (!savedStories.includes(storyId)) {
-        const updatedSavedStories = [...savedStories, storyId];
-        setSavedStories(updatedSavedStories);
-        localStorage.setItem(`${SAVED_STORIES_KEY}_${user.id}`, JSON.stringify(updatedSavedStories));
-        
-        toast({
-          title: "Story saved",
-          description: "This story has been added to your saved stories",
-        });
-      } else {
-        toast({
-          title: "Already Saved",
-          description: "This story is already in your saved collection",
-        });
-      }
+      toast({
+        title: "Story saved",
+        description: "This story has been added to your saved stories",
+      });
     } catch (error: any) {
-      console.error("Error saving story:", error);
       toast({
         title: "Error",
-        description: `Could not save story: ${error.message}`,
+        description: error instanceof SocialError ? error.message : "Could not save story",
         variant: "destructive",
       });
     }
@@ -187,23 +171,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      if (!storyId) {
-        throw new Error("Invalid story ID");
-      }
-      
-      const updatedSavedStories = savedStories.filter(id => id !== storyId);
+      const updatedSavedStories = socialService.unsaveStory(user.id, storyId, savedStories);
       setSavedStories(updatedSavedStories);
-      localStorage.setItem(`${SAVED_STORIES_KEY}_${user.id}`, JSON.stringify(updatedSavedStories));
       
       toast({
         title: "Story removed",
         description: "This story has been removed from your saved stories",
       });
     } catch (error: any) {
-      console.error("Error removing saved story:", error);
       toast({
         title: "Error",
-        description: `Could not remove story: ${error.message}`,
+        description: error instanceof SocialError ? error.message : "Could not remove story",
         variant: "destructive",
       });
     }
@@ -220,39 +198,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      if (!userId) {
-        throw new Error("Invalid user ID");
-      }
+      const updatedFollowing = socialService.followUser(user.id, userId, following);
+      setFollowing(updatedFollowing);
       
-      if (userId === user.id) {
-        toast({
-          title: "Cannot follow yourself",
-          description: "You cannot follow your own account",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      if (!following.includes(userId)) {
-        const updatedFollowing = [...following, userId];
-        setFollowing(updatedFollowing);
-        localStorage.setItem(`${FOLLOWING_KEY}_${user.id}`, JSON.stringify(updatedFollowing));
-        
-        toast({
-          title: "User followed",
-          description: "You are now following this user",
-        });
-      } else {
-        toast({
-          title: "Already following",
-          description: "You are already following this user",
-        });
-      }
+      toast({
+        title: "User followed",
+        description: "You are now following this user",
+      });
     } catch (error: any) {
-      console.error("Error following user:", error);
       toast({
         title: "Error",
-        description: `Could not follow user: ${error.message}`,
+        description: error instanceof SocialError ? error.message : "Could not follow user",
         variant: "destructive",
       });
     }
@@ -269,23 +225,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      if (!userId) {
-        throw new Error("Invalid user ID");
-      }
-      
-      const updatedFollowing = following.filter(id => id !== userId);
+      const updatedFollowing = socialService.unfollowUser(user.id, userId, following);
       setFollowing(updatedFollowing);
-      localStorage.setItem(`${FOLLOWING_KEY}_${user.id}`, JSON.stringify(updatedFollowing));
       
       toast({
         title: "User unfollowed",
         description: "You are no longer following this user",
       });
     } catch (error: any) {
-      console.error("Error unfollowing user:", error);
       toast({
         title: "Error",
-        description: `Could not unfollow user: ${error.message}`,
+        description: error instanceof SocialError ? error.message : "Could not unfollow user",
         variant: "destructive",
       });
     }
@@ -302,26 +252,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      if (!contentId || !contentType) {
-        throw new Error("Invalid content information");
-      }
+      const updatedLikedContent = socialService.likeContent(user.id, contentId, contentType, likedContent);
+      setLikedContent(updatedLikedContent);
       
-      const likeId = `${contentType}_${contentId}`;
-      if (!likedContent.includes(likeId)) {
-        const updatedLikedContent = [...likedContent, likeId];
-        setLikedContent(updatedLikedContent);
-        localStorage.setItem(`${LIKED_CONTENT_KEY}_${user.id}`, JSON.stringify(updatedLikedContent));
-        
-        toast({
-          title: "Content liked",
-          description: "You have liked this content",
-        });
-      }
+      toast({
+        title: "Content liked",
+        description: "You have liked this content",
+      });
     } catch (error: any) {
-      console.error("Error liking content:", error);
       toast({
         title: "Error",
-        description: `Could not like content: ${error.message}`,
+        description: error instanceof SocialError ? error.message : "Could not like content",
         variant: "destructive",
       });
     }
@@ -338,19 +279,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      if (!contentId || !contentType) {
-        throw new Error("Invalid content information");
-      }
-      
-      const likeId = `${contentType}_${contentId}`;
-      const updatedLikedContent = likedContent.filter(id => id !== likeId);
+      const updatedLikedContent = socialService.unlikeContent(user.id, contentId, contentType, likedContent);
       setLikedContent(updatedLikedContent);
-      localStorage.setItem(`${LIKED_CONTENT_KEY}_${user.id}`, JSON.stringify(updatedLikedContent));
     } catch (error: any) {
-      console.error("Error unliking content:", error);
       toast({
         title: "Error",
-        description: `Could not unlike content: ${error.message}`,
+        description: error instanceof SocialError ? error.message : "Could not unlike content",
         variant: "destructive",
       });
     }
@@ -383,7 +317,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </div>;
   }
 
-  // Local user submission functions
+  // Content submission functions
   const getUserSubmissions = () => {
     if (!user) {
       toast({
@@ -394,18 +328,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return [];
     }
     
-    try {
-      const submissions = localStorage.getItem(`${SUBMISSIONS_KEY}_${user.id}`);
-      return submissions ? JSON.parse(submissions) : [];
-    } catch (error: any) {
-      console.error("Error fetching user submissions:", error);
-      toast({
-        title: "Error",
-        description: `Could not fetch your submissions: ${error.message}`,
-        variant: "destructive",
-      });
-      return [];
-    }
+    return submissionService.getUserSubmissions(user.id);
   };
   
   const submitContent = async (content: any): Promise<boolean> => {
@@ -419,49 +342,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      // Validate content submission
-      if (!content || typeof content !== 'object') {
-        throw new Error("Invalid content format");
-      }
-      
-      // Required fields validation
-      const requiredFields = ['title', 'description'];
-      for (const field of requiredFields) {
-        if (!content[field]) {
-          throw new Error(`Missing required field: ${field}`);
-        }
-      }
-      
-      const submission = {
-        ...content,
-        id: `sub_${Date.now()}`,
-        userId: user.id,
-        userName: user.username,
-        submittedAt: new Date().toISOString(),
-        status: "pending",
-      };
-      
-      const userSubmissions = getUserSubmissions();
-      const updatedSubmissions = [...userSubmissions, submission];
-      
-      localStorage.setItem(`${SUBMISSIONS_KEY}_${user.id}`, JSON.stringify(updatedSubmissions));
-      
-      const allSubmissions = localStorage.getItem(SUBMISSIONS_KEY) || "[]";
-      const parsedSubmissions = JSON.parse(allSubmissions);
-      parsedSubmissions.push(submission);
-      localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(parsedSubmissions));
+      const result = await submissionService.submitContent(user.id, user.username || 'user', content);
       
       toast({
         title: "Submission Received",
         description: "Your content has been submitted for review",
       });
       
-      return true;
+      return result;
     } catch (error: any) {
-      console.error("Content submission error:", error);
       toast({
         title: "Submission Failed",
-        description: `Could not submit content: ${error.message}`,
+        description: error instanceof SubmissionError ? error.message : "Could not submit content",
         variant: "destructive",
       });
       return false;
@@ -495,152 +387,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     savedStories,
     saveStory,
     unsaveStory,
-    isStorySaved: (storyId: string) => savedStories.includes(storyId),
-    followUser: (userId: string) => {
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "You must be logged in to follow users",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      try {
-        if (!userId) {
-          throw new Error("Invalid user ID");
-        }
-        
-        if (userId === user.id) {
-          toast({
-            title: "Cannot follow yourself",
-            description: "You cannot follow your own account",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        if (!following.includes(userId)) {
-          const updatedFollowing = [...following, userId];
-          setFollowing(updatedFollowing);
-          localStorage.setItem(`${FOLLOWING_KEY}_${user.id}`, JSON.stringify(updatedFollowing));
-          
-          toast({
-            title: "User followed",
-            description: "You are now following this user",
-          });
-        } else {
-          toast({
-            title: "Already following",
-            description: "You are already following this user",
-          });
-        }
-      } catch (error: any) {
-        console.error("Error following user:", error);
-        toast({
-          title: "Error",
-          description: `Could not follow user: ${error.message}`,
-          variant: "destructive",
-        });
-      }
-    },
-    unfollowUser: (userId: string) => {
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "You must be logged in to unfollow users",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      try {
-        if (!userId) {
-          throw new Error("Invalid user ID");
-        }
-        
-        const updatedFollowing = following.filter(id => id !== userId);
-        setFollowing(updatedFollowing);
-        localStorage.setItem(`${FOLLOWING_KEY}_${user.id}`, JSON.stringify(updatedFollowing));
-        
-        toast({
-          title: "User unfollowed",
-          description: "You are no longer following this user",
-        });
-      } catch (error: any) {
-        console.error("Error unfollowing user:", error);
-        toast({
-          title: "Error",
-          description: `Could not unfollow user: ${error.message}`,
-          variant: "destructive",
-        });
-      }
-    },
-    isFollowingUser: (userId: string) => following.includes(userId),
-    likeContent: (contentId: string, contentType: string) => {
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "You must be logged in to like content",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      try {
-        if (!contentId || !contentType) {
-          throw new Error("Invalid content information");
-        }
-        
-        const likeId = `${contentType}_${contentId}`;
-        if (!likedContent.includes(likeId)) {
-          const updatedLikedContent = [...likedContent, likeId];
-          setLikedContent(updatedLikedContent);
-          localStorage.setItem(`${LIKED_CONTENT_KEY}_${user.id}`, JSON.stringify(updatedLikedContent));
-          
-          toast({
-            title: "Content liked",
-            description: "You have liked this content",
-          });
-        }
-      } catch (error: any) {
-        console.error("Error liking content:", error);
-        toast({
-          title: "Error",
-          description: `Could not like content: ${error.message}`,
-          variant: "destructive",
-        });
-      }
-    },
-    unlikeContent: (contentId: string, contentType: string) => {
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "You must be logged in to unlike content",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      try {
-        if (!contentId || !contentType) {
-          throw new Error("Invalid content information");
-        }
-        
-        const likeId = `${contentType}_${contentId}`;
-        const updatedLikedContent = likedContent.filter(id => id !== likeId);
-        setLikedContent(updatedLikedContent);
-        localStorage.setItem(`${LIKED_CONTENT_KEY}_${user.id}`, JSON.stringify(updatedLikedContent));
-      } catch (error: any) {
-        console.error("Error unliking content:", error);
-        toast({
-          title: "Error",
-          description: `Could not unlike content: ${error.message}`,
-          variant: "destructive",
-        });
-      }
-    },
-    isContentLiked: (contentId: string) => likedContent.some(id => id.includes(contentId)),
+    isStorySaved: (storyId: string) => socialService.isStorySaved(storyId, savedStories),
+    followUser,
+    unfollowUser,
+    isFollowingUser: (userId: string) => socialService.isFollowingUser(userId, following),
+    likeContent,
+    unlikeContent,
+    isContentLiked: (contentId: string) => socialService.isContentLiked(contentId, likedContent),
     getUserSubmissions,
     submitContent,
     adminLogin
