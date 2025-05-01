@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
-import { Profile, ExtendedUser } from '@/types/auth';
+import { Profile, ExtendedUser, UserRole } from '@/types/auth';
 import { useToast } from '@/components/ui/use-toast';
 
 export const useAuthState = () => {
@@ -57,7 +57,8 @@ export const useAuthState = () => {
         display_name: data.display_name || null,
         avatar_url: data.avatar_url || null,
         bio: data.bio || '',
-        role: ((data as any).role as string) || "user"
+        // Fix: Cast the role string to UserRole type or default to "user"
+        role: (((data as any).role as string) || "user") as UserRole
       };
       
       setProfile(profileWithRole);
