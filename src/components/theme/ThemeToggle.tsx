@@ -13,12 +13,12 @@ const ThemeToggle: React.FC = () => {
       size="icon" 
       onClick={toggleTheme} 
       aria-label="Toggle theme"
-      className="rounded-full hover:bg-heritage-ochre/10 hover:text-heritage-ochre transition-all duration-200"
+      className="rounded-full"
     >
       {theme === 'light' ? (
         <Moon className="h-[1.2rem] w-[1.2rem]" />
       ) : (
-        <Sun className="h-[1.2rem] w-[1.2rem] text-kente-gold" />
+        <Sun className="h-[1.2rem] w-[1.2rem]" />
       )}
     </Button>
   );

@@ -1,37 +1,36 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 40 15% 95%;
-    --foreground: 30 10% 15%;
+    --background: 260 60% 98%;
+    --foreground: 260 10% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 30 10% 15%;
+    --card-foreground: 260 10% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 30 10% 15%;
+    --popover-foreground: 260 10% 15%;
 
-    --primary: 35 45% 35%;
+    --primary: 260 60% 75%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 20% 85%;
-    --secondary-foreground: 30 30% 25%;
+    --secondary: 260 30% 90%;
+    --secondary-foreground: 260 30% 30%;
 
-    --muted: 30 15% 88%;
-    --muted-foreground: 30 10% 40%;
+    --muted: 260 20% 90%;
+    --muted-foreground: 260 10% 40%;
 
-    --accent: 40 60% 55%;
-    --accent-foreground: 30 10% 15%;
+    --accent: 40 100% 67%;
+    --accent-foreground: 260 10% 15%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 25% 82%;
-    --input: 30 25% 82%;
-    --ring: 35 45% 35%;
+    --border: 260 30% 86%;
+    --input: 260 30% 86%;
+    --ring: 260 60% 75%;
 
     --radius: 0.75rem;
 
@@ -46,33 +45,33 @@
   }
 
   .dark {
-    --background: 25 20% 8%;
-    --foreground: 40 15% 95%;
+    --background: 260 20% 10%;
+    --foreground: 260 10% 98%;
 
-    --card: 25 20% 10%;
-    --card-foreground: 40 15% 95%;
+    --card: 260 20% 12%;
+    --card-foreground: 260 10% 98%;
 
-    --popover: 25 20% 10%;
-    --popover-foreground: 40 15% 95%;
+    --popover: 260 20% 12%;
+    --popover-foreground: 260 10% 98%;
 
-    --primary: 35 60% 55%;
-    --primary-foreground: 25 20% 8%;
+    --primary: 260 60% 75%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 15% 15%;
-    --secondary-foreground: 40 15% 95%;
+    --secondary: 260 30% 20%;
+    --secondary-foreground: 260 10% 98%;
 
-    --muted: 30 15% 15%;
-    --muted-foreground: 40 10% 75%;
+    --muted: 260 20% 20%;
+    --muted-foreground: 260 10% 85%;
 
-    --accent: 40 80% 65%;
-    --accent-foreground: 25 20% 8%;
+    --accent: 40 100% 67%;
+    --accent-foreground: 260 20% 10%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 15% 20%;
-    --input: 30 15% 20%;
-    --ring: 35 60% 55%;
+    --border: 260 20% 25%;
+    --input: 260 20% 25%;
+    --ring: 260 60% 75%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -108,21 +107,5 @@
   .story-link {
     @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
   }
-
-  .african-pattern {
-    background-image: radial-gradient(circle at 25% 25%, hsl(var(--accent)) 2px, transparent 2px),
-                      radial-gradient(circle at 75% 75%, hsl(var(--primary)) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  .kente-accent {
-    background: linear-gradient(45deg, 
-      hsl(var(--accent)) 25%, 
-      hsl(var(--primary)) 25%, 
-      hsl(var(--primary)) 50%, 
-      hsl(var(--accent)) 50%, 
-      hsl(var(--accent)) 75%, 
-      hsl(var(--primary)) 75%);
-    background-size: 8px 8px;
-  }
 }
+
