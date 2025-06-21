@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { authService, AuthError } from "@/services/authService";
@@ -33,11 +32,11 @@ export const useAuthOperations = () => {
 
   const login = async (email: string, password: string) => {
     try {
-      const { data } = await authService.login(email, password);
+      const authResult = await authService.login(email, password);
       
       // Check if user is admin and redirect accordingly
-      if (data?.user) {
-        const isAdmin = await checkAdminStatus(data.user.id);
+      if (authResult?.user) {
+        const isAdmin = await checkAdminStatus(authResult.user.id);
         console.log("User is admin:", isAdmin);
         
         if (isAdmin) {
@@ -74,7 +73,7 @@ export const useAuthOperations = () => {
 
   const signup = async (username: string, email: string, password: string) => {
     try {
-      const { data } = await authService.signup(username, email, password);
+      const authResult = await authService.signup(username, email, password);
       
       toast({
         title: "Account created",
