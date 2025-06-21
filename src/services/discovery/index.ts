@@ -1,4 +1,8 @@
 
+import { reviewService } from './reviewService';
+import { userListService } from './userListService';
+import { commentService } from './commentService';
+
 export * from './types';
 export { reviewService } from './reviewService';
 export { userListService } from './userListService';
