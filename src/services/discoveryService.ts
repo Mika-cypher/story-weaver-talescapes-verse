@@ -49,7 +49,7 @@ export const discoveryService = {
       .from('reviews')
       .select(`
         *,
-        profiles (
+        profiles!reviews_user_id_fkey (
           username,
           display_name,
           avatar_url
@@ -169,7 +169,7 @@ export const discoveryService = {
       .from('content_comments')
       .select(`
         *,
-        profiles (
+        profiles!content_comments_user_id_fkey (
           username,
           display_name,
           avatar_url
