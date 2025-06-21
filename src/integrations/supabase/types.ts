@@ -170,6 +170,47 @@ export type Database = {
           },
         ]
       }
+      content_comments: {
+        Row: {
+          comment_text: string
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          parent_comment_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment_text: string
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          parent_comment_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment_text?: string
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          parent_comment_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "content_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_media: {
         Row: {
           category: string | null
@@ -398,6 +439,39 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          rating: number
+          review_text: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          rating: number
+          review_text?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_stories: {
         Row: {
           created_at: string
@@ -524,6 +598,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_lists: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          list_type: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          list_type: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          list_type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_story_settings: {
         Row: {

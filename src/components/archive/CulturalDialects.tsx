@@ -5,9 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MessageSquare, VolumeX, Volume2, Globe, BookOpen } from "lucide-react";
+import { MessageSquare, VolumeX, Volume2, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import { africanDialects } from "@/data/culturalData";
+import RatingDisplay from "@/components/discovery/RatingDisplay";
+import AddToListButton from "@/components/discovery/AddToListButton";
 
 const CulturalDialects: React.FC = () => {
   const [region, setRegion] = useState<string>("all");
@@ -76,6 +78,7 @@ const CulturalDialects: React.FC = () => {
                   <Globe className="h-3 w-3 mr-1" />
                   <span>{dialect.tribe}</span>
                 </div>
+                <RatingDisplay contentId={dialect.id.toString()} contentType="dialect" />
               </CardHeader>
               <CardContent className="flex-grow">
                 <p className="text-muted-foreground mb-4">
@@ -107,15 +110,12 @@ const CulturalDialects: React.FC = () => {
                   </ul>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between border-t pt-4">
-                <div className="flex items-center text-muted-foreground">
-                  <MessageSquare className="h-4 w-4 mr-1" />
-                  <span>{dialect.speakerCount} speakers</span>
-                </div>
+              <CardFooter className="flex justify-between items-center border-t pt-4">
+                <AddToListButton contentId={dialect.id.toString()} contentType="dialect" />
                 <Button variant="outline" size="sm" asChild>
                   <Link to={`/archive/dialect/${dialect.id}`}>
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Learn More
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Discuss
                   </Link>
                 </Button>
               </CardFooter>

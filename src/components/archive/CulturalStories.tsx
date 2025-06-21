@@ -5,9 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Headphones, Globe, Heart } from "lucide-react";
+import { BookOpen, Headphones, Globe, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { africanStories } from "@/data/culturalData";
+import RatingDisplay from "@/components/discovery/RatingDisplay";
+import AddToListButton from "@/components/discovery/AddToListButton";
 
 const CulturalStories: React.FC = () => {
   const [region, setRegion] = useState<string>("all");
@@ -84,21 +86,19 @@ const CulturalStories: React.FC = () => {
                   <Globe className="h-3 w-3 mr-1" />
                   <span>{story.tribe}</span>
                 </div>
+                <RatingDisplay contentId={story.id.toString()} contentType="story" />
               </CardHeader>
               <CardContent className="flex-grow">
                 <p className="text-muted-foreground line-clamp-3">
                   {story.description}
                 </p>
               </CardContent>
-              <CardFooter className="flex justify-between border-t pt-4">
-                <div className="flex items-center text-muted-foreground">
-                  <Heart className="h-4 w-4 mr-1" />
-                  <span>{story.likes}</span>
-                </div>
+              <CardFooter className="flex justify-between items-center border-t pt-4">
+                <AddToListButton contentId={story.id.toString()} contentType="story" />
                 <Button variant="outline" size="sm" asChild>
                   <Link to={`/archive/story/${story.id}`}>
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Read Story
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Discuss
                   </Link>
                 </Button>
               </CardFooter>

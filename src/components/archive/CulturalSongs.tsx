@@ -5,8 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Music, Play, Pause, Info, Heart } from "lucide-react";
+import { Music, Play, Pause, MessageSquare } from "lucide-react";
+import { Link } from "react-router-dom";
 import { africanSongs } from "@/data/culturalData";
+import RatingDisplay from "@/components/discovery/RatingDisplay";
+import AddToListButton from "@/components/discovery/AddToListButton";
 
 const CulturalSongs: React.FC = () => {
   const [region, setRegion] = useState<string>("all");
@@ -98,20 +101,20 @@ const CulturalSongs: React.FC = () => {
                   <Music className="h-3 w-3 mr-1" />
                   <span>{song.tribe}</span>
                 </div>
+                <RatingDisplay contentId={song.id.toString()} contentType="song" />
               </CardHeader>
               <CardContent className="flex-grow">
                 <p className="text-muted-foreground line-clamp-3">
                   {song.description}
                 </p>
               </CardContent>
-              <CardFooter className="flex justify-between border-t pt-4">
-                <div className="flex items-center text-muted-foreground">
-                  <Heart className="h-4 w-4 mr-1" />
-                  <span>{song.likes}</span>
-                </div>
-                <Button variant="outline" size="sm">
-                  <Info className="h-4 w-4 mr-2" />
-                  More Info
+              <CardFooter className="flex justify-between items-center border-t pt-4">
+                <AddToListButton contentId={song.id.toString()} contentType="song" />
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={`/archive/song/${song.id}`}>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Discuss
+                  </Link>
                 </Button>
               </CardFooter>
             </Card>

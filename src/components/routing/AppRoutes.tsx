@@ -24,6 +24,7 @@ const Login = React.lazy(() => import("@/pages/Login"));
 const Signup = React.lazy(() => import("@/pages/Signup"));
 const ResetPassword = React.lazy(() => import("@/pages/ResetPassword"));
 const Profile = React.lazy(() => import("@/pages/Profile"));
+const ContentDetail = React.lazy(() => import("@/pages/ContentDetail"));
 
 export const AppRoutes = () => {
   return (
@@ -82,6 +83,9 @@ export const AppRoutes = () => {
             </motion.div>
           } />
           <Route path="/story/:id" element={<Story />} />
+          
+          {/* Cultural Heritage Detail Routes */}
+          <Route path="/archive/:type/:id" element={<ContentDetail />} />
           
           {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
