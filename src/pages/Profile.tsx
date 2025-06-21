@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
@@ -27,8 +26,8 @@ const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [activeAudioId, setActiveAudioId] = useState<number | null>(null);
-  const [openSettingsId, setOpenSettingsId] = useState<number | null>(null);
+  const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
+  const [openSettingsId, setOpenSettingsId] = useState<string | null>(null);
   const [showDrafts, setShowDrafts] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
@@ -58,7 +57,7 @@ const Profile: React.FC = () => {
         const savedStoriesData = allStories
           .filter(story => savedStories.includes(story.id))
           .map(story => ({
-            id: parseInt(story.id),
+            id: story.id, // Keep as string
             title: story.title,
             excerpt: story.description,
             coverImage: story.coverImage || "/placeholder.svg",
@@ -78,7 +77,7 @@ const Profile: React.FC = () => {
             story.author === displayName
           )
           .map(story => ({
-            id: parseInt(story.id),
+            id: story.id, // Keep as string
             title: story.title,
             excerpt: story.description,
             coverImage: story.coverImage || "/placeholder.svg",
@@ -113,11 +112,11 @@ const Profile: React.FC = () => {
     loadUserData();
   }, [isLoggedIn, isOwnProfile, navigate, savedStories, displayName, user]);
   
-  const handleToggleAudio = (storyId: number) => {
+  const handleToggleAudio = (storyId: string) => {
     setActiveAudioId(activeAudioId === storyId ? null : storyId);
   };
 
-  const handleToggleSettings = (storyId: number) => {
+  const handleToggleSettings = (storyId: string) => {
     setOpenSettingsId(openSettingsId === storyId ? null : storyId);
   };
   
