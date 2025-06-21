@@ -153,6 +153,27 @@ export const mediaService = {
     return (data || []) as Portfolio[];
   },
 
+  async updatePortfolio(id: string, updates: Partial<Portfolio>): Promise<Portfolio> {
+    const { data, error } = await supabase
+      .from('portfolios')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data as Portfolio;
+  },
+
+  async deletePortfolio(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('portfolios')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
   async addToPortfolio(portfolioId: string, mediaId: string, orderIndex: number = 0): Promise<PortfolioItem> {
     const { data, error } = await supabase
       .from('portfolio_items')

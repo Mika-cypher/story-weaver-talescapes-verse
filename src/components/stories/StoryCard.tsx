@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,24 +8,14 @@ import { BookOpen, Headphones, Heart, Settings } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import AudioPlayer from "@/components/AudioPlayer";
 import StoryBackgroundControls from "@/components/StoryBackgroundControls";
-
-export interface Story {
-  id: number;
-  title: string;
-  excerpt: string;
-  coverImage: string;
-  category: string;
-  hasAudio: boolean;
-  audioSrc?: string;
-  likes: number;
-}
+import { Story } from "@/types/story";
 
 interface StoryCardProps {
   story: Story;
-  activeAudioId: number | null;
-  openSettingsId: number | null;
-  onToggleAudio: (storyId: number) => void;
-  onToggleSettings: (storyId: number) => void;
+  activeAudioId: string | null;
+  openSettingsId: string | null;
+  onToggleAudio: (storyId: string) => void;
+  onToggleSettings: (storyId: string) => void;
 }
 
 const StoryCard: React.FC<StoryCardProps> = ({
@@ -35,6 +25,9 @@ const StoryCard: React.FC<StoryCardProps> = ({
   onToggleAudio,
   onToggleSettings
 }) => {
+  const hasAudio = story.scenes?.[0]?.audio;
+  const firstSceneAudio = story.scenes?.[0]?.audio;
+
   return (
     <Card 
       key={story.id} 
@@ -43,13 +36,13 @@ const StoryCard: React.FC<StoryCardProps> = ({
     >
       <div className="aspect-w-16 aspect-h-9 relative">
         <img
-          src={story.coverImage}
+          src={story.coverImage || "https://images.unsplash.com/photo-1633621477511-b1b3fb9a2280?q=80&w=2748&auto=format&fit=crop"}
           alt={story.title}
           className="w-full h-48 object-cover"
         />
         <div className="absolute top-2 right-2">
           <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
-            {story.category}
+            {story.status}
           </Badge>
         </div>
       </div>
@@ -57,11 +50,11 @@ const StoryCard: React.FC<StoryCardProps> = ({
         <CardTitle className="text-xl line-clamp-1">{story.title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground line-clamp-2 mb-4">{story.excerpt}</p>
+        <p className="text-muted-foreground line-clamp-2 mb-4">{story.description || "No description available"}</p>
         
-        {activeAudioId === story.id && story.hasAudio && story.audioSrc && (
+        {activeAudioId === story.id && hasAudio && firstSceneAudio && (
           <div className="mt-4">
-            <AudioPlayer audioSrc={story.audioSrc} title={story.title} />
+            <AudioPlayer audioSrc={firstSceneAudio} title={story.title} />
           </div>
         )}
 
@@ -79,9 +72,9 @@ const StoryCard: React.FC<StoryCardProps> = ({
         <div className="flex items-center space-x-4 text-muted-foreground">
           <div className="flex items-center">
             <Heart className="h-4 w-4 mr-1" />
-            <span className="text-sm">{story.likes}</span>
+            <span className="text-sm">0</span>
           </div>
-          {story.hasAudio && (
+          {hasAudio && (
             <Button 
               variant="ghost" 
               size="sm" 

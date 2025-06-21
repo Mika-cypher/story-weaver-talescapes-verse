@@ -1,13 +1,14 @@
 
 import React from "react";
-import StoryCard, { Story } from "./StoryCard";
+import StoryCard from "./StoryCard";
+import { Story } from "@/types/story";
 
 interface StoryListProps {
   stories: Story[];
-  activeAudioId: number | null;
-  openSettingsId: number | null;
-  onToggleAudio: (storyId: number) => void;
-  onToggleSettings: (storyId: number) => void;
+  activeAudioId: string | null;
+  openSettingsId: string | null;
+  onToggleAudio: (storyId: string) => void;
+  onToggleSettings: (storyId: string) => void;
 }
 
 const StoryList: React.FC<StoryListProps> = ({

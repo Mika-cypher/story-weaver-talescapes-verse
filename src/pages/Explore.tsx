@@ -5,16 +5,49 @@ import Footer from "@/components/layout/Footer";
 import StoryFilters from "@/components/stories/StoryFilters";
 import StoryList from "@/components/stories/StoryList";
 import SignUpReminder from "@/components/auth/SignUpReminder";
-import { allStories, categories } from "@/data/mockStories";
+import { storyService } from "@/services/storyService";
+import { Story } from "@/types/story";
 import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 const Explore: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [activeAudioId, setActiveAudioId] = useState<number | null>(null);
-  const [openSettingsId, setOpenSettingsId] = useState<number | null>(null);
+  const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
+  const [openSettingsId, setOpenSettingsId] = useState<string | null>(null);
   const [showSignUpReminder, setShowSignUpReminder] = useState(false);
+  const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
   const { isLoggedIn } = useAuth();
+
+  // Dynamic categories based on actual stories
+  const [categories, setCategories] = useState<string[]>(["All"]);
+
+  useEffect(() => {
+    const loadStories = async () => {
+      try {
+        const publishedStories = await storyService.getPublishedStories();
+        setStories(publishedStories);
+        
+        // Extract unique categories from stories (you can expand this logic)
+        const storyCategories = new Set<string>();
+        publishedStories.forEach(story => {
+          // For now, we'll use status as category, but you can add a proper category field
+          if (story.status) {
+            storyCategories.add(story.status);
+          }
+        });
+        
+        setCategories(["All", ...Array.from(storyCategories)]);
+      } catch (error) {
+        console.error("Failed to load stories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStories();
+  }, []);
 
   useEffect(() => {
     // Show sign-up reminder after 30 seconds if not logged in
@@ -26,20 +59,20 @@ const Explore: React.FC = () => {
     }
   }, [isLoggedIn]);
 
-  const filteredStories = allStories.filter(story => {
-    if (selectedCategory !== "All" && story.category !== selectedCategory) {
+  const filteredStories = stories.filter(story => {
+    if (selectedCategory !== "All" && story.status !== selectedCategory) {
       return false;
     }
     
     if (searchTerm && !story.title.toLowerCase().includes(searchTerm.toLowerCase()) && 
-        !story.excerpt.toLowerCase().includes(searchTerm.toLowerCase())) {
+        !story.description?.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
     
     return true;
   });
 
-  const toggleAudio = (storyId: number) => {
+  const toggleAudio = (storyId: string) => {
     if (activeAudioId === storyId) {
       setActiveAudioId(null);
     } else {
@@ -47,7 +80,7 @@ const Explore: React.FC = () => {
     }
   };
 
-  const toggleSettings = (storyId: number) => {
+  const toggleSettings = (storyId: string) => {
     if (openSettingsId === storyId) {
       setOpenSettingsId(null);
     } else {
@@ -75,13 +108,20 @@ const Explore: React.FC = () => {
             onCategoryChange={setSelectedCategory}
           />
 
-          <StoryList 
-            stories={filteredStories}
-            activeAudioId={activeAudioId}
-            openSettingsId={openSettingsId}
-            onToggleAudio={toggleAudio}
-            onToggleSettings={toggleSettings}
-          />
+          {loading ? (
+            <div className="flex justify-center items-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2">Loading stories...</span>
+            </div>
+          ) : (
+            <StoryList 
+              stories={filteredStories}
+              activeAudioId={activeAudioId}
+              openSettingsId={openSettingsId}
+              onToggleAudio={toggleAudio}
+              onToggleSettings={toggleSettings}
+            />
+          )}
         </div>
       </main>
       <Footer />
