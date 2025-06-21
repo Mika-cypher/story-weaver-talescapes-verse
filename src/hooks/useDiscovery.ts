@@ -1,21 +1,21 @@
 
-import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { discoveryService, Review, UserList, ContentComment } from '@/services/discoveryService';
+import { reviewService, userListService, commentService } from '@/services/discovery';
+import type { Review, UserList, ContentComment } from '@/services/discovery';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 export const useReviews = (contentId: string, contentType: string) => {
   return useQuery({
     queryKey: ['reviews', contentId, contentType],
-    queryFn: () => discoveryService.getReviews(contentId, contentType),
+    queryFn: () => reviewService.getReviews(contentId, contentType),
   });
 };
 
 export const useAverageRating = (contentId: string, contentType: string) => {
   return useQuery({
     queryKey: ['average-rating', contentId, contentType],
-    queryFn: () => discoveryService.getAverageRating(contentId, contentType),
+    queryFn: () => reviewService.getAverageRating(contentId, contentType),
   });
 };
 
@@ -24,7 +24,7 @@ export const useCreateReview = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: discoveryService.createReview,
+    mutationFn: reviewService.createReview,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['reviews', data.content_id, data.content_type] });
       queryClient.invalidateQueries({ queryKey: ['average-rating', data.content_id, data.content_type] });
@@ -48,7 +48,7 @@ export const useUserListStatus = (contentId: string, contentType: string) => {
 
   return useQuery({
     queryKey: ['user-list-status', user?.id, contentId, contentType],
-    queryFn: () => user ? discoveryService.getUserListStatus(user.id, contentId, contentType) : null,
+    queryFn: () => user ? userListService.getUserListStatus(user.id, contentId, contentType) : null,
     enabled: !!user,
   });
 };
@@ -58,7 +58,7 @@ export const useAddToList = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: discoveryService.addToList,
+    mutationFn: userListService.addToList,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-list-status'] });
       queryClient.invalidateQueries({ queryKey: ['user-lists'] });
@@ -83,7 +83,7 @@ export const useRemoveFromList = () => {
 
   return useMutation({
     mutationFn: ({ userId, contentId, contentType }: { userId: string; contentId: string; contentType: string }) =>
-      discoveryService.removeFromList(userId, contentId, contentType),
+      userListService.removeFromList(userId, contentId, contentType),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-list-status'] });
       queryClient.invalidateQueries({ queryKey: ['user-lists'] });
@@ -105,7 +105,7 @@ export const useRemoveFromList = () => {
 export const useComments = (contentId: string, contentType: string) => {
   return useQuery({
     queryKey: ['comments', contentId, contentType],
-    queryFn: () => discoveryService.getComments(contentId, contentType),
+    queryFn: () => commentService.getComments(contentId, contentType),
   });
 };
 
@@ -114,7 +114,7 @@ export const useCreateComment = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: discoveryService.createComment,
+    mutationFn: commentService.createComment,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['comments', data.content_id, data.content_type] });
       toast({
