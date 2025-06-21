@@ -11,6 +11,7 @@ import { UserProtectedRoute } from "@/components/user/UserProtectedRoute";
 import Index from "./pages/Index";
 import Explore from "./pages/Explore";
 import Create from "./pages/Create";
+import Submit from "./pages/Submit";
 import Archive from "./pages/Archive";
 import NotFound from "./pages/NotFound";
 import Story from "./pages/Story";
@@ -63,6 +64,16 @@ const AnimatedRoutes = () => {
           transition={{ duration: 0.3 }}
         >
           <Create />
+        </motion.div>
+      } />
+      <Route path="/submit" element={
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Submit />
         </motion.div>
       } />
       <Route path="/archive" element={
