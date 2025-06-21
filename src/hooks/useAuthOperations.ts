@@ -109,24 +109,10 @@ export const useAuthOperations = () => {
     }
   };
 
-  const adminLogin = (password: string): boolean => {
-    try {
-      return authService.adminLogin(password);
-    } catch (error: any) {
-      toast({
-        title: "Access Denied",
-        description: error instanceof AuthError ? error.message : "Invalid admin password",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
   return {
     login,
     signup,
     logout,
-    updateProfile,
-    adminLogin
+    updateProfile
   };
 };

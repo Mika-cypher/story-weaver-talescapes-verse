@@ -8,38 +8,41 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { useToast } from "@/components/ui/use-toast";
 
 const AdminLogin: React.FC = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { adminLogin, isAdmin } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { login, isAdmin, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Check if already logged in as admin
   useEffect(() => {
-    if (isAdmin) {
+    if (isLoggedIn && isAdmin) {
       navigate("/admin/dashboard");
     }
-  }, [isAdmin, navigate]);
+  }, [isAdmin, isLoggedIn, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Attempting admin login with password");
+    setIsLoading(true);
     
-    const success = adminLogin(password);
-    
-    if (success) {
-      console.log("Admin login successful");
-      toast({
-        title: "Login successful",
-        description: "Welcome to the admin dashboard",
-      });
-      navigate("/admin/dashboard");
-    } else {
-      console.log("Admin login failed");
+    try {
+      console.log("Attempting admin login with email:", email);
+      
+      await login(email, password);
+      
+      // The useEffect above will handle the redirect once isAdmin is updated
+      console.log("Login successful, waiting for admin status check");
+      
+    } catch (error: any) {
+      console.log("Admin login failed:", error);
       toast({
         title: "Login failed",
-        description: "Invalid password",
+        description: error.message || "Invalid credentials or insufficient permissions",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -48,23 +51,34 @@ const AdminLogin: React.FC = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <CardDescription>Enter your password to access the admin dashboard</CardDescription>
+          <CardDescription>Enter your admin credentials to access the dashboard</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent>
             <div className="grid gap-4">
               <Input
+                type="email"
+                placeholder="Enter admin email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <Input
                 type="password"
-                placeholder="Enter admin password"
+                placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <p className="text-xs text-muted-foreground">Default password is: admin123</p>
+              <p className="text-xs text-muted-foreground">
+                Sign up with admin@example.com to get admin access, or use your admin credentials.
+              </p>
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">Login</Button>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
+            </Button>
           </CardFooter>
         </form>
       </Card>

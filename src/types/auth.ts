@@ -38,5 +38,4 @@ export interface AuthContextType {
   isContentLiked: (contentId: string) => boolean;
   getUserSubmissions: () => Promise<any[]>;
   submitContent: (content: any) => Promise<boolean>;
-  adminLogin: (password: string) => boolean;
 }

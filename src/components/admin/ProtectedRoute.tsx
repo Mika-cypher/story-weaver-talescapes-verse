@@ -8,12 +8,17 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isLoggedIn, profile } = useAuth();
   
-  console.log("AdminProtectedRoute - isAdmin:", isAdmin);
+  console.log("AdminProtectedRoute - isLoggedIn:", isLoggedIn, "isAdmin:", isAdmin, "profile role:", profile?.role);
+
+  if (!isLoggedIn) {
+    console.log("User not logged in, redirecting to admin login");
+    return <Navigate to="/admin/login" replace />;
+  }
 
   if (!isAdmin) {
-    console.log("Redirecting to admin login page from ProtectedRoute");
+    console.log("User logged in but not admin, redirecting to admin login");
     return <Navigate to="/admin/login" replace />;
   }
 

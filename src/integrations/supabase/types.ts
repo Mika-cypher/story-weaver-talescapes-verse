@@ -361,6 +361,7 @@ export type Database = {
           display_name: string | null
           hourly_rate: number | null
           id: string
+          role: string | null
           updated_at: string
           username: string
           website_url: string | null
@@ -375,6 +376,7 @@ export type Database = {
           display_name?: string | null
           hourly_rate?: number | null
           id: string
+          role?: string | null
           updated_at?: string
           username: string
           website_url?: string | null
@@ -389,6 +391,7 @@ export type Database = {
           display_name?: string | null
           hourly_rate?: number | null
           id?: string
+          role?: string | null
           updated_at?: string
           username?: string
           website_url?: string | null

@@ -121,20 +121,5 @@ export const authService = {
     if (error) {
       throw new AuthError(`Failed to update profile: ${error.message}`);
     }
-  },
-  
-  /**
-   * Admin authentication method (mock)
-   */
-  adminLogin: (password: string): boolean => {
-    if (!password) {
-      throw new AuthError("Password is required");
-    }
-    
-    if (password === "admin123") {
-      return true;
-    }
-    
-    throw new AuthError("Invalid admin password");
   }
 };

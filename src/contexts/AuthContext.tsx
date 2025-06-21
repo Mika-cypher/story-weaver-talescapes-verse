@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     error: authError
   } = useAuthState();
 
-  const { login, signup, logout, updateProfile, adminLogin } = useAuthOperations();
+  const { login, signup, logout, updateProfile } = useAuthOperations();
   const { saveStory, unsaveStory, followUser, unfollowUser, likeContent, unlikeContent } = useSocialOperations();
   const { getUserSubmissions, submitContent } = useSubmissionOperations();
 
@@ -80,8 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     unlikeContent: (contentId, contentType) => unlikeContent(user, contentId, contentType, likedContent, setLikedContent),
     isContentLiked: (contentId: string) => socialService.isContentLiked(contentId, likedContent),
     getUserSubmissions: () => getUserSubmissions(user),
-    submitContent: (content) => submitContent(user, content),
-    adminLogin
+    submitContent: (content) => submitContent(user, content)
   };
 
   return (
