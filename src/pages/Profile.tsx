@@ -5,18 +5,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { storyService } from "@/services/storyService";
+import { mediaService } from "@/services/mediaService";
 import { Story } from "@/types/story"; 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Settings } from "lucide-react";
+import { Loader2, Settings, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SubmissionForm } from "@/components/user/SubmissionForm";
 import { AccountSettings } from "@/components/user/AccountSettings";
+import { MediaUpload } from "@/components/media/MediaUpload";
+import { MediaGallery } from "@/components/media/MediaGallery";
 
-// Import components
+// Import existing components
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { StoriesTab } from "@/components/profile/StoriesTab";
 import { SavedStoriesTab } from "@/components/profile/SavedStoriesTab";
-import { MediaTab } from "@/components/profile/MediaTab";
 import { ContributionsTab } from "@/components/profile/ContributionsTab";
 
 const Profile: React.FC = () => {
@@ -29,9 +31,11 @@ const Profile: React.FC = () => {
   const [openSettingsId, setOpenSettingsId] = useState<number | null>(null);
   const [showDrafts, setShowDrafts] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
   
   const [userPublishedStories, setUserPublishedStories] = useState<any[]>([]);
   const [userSavedStories, setUserSavedStories] = useState<any[]>([]);
+  const [userMedia, setUserMedia] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Determine if viewing own profile or someone else's
@@ -44,10 +48,10 @@ const Profile: React.FC = () => {
       return;
     }
     
-    const loadStories = async () => {
+    const loadUserData = async () => {
       setLoading(true);
       try {
-        // Get all stories
+        // Load stories
         const allStories = await storyService.getStories();
         
         // Handle saved stories
@@ -61,8 +65,8 @@ const Profile: React.FC = () => {
             category: "Interactive Story",
             hasAudio: !!story.scenes.some(scene => scene.audio),
             audioSrc: story.scenes.find(scene => scene.audio)?.audio,
-            likes: 12, // Mock data
-            views: 45, // Mock data
+            likes: 12,
+            views: 45,
             date: new Date(story.createdAt).toLocaleDateString()
           }));
         setUserSavedStories(savedStoriesData);
@@ -81,17 +85,24 @@ const Profile: React.FC = () => {
             category: "Interactive Story",
             hasAudio: !!story.scenes.some(scene => scene.audio),
             audioSrc: story.scenes.find(scene => scene.audio)?.audio,
-            likes: 18, // Mock data
-            views: 67, // Mock data
+            likes: 18,
+            views: 67,
             date: new Date(story.createdAt).toLocaleDateString(),
             status: story.status
           }));
         setUserPublishedStories(publishedStoriesData);
+
+        // Load user media if viewing own profile or if user exists
+        if (user && isOwnProfile) {
+          const mediaData = await mediaService.getUserMedia(user.id);
+          setUserMedia(mediaData);
+        }
+        
       } catch (error) {
-        console.error("Error loading stories:", error);
+        console.error("Error loading user data:", error);
         toast({
           title: "Error",
-          description: "Failed to load stories",
+          description: "Failed to load profile data",
           variant: "destructive"
         });
       } finally {
@@ -99,26 +110,8 @@ const Profile: React.FC = () => {
       }
     };
     
-    loadStories();
-  }, [isLoggedIn, isOwnProfile, navigate, savedStories, displayName]);
-  
-  // Mock data for other content types
-  const userImages = [
-    { id: "img1", title: "Mountain Landscape", url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", date: "2023-06-15", status: "published" },
-    { id: "img2", title: "Forest Path", url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05", date: "2023-07-20", status: "pending" },
-    { id: "img3", title: "Ocean Sunset", url: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7", date: "2023-08-05", status: "draft" }
-  ];
-
-  const userAudios = [
-    { id: "aud1", title: "Forest Ambience", url: "/sounds/forest.mp3", duration: "2:45", date: "2023-05-10", status: "published" },
-    { id: "aud2", title: "Ocean Waves", url: "/sounds/ocean.mp3", duration: "3:20", date: "2023-06-22", status: "pending" }
-  ];
-
-  const userSubmissions = [
-    { id: "sub1", title: "Traditional Folk Song", type: "Audio", submittedDate: "2023-07-15", date: "2023-07-15", status: "approved" },
-    { id: "sub2", title: "Cultural Artifact Photo", type: "Image", submittedDate: "2023-08-02", date: "2023-08-02", status: "pending" },
-    { id: "sub3", title: "Local Legend", type: "Story", submittedDate: "2023-09-10", date: "2023-09-10", status: "rejected" }
-  ];
+    loadUserData();
+  }, [isLoggedIn, isOwnProfile, navigate, savedStories, displayName, user]);
   
   const handleToggleAudio = (storyId: number) => {
     setActiveAudioId(activeAudioId === storyId ? null : storyId);
@@ -142,6 +135,15 @@ const Profile: React.FC = () => {
     toast({
       title: "Link copied!",
       description: "Profile link has been copied to clipboard",
+    });
+  };
+
+  const handleMediaUploadComplete = (media: any) => {
+    setUserMedia(prev => [media, ...prev]);
+    setShowUpload(false);
+    toast({
+      title: "Media uploaded!",
+      description: "Your media has been added to your profile"
     });
   };
 
@@ -175,12 +177,13 @@ const Profile: React.FC = () => {
           </div>
 
           <Tabs defaultValue="stories" className="mt-8">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="stories">Stories</TabsTrigger>
-              <TabsTrigger value="saved">Saved</TabsTrigger>
               <TabsTrigger value="media">Media</TabsTrigger>
+              <TabsTrigger value="saved">Saved</TabsTrigger>
               <TabsTrigger value="contributions">Contributions</TabsTrigger>
-              {isOwnProfile && <TabsTrigger value="submit">Submit Content</TabsTrigger>}
+              {isOwnProfile && <TabsTrigger value="submit">Submit</TabsTrigger>}
+              {isOwnProfile && <TabsTrigger value="upload"><Upload className="h-4 w-4 mr-2" />Upload</TabsTrigger>}
               {isOwnProfile && <TabsTrigger value="settings"><Settings className="h-4 w-4 mr-2" />Settings</TabsTrigger>}
             </TabsList>
             
@@ -197,6 +200,33 @@ const Profile: React.FC = () => {
                 handleToggleSettings={handleToggleSettings}
               />
             </TabsContent>
+
+            <TabsContent value="media" className="mt-6">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-semibold">
+                    {isOwnProfile ? "Your Media" : `${displayName}'s Media`}
+                  </h3>
+                  {isOwnProfile && (
+                    <button
+                      onClick={() => setShowUpload(!showUpload)}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      {showUpload ? "Hide Upload" : "Upload Media"}
+                    </button>
+                  )}
+                </div>
+                
+                {showUpload && isOwnProfile && (
+                  <MediaUpload onUploadComplete={handleMediaUploadComplete} />
+                )}
+                
+                <MediaGallery 
+                  userId={user?.id} 
+                  showUploadedOnly={isOwnProfile}
+                />
+              </div>
+            </TabsContent>
             
             <TabsContent value="saved" className="mt-6">
               <SavedStoriesTab 
@@ -209,26 +239,23 @@ const Profile: React.FC = () => {
               />
             </TabsContent>
             
-            <TabsContent value="media" className="mt-6">
-              <MediaTab 
-                isOwnProfile={isOwnProfile}
-                displayName={displayName}
-                userImages={userImages}
-                userAudios={userAudios}
-              />
-            </TabsContent>
-            
             <TabsContent value="contributions" className="mt-6">
               <ContributionsTab 
                 isOwnProfile={isOwnProfile}
                 displayName={displayName}
-                userSubmissions={userSubmissions}
+                userSubmissions={[]} // Will be populated from new service
               />
             </TabsContent>
             
             {isOwnProfile && (
               <TabsContent value="submit" className="mt-6">
                 <SubmissionForm />
+              </TabsContent>
+            )}
+
+            {isOwnProfile && (
+              <TabsContent value="upload" className="mt-6">
+                <MediaUpload onUploadComplete={handleMediaUploadComplete} />
               </TabsContent>
             )}
             

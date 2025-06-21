@@ -1,7 +1,8 @@
 
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 
-// Local storage keys
+// Local storage keys for fallback
 export const FOLLOWING_KEY = "talescapes_following";
 export const LIKED_CONTENT_KEY = "talescapes_liked_content";
 export const SAVED_STORIES_KEY = "talescapes_saved_stories";
@@ -15,14 +16,33 @@ export class SocialError extends Error {
 
 export const socialService = {
   /**
-   * Save a story to user's saved stories
+   * Save a story to user's saved stories (Supabase + localStorage fallback)
    */
-  saveStory: (userId: string, storyId: string, savedStories: string[]): string[] => {
+  saveStory: async (userId: string, storyId: string, savedStories: string[]): Promise<string[]> => {
     try {
       if (!userId || !storyId) {
         throw new SocialError("Invalid user or story ID");
       }
       
+      // Try Supabase first
+      const session = await supabase.auth.getSession();
+      if (session.data.session) {
+        const { error } = await supabase
+          .from('saved_stories')
+          .insert({
+            user_id: userId,
+            story_id: storyId
+          });
+        
+        if (!error) {
+          return [...savedStories, storyId];
+        }
+        
+        console.error("Supabase save story error:", error);
+        // Fall through to localStorage
+      }
+      
+      // Fallback to localStorage
       if (!savedStories.includes(storyId)) {
         const updatedSavedStories = [...savedStories, storyId];
         localStorage.setItem(`${SAVED_STORIES_KEY}_${userId}`, JSON.stringify(updatedSavedStories));
@@ -37,14 +57,32 @@ export const socialService = {
   },
 
   /**
-   * Remove a story from user's saved stories
+   * Remove a story from user's saved stories (Supabase + localStorage fallback)
    */
-  unsaveStory: (userId: string, storyId: string, savedStories: string[]): string[] => {
+  unsaveStory: async (userId: string, storyId: string, savedStories: string[]): Promise<string[]> => {
     try {
       if (!userId || !storyId) {
         throw new SocialError("Invalid user or story ID");
       }
       
+      // Try Supabase first
+      const session = await supabase.auth.getSession();
+      if (session.data.session) {
+        const { error } = await supabase
+          .from('saved_stories')
+          .delete()
+          .eq('user_id', userId)
+          .eq('story_id', storyId);
+        
+        if (!error) {
+          return savedStories.filter(id => id !== storyId);
+        }
+        
+        console.error("Supabase unsave story error:", error);
+        // Fall through to localStorage
+      }
+      
+      // Fallback to localStorage
       const updatedSavedStories = savedStories.filter(id => id !== storyId);
       localStorage.setItem(`${SAVED_STORIES_KEY}_${userId}`, JSON.stringify(updatedSavedStories));
       return updatedSavedStories;
@@ -80,9 +118,6 @@ export const socialService = {
     }
   },
 
-  /**
-   * Unfollow a user
-   */
   unfollowUser: (userId: string, targetUserId: string, following: string[]): string[] => {
     try {
       if (!userId || !targetUserId) {
@@ -98,9 +133,6 @@ export const socialService = {
     }
   },
 
-  /**
-   * Like content
-   */
   likeContent: (userId: string, contentId: string, contentType: string, likedContent: string[]): string[] => {
     try {
       if (!userId || !contentId || !contentType) {
@@ -121,9 +153,6 @@ export const socialService = {
     }
   },
 
-  /**
-   * Unlike content
-   */
   unlikeContent: (userId: string, contentId: string, contentType: string, likedContent: string[]): string[] => {
     try {
       if (!userId || !contentId || !contentType) {
@@ -147,16 +176,10 @@ export const socialService = {
     return likedContent.some(id => id.includes(contentId));
   },
 
-  /**
-   * Check if user is following another user
-   */
   isFollowingUser: (targetUserId: string, following: string[]): boolean => {
     return following.includes(targetUserId);
   },
 
-  /**
-   * Check if story is saved
-   */
   isStorySaved: (storyId: string, savedStories: string[]): boolean => {
     return savedStories.includes(storyId);
   }

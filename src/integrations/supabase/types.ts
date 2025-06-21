@@ -78,6 +78,160 @@ export type Database = {
           },
         ]
       }
+      commissions: {
+        Row: {
+          artist_id: string
+          budget_max: number | null
+          budget_min: number | null
+          client_id: string
+          created_at: string
+          deadline: string | null
+          description: string
+          id: string
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          artist_id: string
+          budget_max?: number | null
+          budget_min?: number | null
+          client_id: string
+          created_at?: string
+          deadline?: string | null
+          description: string
+          id?: string
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          artist_id?: string
+          budget_max?: number | null
+          budget_min?: number | null
+          client_id?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string
+          id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_analytics: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          event_type: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          event_type: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_analytics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_media: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          file_size: number | null
+          file_url: string
+          id: string
+          is_featured: boolean | null
+          is_public: boolean | null
+          license_type: string | null
+          media_type: string
+          mime_type: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: number | null
+          file_url: string
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          license_type?: string | null
+          media_type: string
+          mime_type?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          license_type?: string | null
+          media_type?: string
+          mime_type?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_media_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media: {
         Row: {
           created_at: string
@@ -113,33 +267,131 @@ export type Database = {
           },
         ]
       }
+      portfolio_items: {
+        Row: {
+          created_at: string
+          id: string
+          media_id: string
+          order_index: number | null
+          portfolio_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          media_id: string
+          order_index?: number | null
+          portfolio_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          media_id?: string
+          order_index?: number | null
+          portfolio_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_items_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "creator_media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_items_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolios: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          portfolio_type: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          portfolio_type?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          portfolio_type?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolios_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
+          bio_long: string | null
+          commission_status: string | null
           created_at: string
+          creator_type: string[] | null
           display_name: string | null
+          hourly_rate: number | null
           id: string
           updated_at: string
           username: string
+          website_url: string | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          bio_long?: string | null
+          commission_status?: string | null
           created_at?: string
+          creator_type?: string[] | null
           display_name?: string | null
+          hourly_rate?: number | null
           id: string
           updated_at?: string
           username: string
+          website_url?: string | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          bio_long?: string | null
+          commission_status?: string | null
           created_at?: string
+          creator_type?: string[] | null
           display_name?: string | null
+          hourly_rate?: number | null
           id?: string
           updated_at?: string
           username?: string
+          website_url?: string | null
         }
         Relationships: []
       }
