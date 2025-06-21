@@ -3,20 +3,57 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { authService, AuthError } from "@/services/authService";
 import { ExtendedUser, Profile } from "@/types/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAuthOperations = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const checkAdminStatus = async (userId: string): Promise<boolean> => {
+    try {
+      console.log("Checking admin status for user:", userId);
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error("Error fetching user profile:", error);
+        return false;
+      }
+      
+      console.log("User profile role:", profile?.role);
+      return profile?.role === 'admin';
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      return false;
+    }
+  };
+
   const login = async (email: string, password: string) => {
     try {
-      await authService.login(email, password);
+      const { data } = await authService.login(email, password);
       
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
-      });
-      navigate("/");
+      // Check if user is admin and redirect accordingly
+      if (data?.user) {
+        const isAdmin = await checkAdminStatus(data.user.id);
+        console.log("User is admin:", isAdmin);
+        
+        if (isAdmin) {
+          toast({
+            title: "Welcome back, Admin!",
+            description: "Redirecting to admin dashboard.",
+          });
+          navigate("/admin/dashboard");
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "You've successfully logged in.",
+          });
+          navigate("/");
+        }
+      }
     } catch (error: any) {
       if (error instanceof AuthError) {
         toast({
@@ -37,13 +74,20 @@ export const useAuthOperations = () => {
 
   const signup = async (username: string, email: string, password: string) => {
     try {
-      await authService.signup(username, email, password);
+      const { data } = await authService.signup(username, email, password);
       
       toast({
         title: "Account created",
         description: "Please check your email to confirm your account.",
       });
-      navigate("/");
+      
+      // For admin email, redirect to admin login after signup
+      if (email === 'talescapesverse@gmail.com') {
+        console.log("Admin email detected, redirecting to admin login");
+        navigate("/admin/login");
+      } else {
+        navigate("/");
+      }
     } catch (error: any) {
       if (error instanceof AuthError) {
         toast({

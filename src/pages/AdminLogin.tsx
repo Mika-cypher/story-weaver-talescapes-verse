@@ -11,16 +11,26 @@ const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, isAdmin, isLoggedIn } = useAuth();
+  const { login, isAdmin, isLoggedIn, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Check if already logged in as admin
   useEffect(() => {
+    console.log("AdminLogin useEffect - isLoggedIn:", isLoggedIn, "isAdmin:", isAdmin, "user:", user?.email);
+    
     if (isLoggedIn && isAdmin) {
+      console.log("User is already logged in as admin, redirecting to dashboard");
       navigate("/admin/dashboard");
+    } else if (isLoggedIn && !isAdmin) {
+      console.log("User is logged in but not admin");
+      toast({
+        title: "Access Denied",
+        description: "You need admin privileges to access this area.",
+        variant: "destructive",
+      });
     }
-  }, [isAdmin, isLoggedIn, navigate]);
+  }, [isAdmin, isLoggedIn, navigate, user, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,8 +41,7 @@ const AdminLogin: React.FC = () => {
       
       await login(email, password);
       
-      // The useEffect above will handle the redirect once isAdmin is updated
-      console.log("Login successful, waiting for admin status check");
+      console.log("Login successful");
       
     } catch (error: any) {
       console.log("Admin login failed:", error);
@@ -45,6 +54,18 @@ const AdminLogin: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Don't render the form if already logged in as admin
+  if (isLoggedIn && isAdmin) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Redirecting to admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">

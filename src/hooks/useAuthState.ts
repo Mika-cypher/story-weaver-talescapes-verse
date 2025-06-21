@@ -10,6 +10,7 @@ import { useUserPreferences } from './useUserPreferences';
 export const useAuthState = () => {
   const [user, setUser] = useState<ExtendedUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [authInitialized, setAuthInitialized] = useState(false);
   const { toast } = useToast();
   
   // Use our refactored hooks
@@ -32,8 +33,11 @@ export const useAuthState = () => {
   } = useUserPreferences(user?.id);
 
   useEffect(() => {
+    console.log("Setting up auth state listener");
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
+        console.log("Auth state change event:", event, "Session:", currentSession?.user?.email);
         setSession(currentSession);
         
         if (currentSession?.user) {
@@ -48,6 +52,7 @@ export const useAuthState = () => {
             
             // Use setTimeout to avoid Supabase auth deadlock issues
             setTimeout(() => {
+              console.log("Fetching profile for user:", currentSession.user.id);
               fetchProfile(currentSession.user.id, loadUserPreferences);
             }, 0);
           } catch (error: any) {
@@ -59,23 +64,26 @@ export const useAuthState = () => {
             });
           }
         } else {
+          console.log("No user in session, clearing state");
           setUser(null);
-          // Reset loading state when user logs out
-          if (isLoading) {
-            setTimeout(() => {}, 0);
-          }
+        }
+        
+        if (!authInitialized) {
+          setAuthInitialized(true);
         }
       }
     );
 
     const initializeAuth = async () => {
       try {
+        console.log("Initializing auth state");
         const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           throw new Error(sessionError.message);
         }
         
+        console.log("Current session:", currentSession?.user?.email);
         setSession(currentSession);
         
         if (currentSession?.user) {
@@ -88,6 +96,8 @@ export const useAuthState = () => {
           setUser(userWithUsername);
           await fetchProfile(currentSession.user.id, loadUserPreferences);
         }
+        
+        setAuthInitialized(true);
       } catch (error: any) {
         console.error('Session initialization error:', error);
         toast({
@@ -95,6 +105,7 @@ export const useAuthState = () => {
           description: "There was a problem with your authentication session",
           variant: "destructive",
         });
+        setAuthInitialized(true);
       }
     };
 
@@ -116,7 +127,7 @@ export const useAuthState = () => {
     setLikedContent,
     following,
     setFollowing,
-    isLoading,
+    isLoading: isLoading || !authInitialized,
     error
   };
 };

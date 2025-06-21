@@ -15,6 +15,7 @@ export const useProfileManagement = () => {
     try {
       setIsLoading(true);
       setError(null);
+      console.log("Fetching profile for user:", userId);
 
       const { data, error } = await supabase
         .from('profiles')
@@ -25,22 +26,21 @@ export const useProfileManagement = () => {
       if (error) {
         console.error('Error fetching profile:', error);
         setError(`Failed to fetch profile: ${error.message}`);
-        toast({
-          title: "Profile Error",
-          description: `Could not load your profile data: ${error.message}`,
-          variant: "destructive",
-        });
+        
+        // Only show toast for unexpected errors, not missing profiles
+        if (error.code !== 'PGRST116') {
+          toast({
+            title: "Profile Error",
+            description: `Could not load your profile data: ${error.message}`,
+            variant: "destructive",
+          });
+        }
         return;
       }
       
       if (!data) {
-        console.error('No profile data found');
+        console.error('No profile data found for user:', userId);
         setError('No profile data found');
-        toast({
-          title: "Profile Missing",
-          description: "Your profile data could not be found",
-          variant: "destructive",
-        });
         return;
       }
       
@@ -55,8 +55,13 @@ export const useProfileManagement = () => {
         role: (((data as any).role as string) || "user") as UserRole
       };
       
+      console.log("Profile fetched successfully:", profileWithRole);
+      console.log("User role:", profileWithRole.role);
+      
       setProfile(profileWithRole);
-      setIsAdmin(profileWithRole.role === "admin");
+      const adminStatus = profileWithRole.role === "admin";
+      setIsAdmin(adminStatus);
+      console.log("Admin status set to:", adminStatus);
 
       // Load user preferences from localStorage if callback provided
       if (userId && loadPreferences) {
