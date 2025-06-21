@@ -10,7 +10,11 @@ import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { UserProtectedRoute } from "@/components/user/UserProtectedRoute";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import { LoadingSpinner } from "@/components/common/LoadingStates";
-import React, { Suspense } from "react";
+import FeedbackButton from "@/components/feedback/FeedbackButton";
+import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
+import { betaAnalyticsService } from "@/services/betaAnalyticsService";
+import { featureToggleService } from "@/services/featureToggleService";
+import React, { Suspense, useEffect, useState } from "react";
 
 // Lazy load route components for better performance
 const Index = React.lazy(() => import("./pages/Index"));
@@ -49,107 +53,144 @@ const RouteLoading = () => (
 
 // Create a separate component for routes with AnimatePresence
 const AnimatedRoutes = () => {
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    // Check if user is new (hasn't seen onboarding before)
+    const hasSeenOnboarding = localStorage.getItem('has_seen_onboarding');
+    if (!hasSeenOnboarding) {
+      // Show onboarding after a short delay
+      const timer = setTimeout(() => {
+        setShowOnboarding(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('has_seen_onboarding', 'true');
+    setShowOnboarding(false);
+  };
+
+  // Track page views
+  useEffect(() => {
+    const trackPageView = () => {
+      const pageName = window.location.pathname;
+      betaAnalyticsService.trackPageView(pageName);
+    };
+
+    trackPageView();
+    window.addEventListener('popstate', trackPageView);
+    return () => window.removeEventListener('popstate', trackPageView);
+  }, []);
+
   return (
-    <Suspense fallback={<RouteLoading />}>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Index />
-          </motion.div>
-        } />
-        <Route path="/explore" element={
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Explore />
-          </motion.div>
-        } />
-        <Route path="/create" element={
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Create />
-          </motion.div>
-        } />
-        <Route path="/submit" element={
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Submit />
-          </motion.div>
-        } />
-        <Route path="/archive" element={
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Archive />
-          </motion.div>
-        } />
-        <Route path="/story/:id" element={<Story />} />
-        
-        {/* Auth Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        
-        {/* User Protected Routes */}
-        <Route path="/profile" element={
-          <UserProtectedRoute>
-            <Profile />
-          </UserProtectedRoute>
-        } />
-        <Route path="/profile/:username" element={<Profile />} />
+    <>
+      <Suspense fallback={<RouteLoading />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Index />
+            </motion.div>
+          } />
+          <Route path="/explore" element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Explore />
+            </motion.div>
+          } />
+          <Route path="/create" element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Create />
+            </motion.div>
+          } />
+          <Route path="/submit" element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Submit />
+            </motion.div>
+          } />
+          <Route path="/archive" element={
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Archive />
+            </motion.div>
+          } />
+          <Route path="/story/:id" element={<Story />} />
+          
+          {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          
+          {/* User Protected Routes */}
+          <Route path="/profile" element={
+            <UserProtectedRoute>
+              <Profile />
+            </UserProtectedRoute>
+          } />
+          <Route path="/profile/:username" element={<Profile />} />
 
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/stories" element={
-          <ProtectedRoute>
-            <AdminStories />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/stories/new" element={
-          <ProtectedRoute>
-            <StoryEditor />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/stories/:id/edit" element={
-          <ProtectedRoute>
-            <StoryEditor />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/stories/:id/preview" element={
-          <ProtectedRoute>
-            <StoryPreview />
-          </ProtectedRoute>
-        } />
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/stories" element={
+            <ProtectedRoute>
+              <AdminStories />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/stories/new" element={
+            <ProtectedRoute>
+              <StoryEditor />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/stories/:id/edit" element={
+            <ProtectedRoute>
+              <StoryEditor />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/stories/:id/preview" element={
+            <ProtectedRoute>
+              <StoryPreview />
+            </ProtectedRoute>
+          } />
 
-        {/* Not Found Route */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
+          {/* Not Found Route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+
+      {/* Beta Features */}
+      {featureToggleService.isEnabled('real_time_feedback') && <FeedbackButton />}
+      <OnboardingFlow open={showOnboarding} onComplete={handleOnboardingComplete} />
+    </>
   );
 };
 
