@@ -6,7 +6,7 @@ import AmbientSoundControls from "@/components/story/AmbientSoundControls";
 import useStoryBackground from "@/hooks/useStoryBackground";
 
 interface StoryBackgroundControlsProps {
-  storyId: number;
+  storyId: string;
   storyTitle: string;
 }
 
@@ -52,4 +52,3 @@ const StoryBackgroundControls: React.FC<StoryBackgroundControlsProps> = ({ story
 };
 
 export default StoryBackgroundControls;
-

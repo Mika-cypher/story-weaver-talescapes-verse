@@ -8,7 +8,7 @@ import {
 } from "@/utils/storyBackgroundOptions";
 
 interface UseStoryBackgroundProps {
-  storyId: number;
+  storyId: string;
   storyTitle: string;
 }
 

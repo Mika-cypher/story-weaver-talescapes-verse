@@ -16,7 +16,7 @@ import {
 } from "@/utils/storyBackgroundOptions";
 
 interface AmbientSoundControlsProps {
-  storyId: number;
+  storyId: string;
   ambientSoundEnabled: boolean;
   selectedAmbientSound: string | null;
   ambientSoundVolume: number;
@@ -118,4 +118,3 @@ const AmbientSoundControls: React.FC<AmbientSoundControlsProps> = ({
 };
 
 export default AmbientSoundControls;
-

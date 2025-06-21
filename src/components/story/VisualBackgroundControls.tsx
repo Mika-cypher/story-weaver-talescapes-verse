@@ -17,7 +17,7 @@ import {
 } from "@/utils/storyBackgroundOptions";
 
 interface VisualBackgroundControlsProps {
-  storyId: number;
+  storyId: string;
   visualBackgroundEnabled: boolean;
   selectedBackground: string | null;
   backgroundOpacity: number;
@@ -84,4 +84,3 @@ const VisualBackgroundControls: React.FC<VisualBackgroundControlsProps> = ({
 };
 
 export default VisualBackgroundControls;
-
