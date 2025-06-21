@@ -47,7 +47,7 @@ export const useProfileData = () => {
             title: story.title,
             excerpt: story.description,
             coverImage: story.coverImage || "/placeholder.svg",
-            category: story.category || "Story",
+            category: "Story",
             hasAudio: !!story.scenes.some(scene => scene.audio),
             audioSrc: story.scenes.find(scene => scene.audio)?.audio,
             date: new Date(story.createdAt).toLocaleDateString()
@@ -65,7 +65,7 @@ export const useProfileData = () => {
             title: story.title,
             excerpt: story.description,
             coverImage: story.coverImage || "/placeholder.svg",
-            category: story.category || "Story",
+            category: "Story",
             hasAudio: !!story.scenes.some(scene => scene.audio),
             audioSrc: story.scenes.find(scene => scene.audio)?.audio,
             date: new Date(story.createdAt).toLocaleDateString(),
