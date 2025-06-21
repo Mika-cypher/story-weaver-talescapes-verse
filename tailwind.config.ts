@@ -63,12 +63,35 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				// African Heritage Color Palette
+				heritage: {
+					'ochre': '#CC7722',
+					'terracotta': '#CD853F',
+					'mud-cloth': '#8B4513',
+					'baobab': '#A0522D',
+					'earth': '#964B00'
+				},
+				kente: {
+					'gold': '#B8860B',
+					'royal-blue': '#4169E1',
+					'deep-red': '#8B0000',
+					'forest-green': '#228B22',
+					'black': '#000000'
+				},
+				savanna: {
+					'grass': '#9ACD32',
+					'sunset': '#FF8C00',
+					'dawn': '#FFD700',
+					'dusk': '#8B4B8C',
+					'acacia': '#DAA520'
+				},
+				// Legacy tale colors for backward compatibility
 				tale: {
-					purple: '#9b87f5',
-					'dark-purple': '#6E59A5',
-					gold: '#FFC857',
-					blue: '#4D94FF',
-					'soft-green': '#F2FCE2',
+					purple: '#8B4B8C',
+					'dark-purple': '#6A3B6E',
+					gold: '#B8860B',
+					blue: '#4169E1',
+					'soft-green': '#F0F8E8',
 					'soft-yellow': '#FEF7CD',
 					'soft-orange': '#FEC6A1',
 					'soft-purple': '#E5DEFF',
@@ -122,6 +145,14 @@ export default {
 					'50%': {
 						opacity: 0.8
 					}
+				},
+				'kente-flow': {
+					'0%': {
+						backgroundPosition: '0% 0%'
+					},
+					'100%': {
+						backgroundPosition: '100% 100%'
+					}
 				}
 			},
 			animation: {
@@ -129,7 +160,8 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
 				'float': 'float 6s ease-in-out infinite',
-				'pulse-soft': 'pulse-soft 3s ease-in-out infinite'
+				'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+				'kente-flow': 'kente-flow 10s linear infinite'
 			}
 		}
 	},
