@@ -21,7 +21,7 @@ export const StoryDetailsForm = ({ form }: StoryDetailsFormProps) => (
     <CardHeader>
       <CardTitle>Story Information</CardTitle>
       <CardDescription>
-        Basic information about your interactive story
+        Basic information about your story
       </CardDescription>
     </CardHeader>
     <CardContent className="space-y-4">

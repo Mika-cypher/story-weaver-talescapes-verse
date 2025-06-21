@@ -9,7 +9,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Story, StoryScene } from "@/types/story";
 import { storyService } from "@/services/storyService";
 import { StoryForm } from "@/components/story/StoryForm";
-import { StoryBuilder } from "@/components/story/StoryBuilder";
 import { StoryBuilderHeader } from "@/components/story/StoryBuilderHeader";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -22,42 +21,23 @@ const Create = () => {
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [category, setCategory] = useState("");
+  const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  
-  // Story structure
-  const [activeTab, setActiveTab] = useState("write");
-  const [scenes, setScenes] = useState<StoryScene[]>([]);
-  const [currentSceneId, setCurrentSceneId] = useState<string | null>(null);
 
   // Check if user is logged in
   useEffect(() => {
     if (!isLoggedIn) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to create stories",
+        description: "Please sign in to write stories",
         variant: "destructive",
       });
       navigate("/login");
     }
   }, [isLoggedIn, navigate, toast]);
-  
-  // Initialize with first scene
-  useEffect(() => {
-    if (scenes.length === 0) {
-      const firstSceneId = uuidv4();
-      const initialScene: StoryScene = {
-        id: firstSceneId,
-        title: "Start",
-        content: "",
-        choices: [],
-      };
-      setScenes([initialScene]);
-      setCurrentSceneId(firstSceneId);
-    }
-  }, []);
 
   // Check if story can be published
-  const canPublish = title && scenes.length > 0 && scenes[0].content.trim().length > 0;
+  const canPublish = title && content.trim().length > 0;
 
   // Save story as draft
   const handleSaveDraft = async () => {
@@ -74,7 +54,16 @@ const Create = () => {
     
     try {
       const storyId = uuidv4();
-      const startSceneId = scenes.length > 0 ? scenes[0].id : "";
+      const sceneId = uuidv4();
+      
+      // Create a single scene for the linear story
+      const scene: StoryScene = {
+        id: sceneId,
+        title: "Story Content",
+        content: content,
+        choices: [],
+        isEnding: true
+      };
       
       const newStory: Story = {
         id: storyId,
@@ -85,8 +74,8 @@ const Create = () => {
         updatedAt: new Date().toISOString(),
         status: "draft",
         featured: false,
-        startSceneId,
-        scenes,
+        startSceneId: sceneId,
+        scenes: [scene],
       };
       
       storyService.saveStory(newStory);
@@ -108,7 +97,7 @@ const Create = () => {
 
   // Preview story
   const handlePreview = () => {
-    if (!title || scenes.length === 0 || !scenes[0].content) {
+    if (!title || !content.trim()) {
       toast({
         title: "Incomplete Story",
         description: "Please provide a title and content for your story.",
@@ -117,7 +106,11 @@ const Create = () => {
       return;
     }
 
-    setActiveTab("preview");
+    // For now, just show a preview message
+    toast({
+      title: "Preview",
+      description: "Story preview will open in a new window (feature coming soon).",
+    });
   };
 
   // Publish story
@@ -125,7 +118,7 @@ const Create = () => {
     if (!canPublish) {
       toast({
         title: "Cannot Publish",
-        description: "Your story needs a title and at least one scene with content.",
+        description: "Your story needs a title and content to be published.",
         variant: "destructive",
       });
       return;
@@ -135,7 +128,16 @@ const Create = () => {
 
     try {
       const storyId = uuidv4();
-      const startSceneId = scenes.length > 0 ? scenes[0].id : "";
+      const sceneId = uuidv4();
+      
+      // Create a single scene for the linear story
+      const scene: StoryScene = {
+        id: sceneId,
+        title: "Story Content",
+        content: content,
+        choices: [],
+        isEnding: true
+      };
       
       const newStory: Story = {
         id: storyId,
@@ -146,15 +148,15 @@ const Create = () => {
         updatedAt: new Date().toISOString(),
         status: "published",
         featured: false,
-        startSceneId,
-        scenes,
+        startSceneId: sceneId,
+        scenes: [scene],
       };
       
       storyService.saveStory(newStory);
       
       toast({
-        title: "Story Published",
-        description: "Your story has been published and is now available to readers.",
+        title: "Story Published!",
+        description: "Your story is now live and available to readers.",
       });
       
       navigate("/explore");
@@ -177,18 +179,16 @@ const Create = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow pt-24 pb-16 bg-background">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <StoryBuilderHeader
-            title={title}
-            onSaveDraft={handleSaveDraft}
-            onPreview={handlePreview}
-            onPublish={handlePublish}
-            canPublish={canPublish}
-            isSaving={isSaving}
-          />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold tracking-tight mb-2">Write Your Story</h1>
+            <p className="text-muted-foreground">
+              Share your creativity with readers around the world. Every great story starts with a single word.
+            </p>
+          </div>
 
           <Card className="shadow-lg">
-            <CardContent className="p-6">
+            <CardContent className="p-8">
               <StoryForm 
                 title={title}
                 setTitle={setTitle}
@@ -196,21 +196,12 @@ const Create = () => {
                 setExcerpt={setExcerpt}
                 category={category}
                 setCategory={setCategory}
+                content={content}
+                setContent={setContent}
                 onSaveDraft={handleSaveDraft}
                 onPreview={handlePreview}
                 onPublish={handlePublish}
               />
-
-              <div className="mt-8">
-                <StoryBuilder 
-                  scenes={scenes}
-                  setScenes={setScenes}
-                  currentSceneId={currentSceneId}
-                  setCurrentSceneId={setCurrentSceneId}
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                />
-              </div>
             </CardContent>
           </Card>
         </div>

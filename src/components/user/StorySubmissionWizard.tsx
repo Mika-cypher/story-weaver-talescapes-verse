@@ -33,7 +33,7 @@ export const StorySubmissionWizard: React.FC = () => {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "Please log in to submit your story",
+        description: "Please log in to share your story",
         variant: "destructive",
       });
       return;
@@ -67,14 +67,14 @@ export const StorySubmissionWizard: React.FC = () => {
       <Card className="max-w-2xl mx-auto">
         <CardHeader className="text-center">
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <CardTitle>Story Submitted Successfully!</CardTitle>
+          <CardTitle>Story Shared Successfully!</CardTitle>
           <CardDescription>
-            Your story has been submitted and will be reviewed for publication.
+            Your story has been submitted and will be reviewed for publication in our cultural archive.
           </CardDescription>
         </CardHeader>
         <CardFooter className="justify-center">
           <Button onClick={() => setSubmitted(false)}>
-            Submit Another Story
+            Share Another Story
           </Button>
         </CardFooter>
       </Card>
@@ -86,10 +86,10 @@ export const StorySubmissionWizard: React.FC = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-6 w-6" />
-          Submit Your Story
+          Share Your Story
         </CardTitle>
         <CardDescription>
-          Share your story with our community. All submissions are reviewed before publication.
+          Share your story with our community and help preserve cultural narratives for future generations.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -148,11 +148,11 @@ export const StorySubmissionWizard: React.FC = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="content">Story Content *</Label>
+            <Label htmlFor="content">Your Story *</Label>
             <Textarea
               id="content"
               {...register("content", { required: "Story content is required" })}
-              placeholder="Write your story here..."
+              placeholder="Write your story here... Let your words come to life!"
               rows={10}
               className="resize-none"
             />
@@ -180,12 +180,12 @@ export const StorySubmissionWizard: React.FC = () => {
             {isSubmitting ? (
               <>
                 <Upload className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
+                Sharing...
               </>
             ) : (
               <>
                 <Upload className="mr-2 h-4 w-4" />
-                Submit Story
+                Share Story
               </>
             )}
           </Button>

@@ -16,6 +16,8 @@ interface StoryFormProps {
   setExcerpt: (excerpt: string) => void;
   category: string;
   setCategory: (category: string) => void;
+  content: string;
+  setContent: (content: string) => void;
   onSaveDraft: () => void;
   onPreview: () => void;
   onPublish: () => void;
@@ -28,6 +30,8 @@ export const StoryForm = ({
   setExcerpt,
   category,
   setCategory,
+  content,
+  setContent,
   onSaveDraft,
   onPreview,
   onPublish,
@@ -49,7 +53,7 @@ export const StoryForm = ({
         <Label htmlFor="excerpt">Short Description</Label>
         <Textarea
           id="excerpt"
-          placeholder="Write a brief description of your story..."
+          placeholder="Write a brief description to hook your readers..."
           value={excerpt}
           onChange={(e) => setExcerpt(e.target.value)}
           className="mt-1 resize-none"
@@ -58,22 +62,49 @@ export const StoryForm = ({
       </div>
 
       <div>
-        <Label htmlFor="category">Category</Label>
+        <Label htmlFor="category">Genre</Label>
         <Select value={category} onValueChange={setCategory}>
           <SelectTrigger id="category" className="mt-1">
-            <SelectValue placeholder="Select a category" />
+            <SelectValue placeholder="Select a genre" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="romance">Romance</SelectItem>
             <SelectItem value="fantasy">Fantasy</SelectItem>
             <SelectItem value="mystery">Mystery</SelectItem>
-            <SelectItem value="scifi">Science Fiction</SelectItem>
-            <SelectItem value="historical">Historical</SelectItem>
+            <SelectItem value="teen-fiction">Teen Fiction</SelectItem>
+            <SelectItem value="young-adult">Young Adult</SelectItem>
+            <SelectItem value="action">Action</SelectItem>
             <SelectItem value="adventure">Adventure</SelectItem>
-            <SelectItem value="romance">Romance</SelectItem>
-            <SelectItem value="horror">Horror</SelectItem>
+            <SelectItem value="drama">Drama</SelectItem>
+            <SelectItem value="historical-fiction">Historical Fiction</SelectItem>
+            <SelectItem value="humor">Humor</SelectItem>
+            <SelectItem value="lgbtq">LGBTQ+</SelectItem>
+            <SelectItem value="paranormal">Paranormal</SelectItem>
+            <SelectItem value="poetry">Poetry</SelectItem>
+            <SelectItem value="science-fiction">Science Fiction</SelectItem>
+            <SelectItem value="thriller">Thriller</SelectItem>
+            <SelectItem value="werewolf">Werewolf</SelectItem>
+            <SelectItem value="vampire">Vampire</SelectItem>
+            <SelectItem value="fan-fiction">Fan Fiction</SelectItem>
+            <SelectItem value="non-fiction">Non-Fiction</SelectItem>
+            <SelectItem value="spiritual">Spiritual</SelectItem>
             <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="content">Your Story</Label>
+        <Textarea
+          id="content"
+          placeholder="Start writing your story here... Let your imagination flow!"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="mt-1 resize-none min-h-[400px]"
+        />
+        <p className="text-sm text-muted-foreground mt-1">
+          Write your complete story here. You can always come back to edit and add more chapters later.
+        </p>
       </div>
 
       <div className="flex flex-wrap justify-end gap-3 pt-4">
