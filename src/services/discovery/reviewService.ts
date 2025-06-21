@@ -8,7 +8,7 @@ export const reviewService = {
       .from('reviews')
       .select(`
         *,
-        profiles!inner (
+        profiles!reviews_user_id_fkey (
           username,
           display_name,
           avatar_url

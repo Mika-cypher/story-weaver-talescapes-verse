@@ -8,7 +8,7 @@ export const commentService = {
       .from('content_comments')
       .select(`
         *,
-        profiles!inner (
+        profiles!content_comments_user_id_fkey (
           username,
           display_name,
           avatar_url
