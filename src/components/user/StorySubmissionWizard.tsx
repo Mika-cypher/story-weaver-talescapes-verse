@@ -89,7 +89,7 @@ export const StorySubmissionWizard: React.FC = () => {
           Share Your Story
         </CardTitle>
         <CardDescription>
-          Share your story with our community and help preserve cultural narratives for future generations.
+          Share your story with our community and help preserve African cultural narratives for future generations.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -127,11 +127,14 @@ export const StorySubmissionWizard: React.FC = () => {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="folklore">Folklore & Legends</SelectItem>
+                  <SelectItem value="folklore">African Folklore & Legends</SelectItem>
                   <SelectItem value="historical">Historical Stories</SelectItem>
-                  <SelectItem value="personal">Personal Narratives</SelectItem>
-                  <SelectItem value="traditional">Traditional Tales</SelectItem>
-                  <SelectItem value="modern">Modern Stories</SelectItem>
+                  <SelectItem value="contemporary">Contemporary Literature</SelectItem>
+                  <SelectItem value="oral-tradition">Oral Tradition</SelectItem>
+                  <SelectItem value="diaspora">Diaspora Stories</SelectItem>
+                  <SelectItem value="coming-of-age">Coming of Age</SelectItem>
+                  <SelectItem value="family-saga">Family Stories</SelectItem>
+                  <SelectItem value="spiritual">Spiritual & Religious</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
@@ -142,7 +145,7 @@ export const StorySubmissionWizard: React.FC = () => {
               <Input
                 id="cultural-origin"
                 {...register("culturalOrigin")}
-                placeholder="e.g., West African, Irish, etc."
+                placeholder="e.g., Yoruba, Swahili, Amhara, etc."
               />
             </div>
           </div>
@@ -152,7 +155,7 @@ export const StorySubmissionWizard: React.FC = () => {
             <Textarea
               id="content"
               {...register("content", { required: "Story content is required" })}
-              placeholder="Write your story here... Let your words come to life!"
+              placeholder="Write your story here... Let your African heritage and creativity shine through your words!"
               rows={10}
               className="resize-none"
             />

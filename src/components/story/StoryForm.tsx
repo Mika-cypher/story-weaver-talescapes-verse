@@ -1,13 +1,10 @@
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Save, Eye, Play } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { Story } from "@/types/story";
 
 interface StoryFormProps {
   title: string;
@@ -68,26 +65,25 @@ export const StoryForm = ({
             <SelectValue placeholder="Select a genre" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="folklore">African Folklore & Legends</SelectItem>
+            <SelectItem value="historical">Historical Fiction</SelectItem>
+            <SelectItem value="contemporary">Contemporary African Literature</SelectItem>
             <SelectItem value="romance">Romance</SelectItem>
-            <SelectItem value="fantasy">Fantasy</SelectItem>
-            <SelectItem value="mystery">Mystery</SelectItem>
-            <SelectItem value="teen-fiction">Teen Fiction</SelectItem>
-            <SelectItem value="young-adult">Young Adult</SelectItem>
-            <SelectItem value="action">Action</SelectItem>
-            <SelectItem value="adventure">Adventure</SelectItem>
-            <SelectItem value="drama">Drama</SelectItem>
-            <SelectItem value="historical-fiction">Historical Fiction</SelectItem>
-            <SelectItem value="humor">Humor</SelectItem>
+            <SelectItem value="magical-realism">Magical Realism</SelectItem>
+            <SelectItem value="urban-fiction">Urban Fiction</SelectItem>
+            <SelectItem value="coming-of-age">Coming of Age</SelectItem>
+            <SelectItem value="family-saga">Family Saga</SelectItem>
+            <SelectItem value="political-fiction">Political Fiction</SelectItem>
+            <SelectItem value="diaspora">Diaspora Stories</SelectItem>
+            <SelectItem value="oral-tradition">Oral Tradition</SelectItem>
+            <SelectItem value="postcolonial">Postcolonial Literature</SelectItem>
+            <SelectItem value="afrofuturism">Afrofuturism</SelectItem>
+            <SelectItem value="mystery">Mystery & Thriller</SelectItem>
+            <SelectItem value="spiritual">Spiritual & Religious</SelectItem>
             <SelectItem value="lgbtq">LGBTQ+</SelectItem>
-            <SelectItem value="paranormal">Paranormal</SelectItem>
+            <SelectItem value="young-adult">Young Adult</SelectItem>
             <SelectItem value="poetry">Poetry</SelectItem>
-            <SelectItem value="science-fiction">Science Fiction</SelectItem>
-            <SelectItem value="thriller">Thriller</SelectItem>
-            <SelectItem value="werewolf">Werewolf</SelectItem>
-            <SelectItem value="vampire">Vampire</SelectItem>
-            <SelectItem value="fan-fiction">Fan Fiction</SelectItem>
-            <SelectItem value="non-fiction">Non-Fiction</SelectItem>
-            <SelectItem value="spiritual">Spiritual</SelectItem>
+            <SelectItem value="memoir">Memoir & Biography</SelectItem>
             <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>
@@ -97,13 +93,13 @@ export const StoryForm = ({
         <Label htmlFor="content">Your Story</Label>
         <Textarea
           id="content"
-          placeholder="Start writing your story here... Let your imagination flow!"
+          placeholder="Begin your story here... Let your voice and heritage shine through your words!"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="mt-1 resize-none min-h-[400px]"
         />
         <p className="text-sm text-muted-foreground mt-1">
-          Write your complete story here. You can always come back to edit and add more chapters later.
+          Share your unique African perspective and storytelling tradition. Your voice matters.
         </p>
       </div>
 
