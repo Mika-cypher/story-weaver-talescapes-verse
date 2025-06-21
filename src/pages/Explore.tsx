@@ -6,9 +6,10 @@ import StoryFilters from "@/components/stories/StoryFilters";
 import StoryList from "@/components/stories/StoryList";
 import SignUpReminder from "@/components/auth/SignUpReminder";
 import { storyService } from "@/services/storyService";
+import { sampleDataService } from "@/services/sampleDataService";
 import { Story } from "@/types/story";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2 } from "lucide-react";
+import { StoryCardSkeleton } from "@/components/common/LoadingStates";
 
 const Explore: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,13 +27,19 @@ const Explore: React.FC = () => {
   useEffect(() => {
     const loadStories = async () => {
       try {
+        // Check if sample data exists, if not, seed it
+        const sampleDataExists = await sampleDataService.checkIfSampleDataExists();
+        if (!sampleDataExists) {
+          console.log('No sample data found, seeding...');
+          await sampleDataService.seedSampleStories();
+        }
+
         const publishedStories = await storyService.getPublishedStories();
         setStories(publishedStories);
         
-        // Extract unique categories from stories (you can expand this logic)
+        // Extract unique categories from stories
         const storyCategories = new Set<string>();
         publishedStories.forEach(story => {
-          // For now, we'll use status as category, but you can add a proper category field
           if (story.status) {
             storyCategories.add(story.status);
           }
@@ -109,9 +116,10 @@ const Explore: React.FC = () => {
           />
 
           {loading ? (
-            <div className="flex justify-center items-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-2">Loading stories...</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+              {[...Array(6)].map((_, index) => (
+                <StoryCardSkeleton key={index} />
+              ))}
             </div>
           ) : (
             <StoryList 

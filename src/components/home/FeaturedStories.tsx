@@ -3,12 +3,15 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { BookOpen, Headphones, Heart, Settings, Loader2 } from "lucide-react";
+import { BookOpen, Headphones, Heart, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import StoryBackgroundControls from "@/components/StoryBackgroundControls";
 import { storyService } from "@/services/storyService";
+import { sampleDataService } from "@/services/sampleDataService";
 import { Story } from "@/types/story";
+import { OptimizedImage } from "@/components/common/OptimizedImage";
+import { StoryCardSkeleton } from "@/components/common/LoadingStates";
 import {
   Collapsible,
   CollapsibleContent,
@@ -24,6 +27,13 @@ const FeaturedStories = () => {
   useEffect(() => {
     const loadFeaturedStories = async () => {
       try {
+        // Check if sample data exists, if not, seed it
+        const sampleDataExists = await sampleDataService.checkIfSampleDataExists();
+        if (!sampleDataExists) {
+          console.log('No sample data found, seeding...');
+          await sampleDataService.seedSampleStories();
+        }
+
         const stories = await storyService.getFeaturedStories();
         setFeaturedStories(stories.slice(0, 3)); // Show only 3 featured stories
       } catch (error) {
@@ -62,9 +72,10 @@ const FeaturedStories = () => {
               Immerse yourself in our handpicked collection of extraordinary tales created by talented storytellers.
             </p>
           </div>
-          <div className="flex justify-center items-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2">Loading featured stories...</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, index) => (
+              <StoryCardSkeleton key={index} />
+            ))}
           </div>
         </div>
       </section>
@@ -96,11 +107,12 @@ const FeaturedStories = () => {
                 className="overflow-hidden transition-all duration-300 hover:shadow-lg"
                 id={`story-card-${story.id}`}
               >
-                <div className="aspect-w-16 aspect-h-9 relative">
-                  <img
+                <div className="relative">
+                  <OptimizedImage
                     src={story.coverImage || "https://images.unsplash.com/photo-1633621477511-b1b3fb9a2280?q=80&w=2748&auto=format&fit=crop"}
                     alt={story.title}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48"
+                    aspectRatio="16/9"
                   />
                   <div className="absolute top-2 right-2">
                     <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">

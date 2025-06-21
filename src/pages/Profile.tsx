@@ -2,9 +2,9 @@
 import React from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { Loader2 } from "lucide-react";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
+import { ProfileSkeleton } from "@/components/common/LoadingStates";
 import { useProfileData } from "@/hooks/useProfileData";
 
 const Profile: React.FC = () => {
@@ -33,9 +33,12 @@ const Profile: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-grow pt-24 pb-16 bg-background flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="ml-2">Loading profile...</p>
+        <main className="flex-grow pt-24 pb-16 bg-background">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-8">
+              <ProfileSkeleton />
+            </div>
+          </div>
         </main>
         <Footer />
       </div>
