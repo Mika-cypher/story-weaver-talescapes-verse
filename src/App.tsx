@@ -23,7 +23,7 @@ const Story = React.lazy(() => import("./pages/Story"));
 const AdminLogin = React.lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
 const AdminStories = React.lazy(() => import("./pages/AdminStories"));
-const StoryEditor = React.lazy(() => import("./components/admin/StoryEditor"));
+const StoryEditor = React.lazy(() => import("./components/admin/StoryEditor").then(module => ({ default: module.StoryEditor })));
 const StoryPreview = React.lazy(() => import("./pages/StoryPreview"));
 const Login = React.lazy(() => import("./pages/Login"));
 const Signup = React.lazy(() => import("./pages/Signup"));

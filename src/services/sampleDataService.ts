@@ -52,21 +52,25 @@ const sampleStories: SampleStory[] = [
       {
         title: "The Magic Flowers",
         content: "As you touch the flowers, they pulse with warm light. You feel a surge of ancient magic flowing through you, and suddenly you can understand the language of the forest.",
+        choices: [],
         isEnding: true
       },
       {
         title: "Across the Stream",
         content: "On the other side of the stream, you find a treehouse built into a massive oak. A wise old owl perches nearby, watching you with knowing eyes.",
+        choices: [],
         isEnding: true
       },
       {
         title: "The Stone Circle",
         content: "Stepping into the circle, you're transported to a realm between worlds where time flows differently. You've discovered a gateway to infinite adventures.",
+        choices: [],
         isEnding: true
       },
       {
         title: "Rune Study",
         content: "The runes tell the story of the forest's guardians. As you read them, you gain the wisdom of ages and become the forest's newest protector.",
+        choices: [],
         isEnding: true
       }
     ]
@@ -104,16 +108,19 @@ const sampleStories: SampleStory[] = [
       {
         title: "Life Support Restored",
         content: "You successfully restart the life support systems, saving the station. As the air clears, you discover the crew was hiding in the emergency bunkers, protected from a solar storm.",
+        choices: [],
         isEnding: true
       },
       {
         title: "The Truth Revealed",
         content: "The station logs reveal the crew discovered an alien artifact that influenced their behavior. By understanding this, you're able to neutralize the threat and restore normalcy.",
+        choices: [],
         isEnding: true
       },
       {
         title: "Hidden Survivors",
         content: "You find the crew hiding in a shielded section of the station. Together, you work to repair the damage and uncover the truth behind the mysterious events.",
+        choices: [],
         isEnding: true
       }
     ]
@@ -164,13 +171,14 @@ export const sampleDataService = {
           coverImage: sampleStory.coverImage,
           author: 'Sample Stories',
           status: 'published' as const,
+          featured: false,
           startSceneId: scenes[0].id,
           scenes,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
         
-        await storyService.createStory(story);
+        await storyService.saveStory(story);
         console.log(`Created sample story: ${story.title}`);
       }
       
