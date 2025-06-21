@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ContentComment } from "./types";
 
@@ -8,7 +7,7 @@ export const commentService = {
       .from('content_comments')
       .select(`
         *,
-        profiles (
+        profiles!fk_content_comments_user_profile (
           username,
           display_name,
           avatar_url

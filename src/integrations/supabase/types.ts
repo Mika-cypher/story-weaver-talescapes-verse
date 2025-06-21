@@ -209,6 +209,13 @@ export type Database = {
             referencedRelation: "content_comments"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_content_comments_user_profile"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       creator_media: {
@@ -470,7 +477,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_reviews_user_profile"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_stories: {
         Row: {
