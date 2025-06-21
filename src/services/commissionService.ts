@@ -16,7 +16,7 @@ export interface Commission {
 }
 
 export const commissionService = {
-  // Create commission request
+  // Create a new commission request
   async createCommission(commissionData: Omit<Commission, 'id' | 'created_at' | 'updated_at'>): Promise<Commission> {
     const { data, error } = await supabase
       .from('commissions')
@@ -25,10 +25,10 @@ export const commissionService = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Commission;
   },
 
-  // Get user's commissions (as client or artist)
+  // Get commissions for a user (as client or artist)
   async getUserCommissions(userId: string): Promise<Commission[]> {
     const { data, error } = await supabase
       .from('commissions')
@@ -37,7 +37,7 @@ export const commissionService = {
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data || [];
+    return (data || []) as Commission[];
   },
 
   // Update commission status
@@ -50,11 +50,11 @@ export const commissionService = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Commission;
   },
 
-  // Get commissions for artist (open for applications)
-  async getOpenCommissions(): Promise<Commission[]> {
+  // Get commissions available for an artist
+  async getAvailableCommissions(): Promise<Commission[]> {
     const { data, error } = await supabase
       .from('commissions')
       .select('*')
@@ -62,6 +62,6 @@ export const commissionService = {
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data || [];
+    return (data || []) as Commission[];
   }
 };

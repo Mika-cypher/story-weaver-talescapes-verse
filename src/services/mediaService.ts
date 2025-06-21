@@ -68,7 +68,7 @@ export const mediaService = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as CreatorMedia;
   },
 
   // Get user's media
@@ -80,7 +80,7 @@ export const mediaService = {
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data || [];
+    return (data || []) as CreatorMedia[];
   },
 
   // Get public media
@@ -97,7 +97,7 @@ export const mediaService = {
     const { data, error } = await query.order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data || [];
+    return (data || []) as CreatorMedia[];
   },
 
   // Update media
@@ -110,7 +110,7 @@ export const mediaService = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as CreatorMedia;
   },
 
   // Delete media
@@ -132,7 +132,7 @@ export const mediaService = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as Portfolio;
   },
 
   async getUserPortfolios(userId: string): Promise<Portfolio[]> {
@@ -150,7 +150,7 @@ export const mediaService = {
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data || [];
+    return (data || []) as Portfolio[];
   },
 
   async addToPortfolio(portfolioId: string, mediaId: string, orderIndex: number = 0): Promise<PortfolioItem> {
@@ -165,6 +165,6 @@ export const mediaService = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as PortfolioItem;
   }
 };

@@ -133,7 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Social features - integrated with socialService
-  const saveStory = (storyId: string) => {
+  const saveStory = async (storyId: string) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -144,7 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      const updatedSavedStories = socialService.saveStory(user.id, storyId, savedStories);
+      const updatedSavedStories = await socialService.saveStory(user.id, storyId, savedStories);
       setSavedStories(updatedSavedStories);
       
       toast({
@@ -160,7 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const unsaveStory = (storyId: string) => {
+  const unsaveStory = async (storyId: string) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -171,7 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     try {
-      const updatedSavedStories = socialService.unsaveStory(user.id, storyId, savedStories);
+      const updatedSavedStories = await socialService.unsaveStory(user.id, storyId, savedStories);
       setSavedStories(updatedSavedStories);
       
       toast({
@@ -318,7 +318,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   // Content submission functions
-  const getUserSubmissions = () => {
+  const getUserSubmissions = async (): Promise<any[]> => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -328,7 +328,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return [];
     }
     
-    return submissionService.getUserSubmissions(user.id);
+    try {
+      return await submissionService.getUserSubmissions(user.id);
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+      return [];
+    }
   };
   
   const submitContent = async (content: any): Promise<boolean> => {

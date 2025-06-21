@@ -27,8 +27,8 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   savedStories: string[];
-  saveStory: (storyId: string) => void;
-  unsaveStory: (storyId: string) => void;
+  saveStory: (storyId: string) => Promise<void>;
+  unsaveStory: (storyId: string) => Promise<void>;
   isStorySaved: (storyId: string) => boolean;
   followUser: (userId: string) => void;
   unfollowUser: (userId: string) => void;
@@ -36,7 +36,7 @@ export interface AuthContextType {
   likeContent: (contentId: string, contentType: string) => void;
   unlikeContent: (contentId: string, contentType: string) => void;
   isContentLiked: (contentId: string) => boolean;
-  getUserSubmissions: () => any[];
+  getUserSubmissions: () => Promise<any[]>;
   submitContent: (content: any) => Promise<boolean>;
   adminLogin: (password: string) => boolean;
 }
