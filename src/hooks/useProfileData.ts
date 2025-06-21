@@ -47,11 +47,9 @@ export const useProfileData = () => {
             title: story.title,
             excerpt: story.description,
             coverImage: story.coverImage || "/placeholder.svg",
-            category: "Interactive Story",
+            category: story.category || "Story",
             hasAudio: !!story.scenes.some(scene => scene.audio),
             audioSrc: story.scenes.find(scene => scene.audio)?.audio,
-            likes: 12,
-            views: 45,
             date: new Date(story.createdAt).toLocaleDateString()
           }));
         setUserSavedStories(savedStoriesData);
@@ -67,11 +65,9 @@ export const useProfileData = () => {
             title: story.title,
             excerpt: story.description,
             coverImage: story.coverImage || "/placeholder.svg",
-            category: "Interactive Story",
+            category: story.category || "Story",
             hasAudio: !!story.scenes.some(scene => scene.audio),
             audioSrc: story.scenes.find(scene => scene.audio)?.audio,
-            likes: 18,
-            views: 67,
             date: new Date(story.createdAt).toLocaleDateString(),
             status: story.status
           }));

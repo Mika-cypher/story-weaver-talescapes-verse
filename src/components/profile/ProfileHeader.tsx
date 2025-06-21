@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { UserPlus, Share2, LogOut } from "lucide-react";
@@ -38,10 +37,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <AvatarFallback>{displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <div className="flex items-center gap-2">
-                <CardTitle>{displayName}</CardTitle>
-                <Badge className="ml-2">Storyteller</Badge>
-              </div>
+              <CardTitle>{displayName}</CardTitle>
               {!isOwnProfile && user && (
                 <Button 
                   variant={isFollowing ? "outline" : "default"} 
@@ -63,7 +59,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </Button>
               )}
               {isOwnProfile && user && (
-                <CardDescription>{user.email}</CardDescription>
+                <CardDescription className="mt-2">{user.email}</CardDescription>
               )}
             </div>
           </div>
@@ -83,14 +79,6 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="text-center">
             <p className="text-xl font-bold">{publishedStoriesCount}</p>
             <p className="text-sm text-muted-foreground">Stories</p>
-          </div>
-          <div className="text-center">
-            <p className="text-xl font-bold">142</p>
-            <p className="text-sm text-muted-foreground">Followers</p>
-          </div>
-          <div className="text-center">
-            <p className="text-xl font-bold">38</p>
-            <p className="text-sm text-muted-foreground">Following</p>
           </div>
         </div>
       </CardHeader>
