@@ -49,7 +49,7 @@ export const discoveryService = {
       .from('reviews')
       .select(`
         *,
-        profiles:user_id (
+        profiles!reviews_user_id_fkey (
           username,
           display_name,
           avatar_url
@@ -60,7 +60,7 @@ export const discoveryService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as Review[];
   },
 
   async createReview(review: Omit<Review, 'id' | 'created_at' | 'updated_at' | 'profiles'>): Promise<Review> {
@@ -71,7 +71,7 @@ export const discoveryService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as Review;
   },
 
   async updateReview(id: string, updates: Partial<Pick<Review, 'rating' | 'review_text'>>): Promise<Review> {
@@ -83,7 +83,7 @@ export const discoveryService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as Review;
   },
 
   async deleteReview(id: string): Promise<void> {
@@ -125,7 +125,7 @@ export const discoveryService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as UserList[];
   },
 
   async addToList(listItem: Omit<UserList, 'id' | 'created_at'>): Promise<UserList> {
@@ -136,7 +136,7 @@ export const discoveryService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as UserList;
   },
 
   async removeFromList(userId: string, contentId: string, contentType: string): Promise<void> {
@@ -160,7 +160,7 @@ export const discoveryService = {
       .maybeSingle();
 
     if (error) throw error;
-    return data;
+    return data as UserList | null;
   },
 
   // Comments
@@ -169,7 +169,7 @@ export const discoveryService = {
       .from('content_comments')
       .select(`
         *,
-        profiles:user_id (
+        profiles!content_comments_user_id_fkey (
           username,
           display_name,
           avatar_url
@@ -180,7 +180,7 @@ export const discoveryService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as ContentComment[];
   },
 
   async createComment(comment: Omit<ContentComment, 'id' | 'created_at' | 'updated_at' | 'profiles'>): Promise<ContentComment> {
@@ -191,7 +191,7 @@ export const discoveryService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as ContentComment;
   },
 
   async deleteComment(id: string): Promise<void> {
