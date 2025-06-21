@@ -71,7 +71,7 @@ const AdminLogin: React.FC = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Sign up with admin@gmail.com to get admin access, or use your admin credentials.
+                Sign up with talescapesverse@gmail.com to get admin access, or use your admin credentials.
               </p>
             </div>
           </CardContent>
