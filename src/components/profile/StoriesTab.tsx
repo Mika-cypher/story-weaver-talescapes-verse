@@ -14,10 +14,10 @@ interface StoriesTabProps {
   setShowDrafts: (value: boolean) => void;
   userPublishedStories: any[];
   displayName: string;
-  activeAudioId: number | null;
-  openSettingsId: number | null;
-  handleToggleAudio: (storyId: number) => void;
-  handleToggleSettings: (storyId: number) => void;
+  activeAudioId: string | null;
+  openSettingsId: string | null;
+  handleToggleAudio: (storyId: string) => void;
+  handleToggleSettings: (storyId: string) => void;
 }
 
 export const StoriesTab: React.FC<StoriesTabProps> = ({

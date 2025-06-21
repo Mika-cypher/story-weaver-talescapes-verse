@@ -9,10 +9,10 @@ import StoryList from "@/components/stories/StoryList";
 interface SavedStoriesTabProps {
   isOwnProfile: boolean;
   userSavedStories: any[];
-  activeAudioId: number | null;
-  openSettingsId: number | null;
-  handleToggleAudio: (storyId: number) => void;
-  handleToggleSettings: (storyId: number) => void;
+  activeAudioId: string | null;
+  openSettingsId: string | null;
+  handleToggleAudio: (storyId: string) => void;
+  handleToggleSettings: (storyId: string) => void;
 }
 
 export const SavedStoriesTab: React.FC<SavedStoriesTabProps> = ({

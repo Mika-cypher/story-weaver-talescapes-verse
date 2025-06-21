@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Table, 
@@ -28,7 +27,6 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Plus, Settings, Tag, Image as ImageIcon, Edit, Trash2, GalleryHorizontal } from "lucide-react";
-import { categories } from "@/data/mockStories";
 
 interface Category {
   id: string;
@@ -45,8 +43,9 @@ interface VisualAsset {
 }
 
 export const CategoriesAndVisualsManagement: React.FC = () => {
-  // Initialize with mock data based on the imported categories
-  const initialCategories: Category[] = categories.filter(c => c !== "All").map((name, index) => ({
+  // Initialize with default categories
+  const defaultCategories = ["Adventure", "Romance", "Mystery", "Science Fiction", "Fantasy", "Horror", "Historical"];
+  const initialCategories: Category[] = defaultCategories.map((name, index) => ({
     id: `cat-${index + 1}`,
     name,
     storyCount: Math.floor(Math.random() * 10)
