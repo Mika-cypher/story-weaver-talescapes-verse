@@ -38,6 +38,10 @@ export const useProfileData = () => {
         // Load stories
         const allStories = await storyService.getStories();
         
+        console.log("Current user:", user);
+        console.log("All stories:", allStories);
+        console.log("Is own profile:", isOwnProfile);
+        
         // Handle saved stories
         const savedStoriesData = allStories
           .filter(story => savedStories.includes(story.id))
@@ -53,13 +57,28 @@ export const useProfileData = () => {
           }));
         setUserSavedStories(savedStoriesData);
         
-        // Handle published stories - filter by user ID instead of displayName
+        // Handle published stories - filter by user ID and exclude sample stories
         const publishedStoriesData = allStories
           .filter(story => {
+            // Debug logging
+            console.log(`Story "${story.title}" - Author: "${story.author}", User ID: "${user?.id}"`);
+            
+            // Exclude sample stories (stories with "Sample Stories" as author or specific sample story titles)
+            if (story.author === 'Sample Stories' || 
+                story.title === 'The Enchanted Forest' || 
+                story.title === 'The Space Station Mystery') {
+              console.log(`Excluding sample story: ${story.title}`);
+              return false;
+            }
+            
             // For own profile, match by user ID; for others, only show published stories
             if (isOwnProfile && user) {
-              return story.author === user.id;
+              const isUserStory = story.author === user.id;
+              console.log(`Own profile check - Story matches user: ${isUserStory}`);
+              return isUserStory;
             } else {
+              // For other users' profiles, show published stories by that user
+              // This would need to be updated when we have proper user lookups
               return story.status === "published" && story.author === displayName;
             }
           })
@@ -74,6 +93,8 @@ export const useProfileData = () => {
             date: new Date(story.createdAt).toLocaleDateString(),
             status: story.status
           }));
+        
+        console.log("Filtered published stories:", publishedStoriesData);
         setUserPublishedStories(publishedStoriesData);
 
         // Load user media if viewing own profile or if user exists
