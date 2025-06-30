@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -40,7 +39,7 @@ export const useStoryCreation = () => {
       id: storyId,
       title,
       description: excerpt,
-      author: user?.username || user?.email || "Anonymous",
+      author: user?.id || "anonymous", // Use user ID consistently for author matching
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       status,

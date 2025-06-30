@@ -8,7 +8,7 @@ export function mapSupabaseStory(data: any): Story {
     title: data.title,
     description: data.description || "",
     coverImage: data.cover_image_url,
-    author: data.author_id, // This will be replaced with actual author name in a real app
+    author: data.author_id, // Use author_id consistently for matching
     createdAt: data.created_at,
     updatedAt: data.updated_at,
     status: data.status,

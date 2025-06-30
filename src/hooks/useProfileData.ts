@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
@@ -54,12 +53,16 @@ export const useProfileData = () => {
           }));
         setUserSavedStories(savedStoriesData);
         
-        // Handle published stories
+        // Handle published stories - filter by user ID instead of displayName
         const publishedStoriesData = allStories
-          .filter(story => 
-            (isOwnProfile ? true : story.status === "published") && 
-            story.author === displayName
-          )
+          .filter(story => {
+            // For own profile, match by user ID; for others, only show published stories
+            if (isOwnProfile && user) {
+              return story.author === user.id;
+            } else {
+              return story.status === "published" && story.author === displayName;
+            }
+          })
           .map(story => ({
             id: story.id,
             title: story.title,
