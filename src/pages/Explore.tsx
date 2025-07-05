@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import StoryFilters from "@/components/stories/StoryFilters";
@@ -9,8 +10,12 @@ import { storyService } from "@/services/storyService";
 import { Story } from "@/types/story";
 import { useAuth } from "@/contexts/AuthContext";
 import { StoryCardSkeleton } from "@/components/common/LoadingStates";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Explore: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
@@ -93,6 +98,22 @@ const Explore: React.FC = () => {
       <Navbar />
       <main className="flex-grow pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Return Button */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-6"
+          >
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/")}
+              className="hover:bg-accent"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          </motion.div>
+
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">Explore Stories</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
