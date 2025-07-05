@@ -18,6 +18,100 @@ import { ArrowLeft, Users, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import AudioLibraryTab from "@/components/explore/AudioLibraryTab";
 
+// Sample audio data for the audio library
+const sampleAudioData: CreatorMedia[] = [
+  {
+    id: "audio-1",
+    user_id: "creator-1",
+    title: "African Rain Dance",
+    description: "Traditional percussion and vocals celebrating the coming of rain season",
+    media_type: "audio",
+    file_url: "https://example.com/audio/rain-dance.mp3",
+    tags: ["traditional", "percussion", "african", "cultural"],
+    category: "Traditional Music",
+    is_public: true,
+    is_featured: true,
+    license_type: "Creative Commons",
+    created_at: "2024-01-15T10:00:00Z",
+    updated_at: "2024-01-15T10:00:00Z"
+  },
+  {
+    id: "audio-2",
+    user_id: "creator-2",
+    title: "Kora Meditation",
+    description: "Peaceful kora melodies for relaxation and meditation",
+    media_type: "audio",
+    file_url: "https://example.com/audio/kora-meditation.mp3",
+    tags: ["kora", "meditation", "peaceful", "instrumental"],
+    category: "Instrumental",
+    is_public: true,
+    is_featured: false,
+    license_type: "All Rights Reserved",
+    created_at: "2024-01-14T14:30:00Z",
+    updated_at: "2024-01-14T14:30:00Z"
+  },
+  {
+    id: "audio-3",
+    user_id: "creator-3",
+    title: "Storyteller's Voice",
+    description: "Professional narration sample for African folktales",
+    media_type: "audio",
+    file_url: "https://example.com/audio/storyteller-voice.mp3",
+    tags: ["narration", "storytelling", "voice-over", "professional"],
+    category: "Voice & Narration",
+    is_public: true,
+    is_featured: true,
+    license_type: "Creative Commons",
+    created_at: "2024-01-13T09:15:00Z",
+    updated_at: "2024-01-13T09:15:00Z"
+  },
+  {
+    id: "audio-4",
+    user_id: "creator-4",
+    title: "Modern Afrobeat Mix",
+    description: "Contemporary Afrobeat fusion with electronic elements",
+    media_type: "audio",
+    file_url: "https://example.com/audio/afrobeat-mix.mp3",
+    tags: ["afrobeat", "modern", "electronic", "fusion"],
+    category: "Contemporary",
+    is_public: true,
+    is_featured: false,
+    license_type: "Creative Commons",
+    created_at: "2024-01-12T16:45:00Z",
+    updated_at: "2024-01-12T16:45:00Z"
+  },
+  {
+    id: "audio-5",
+    user_id: "creator-5",
+    title: "Djembe Rhythms",
+    description: "Traditional djembe patterns from West Africa",
+    media_type: "audio",
+    file_url: "https://example.com/audio/djembe-rhythms.mp3",
+    tags: ["djembe", "traditional", "west-africa", "percussion"],
+    category: "Traditional Music",
+    is_public: true,
+    is_featured: true,
+    license_type: "All Rights Reserved",
+    created_at: "2024-01-11T11:20:00Z",
+    updated_at: "2024-01-11T11:20:00Z"
+  },
+  {
+    id: "audio-6",
+    user_id: "creator-6",
+    title: "Ambient Forest Sounds",
+    description: "Natural soundscape from African rainforests",
+    media_type: "audio",
+    file_url: "https://example.com/audio/forest-ambient.mp3",
+    tags: ["ambient", "nature", "forest", "soundscape"],
+    category: "Nature & Ambient",
+    is_public: true,
+    is_featured: false,
+    license_type: "Creative Commons",
+    created_at: "2024-01-10T08:00:00Z",
+    updated_at: "2024-01-10T08:00:00Z"
+  }
+];
+
 const Explore: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,9 +135,10 @@ const Explore: React.FC = () => {
         const publishedStories = await storyService.getPublishedStories();
         setStories(publishedStories);
         
-        // Load public audio media
+        // Load public audio media and combine with sample data
         const publicAudio = await mediaService.getPublicMedia('audio');
-        setAudioMedia(publicAudio);
+        const combinedAudio = [...sampleAudioData, ...publicAudio];
+        setAudioMedia(combinedAudio);
         
         // Extract unique categories from stories
         const storyCategories = new Set<string>();

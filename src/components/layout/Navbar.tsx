@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, PenSquare, Headphones, Archive, User, LogOut } from "lucide-react";
+import { Menu, X, BookOpen, PenSquare, Archive, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
@@ -44,14 +44,14 @@ const Navbar = () => {
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
                 <BookOpen className="mr-2 h-4 w-4" />
-                Explore Stories
+                Explore
               </Link>
               <Link
                 to="/create"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
                 <PenSquare className="mr-2 h-4 w-4" />
-                Create Story
+                Create
               </Link>
               <Link
                 to="/archive"
@@ -59,13 +59,6 @@ const Navbar = () => {
               >
                 <Archive className="mr-2 h-4 w-4" />
                 Cultural Archive
-              </Link>
-              <Link
-                to="/library"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
-              >
-                <Headphones className="mr-2 h-4 w-4" />
-                Audio Library
               </Link>
             </div>
           </div>
@@ -135,14 +128,14 @@ const Navbar = () => {
               className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
             >
               <BookOpen className="inline-block mr-2 h-4 w-4" />
-              Explore Stories
+              Explore
             </Link>
             <Link
               to="/create"
               className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
             >
               <PenSquare className="inline-block mr-2 h-4 w-4" />
-              Create Story
+              Create
             </Link>
             <Link
               to="/archive"
@@ -150,13 +143,6 @@ const Navbar = () => {
             >
               <Archive className="inline-block mr-2 h-4 w-4" />
               Cultural Archive
-            </Link>
-            <Link
-              to="/library"
-              className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
-            >
-              <Headphones className="inline-block mr-2 h-4 w-4" />
-              Audio Library
             </Link>
             {isLoggedIn && (
               <Link

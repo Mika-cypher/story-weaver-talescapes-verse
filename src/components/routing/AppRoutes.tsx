@@ -13,7 +13,6 @@ const Explore = React.lazy(() => import("@/pages/Explore"));
 const Create = React.lazy(() => import("@/pages/Create"));
 const Submit = React.lazy(() => import("@/pages/Submit"));
 const Archive = React.lazy(() => import("@/pages/Archive"));
-const Library = React.lazy(() => import("@/pages/Library"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
 const Story = React.lazy(() => import("@/pages/Story"));
 const AdminLogin = React.lazy(() => import("@/pages/AdminLogin"));
@@ -81,16 +80,6 @@ export const AppRoutes = () => {
               transition={{ duration: 0.3 }}
             >
               <Archive />
-            </motion.div>
-          } />
-          <Route path="/library" element={
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Library />
             </motion.div>
           } />
           <Route path="/story/:id" element={<Story />} />

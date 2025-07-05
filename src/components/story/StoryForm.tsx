@@ -8,6 +8,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { RichTextEditor } from "./RichTextEditor";
+import AudioNarrationRecorder from "./AudioNarrationRecorder";
+import ReadingModeSelector from "./ReadingModeSelector";
+import CollaborationRequestButton from "./CollaborationRequestButton";
 
 interface StoryFormProps {
   title: string;
@@ -37,7 +40,17 @@ export const StoryForm = ({
   onPublish,
 }: StoryFormProps) => {
   const [showSettings, setShowSettings] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string>('');
+  const [readingMode, setReadingMode] = useState<'text' | 'audio' | 'both'>('text');
   const navigate = useNavigate();
+
+  const handleAudioReady = (blob: Blob, url: string) => {
+    setAudioBlob(blob);
+    setAudioUrl(url);
+  };
+
+  const hasAudio = audioBlob && audioBlob.size > 0;
 
   return (
     <div className="relative min-h-screen">
@@ -54,7 +67,7 @@ export const StoryForm = ({
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="text-sm text-muted-foreground">
-              {title || "Untitled Story"}
+              {title || "Untitled Creation"}
             </div>
           </div>
           
@@ -89,42 +102,48 @@ export const StoryForm = ({
           initial={{ opacity: 0, x: 300 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 300 }}
-          className="fixed right-0 top-16 z-40 w-80 h-full bg-background border-l border-border p-6 shadow-lg"
+          className="fixed right-0 top-16 z-40 w-80 h-full bg-background border-l border-border p-6 shadow-lg overflow-y-auto"
         >
-          <h3 className="font-semibold mb-4">Story Settings</h3>
           <div className="space-y-4">
+            <h3 className="font-semibold mb-4">Creation Settings</h3>
+            
             <div>
               <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Genre
+                Category
               </label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a genre" />
+                  <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="folklore">African Folklore & Legends</SelectItem>
-                  <SelectItem value="historical">Historical Fiction</SelectItem>
-                  <SelectItem value="contemporary">Contemporary African Literature</SelectItem>
-                  <SelectItem value="romance">Romance</SelectItem>
-                  <SelectItem value="magical-realism">Magical Realism</SelectItem>
-                  <SelectItem value="urban-fiction">Urban Fiction</SelectItem>
-                  <SelectItem value="coming-of-age">Coming of Age</SelectItem>
-                  <SelectItem value="family-saga">Family Saga</SelectItem>
-                  <SelectItem value="political-fiction">Political Fiction</SelectItem>
-                  <SelectItem value="diaspora">Diaspora Stories</SelectItem>
-                  <SelectItem value="oral-tradition">Oral Tradition</SelectItem>
-                  <SelectItem value="postcolonial">Postcolonial Literature</SelectItem>
-                  <SelectItem value="afrofuturism">Afrofuturism</SelectItem>
-                  <SelectItem value="mystery">Mystery & Thriller</SelectItem>
-                  <SelectItem value="spiritual">Spiritual & Religious</SelectItem>
-                  <SelectItem value="lgbtq">LGBTQ+</SelectItem>
-                  <SelectItem value="young-adult">Young Adult</SelectItem>
+                  <SelectItem value="story">Story</SelectItem>
                   <SelectItem value="poetry">Poetry</SelectItem>
-                  <SelectItem value="memoir">Memoir & Biography</SelectItem>
+                  <SelectItem value="folklore">Folklore & Legends</SelectItem>
+                  <SelectItem value="historical">Historical</SelectItem>
+                  <SelectItem value="contemporary">Contemporary</SelectItem>
+                  <SelectItem value="audio-story">Audio Story</SelectItem>
+                  <SelectItem value="mixed-media">Mixed Media</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            <AudioNarrationRecorder
+              onAudioReady={handleAudioReady}
+              existingAudioUrl={audioUrl}
+            />
+
+            <ReadingModeSelector
+              selectedMode={readingMode}
+              onModeChange={setReadingMode}
+              hasAudio={hasAudio}
+            />
+
+            <CollaborationRequestButton
+              storyId="temp-id"
+              storyTitle={title}
+              isPublished={false}
+            />
           </div>
         </motion.div>
       )}
@@ -135,7 +154,7 @@ export const StoryForm = ({
           {/* Title Input */}
           <div className="mb-8">
             <Input
-              placeholder="Story title"
+              placeholder="Title of your creation"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="text-4xl font-bold border-none shadow-none p-0 h-auto placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
@@ -167,7 +186,7 @@ export const StoryForm = ({
             <RichTextEditor
               content={content}
               setContent={setContent}
-              placeholder="Tell your story... Use the toolbar above to add formatting, images, videos, audio, and more!"
+              placeholder="Start creating... Use the toolbar above to add text, images, videos, audio, and more!"
             />
           </div>
         </div>

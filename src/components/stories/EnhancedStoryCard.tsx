@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Headphones, Heart, Settings, MessageSquare, User, Share } from "lucide-react";
+import { BookOpen, Headphones, Heart, Settings, MessageSquare, User, Share, Users } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import AudioPlayer from "@/components/AudioPlayer";
 import StoryBackgroundControls from "@/components/StoryBackgroundControls";
@@ -65,10 +65,26 @@ const EnhancedStoryCard: React.FC<EnhancedStoryCardProps> = ({
     }
   };
 
+  const handleCollaborate = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to request collaboration",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Collaboration request sent!",
+      description: "Your collaboration request has been sent to the creator"
+    });
+  };
+
   return (
     <Card 
       key={story.id} 
-      className="overflow-hidden transition-all duration-300 hover:shadow-lg"
+      className="overflow-hidden transition-all duration-300 hover:shadow-lg group"
       id={`story-card-${story.id}`}
     >
       <div className="aspect-w-16 aspect-h-9 relative">
@@ -77,14 +93,21 @@ const EnhancedStoryCard: React.FC<EnhancedStoryCardProps> = ({
           alt={story.title}
           className="w-full h-48 object-cover"
         />
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-2 right-2 flex gap-2">
           <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
             {story.status}
           </Badge>
+          {story.status === 'published' && (
+            <Badge variant="outline" className="bg-background/80 backdrop-blur-sm border-green-500 text-green-700">
+              Open to Collab
+            </Badge>
+          )}
         </div>
       </div>
       <CardHeader>
-        <CardTitle className="text-xl line-clamp-1">{story.title}</CardTitle>
+        <CardTitle className="text-xl line-clamp-1 group-hover:text-primary transition-colors">
+          {story.title}
+        </CardTitle>
         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <Avatar className="h-6 w-6">
             <AvatarFallback>
@@ -155,10 +178,23 @@ const EnhancedStoryCard: React.FC<EnhancedStoryCardProps> = ({
         </div>
         
         <div className="flex justify-between items-center w-full gap-2">
-          <Button variant="outline" size="sm">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Discuss
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Discuss
+            </Button>
+            {story.status === 'published' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleCollaborate}
+                className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Collaborate
+              </Button>
+            )}
+          </div>
           <Button size="sm" variant="default" asChild>
             <Link to={`/story/${story.id}`}>
               <BookOpen className="h-4 w-4 mr-2" />
