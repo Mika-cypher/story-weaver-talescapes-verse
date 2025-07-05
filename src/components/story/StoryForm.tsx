@@ -105,40 +105,8 @@ export const StoryForm = ({
           className="fixed right-0 top-16 z-40 w-80 h-full bg-background border-l border-border p-6 shadow-lg overflow-y-auto"
         >
           <div className="space-y-4">
-            <h3 className="font-semibold mb-4">Creation Settings</h3>
+            <h3 className="font-semibold mb-4">Advanced Settings</h3>
             
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                Category
-              </label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="story">Story</SelectItem>
-                  <SelectItem value="poetry">Poetry</SelectItem>
-                  <SelectItem value="folklore">Folklore & Legends</SelectItem>
-                  <SelectItem value="historical">Historical</SelectItem>
-                  <SelectItem value="contemporary">Contemporary</SelectItem>
-                  <SelectItem value="audio-story">Audio Story</SelectItem>
-                  <SelectItem value="mixed-media">Mixed Media</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <AudioNarrationRecorder
-              onAudioReady={handleAudioReady}
-              existingAudioUrl={audioUrl}
-            />
-
-            <ReadingModeSelector
-              selectedMode={readingMode}
-              onModeChange={setReadingMode}
-              hasAudio={hasAudio}
-            />
-
             <CollaborationRequestButton
               storyId="temp-id"
               storyTitle={title}
@@ -167,7 +135,7 @@ export const StoryForm = ({
           </div>
 
           {/* Subtitle/Excerpt Input */}
-          <div className="mb-12">
+          <div className="mb-8">
             <Textarea
               placeholder="Add a subtitle or brief description..."
               value={excerpt}
@@ -178,6 +146,47 @@ export const StoryForm = ({
                 fontSize: '1.25rem',
                 lineHeight: '1.75rem'
               }}
+            />
+          </div>
+
+          {/* Category Selection */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium text-muted-foreground min-w-[80px]">
+                Category:
+              </label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="max-w-xs">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="story">Story</SelectItem>
+                  <SelectItem value="poetry">Poetry</SelectItem>
+                  <SelectItem value="folklore">Folklore & Legends</SelectItem>
+                  <SelectItem value="historical">Historical</SelectItem>
+                  <SelectItem value="contemporary">Contemporary</SelectItem>
+                  <SelectItem value="audio-story">Audio Story</SelectItem>
+                  <SelectItem value="mixed-media">Mixed Media</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Audio Narration Section */}
+          <div className="mb-8">
+            <AudioNarrationRecorder
+              onAudioReady={handleAudioReady}
+              existingAudioUrl={audioUrl}
+            />
+          </div>
+
+          {/* Reading Mode Selection */}
+          <div className="mb-8">
+            <ReadingModeSelector
+              selectedMode={readingMode}
+              onModeChange={setReadingMode}
+              hasAudio={hasAudio}
             />
           </div>
 
