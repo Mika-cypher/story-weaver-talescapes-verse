@@ -29,7 +29,8 @@ const Explore = () => {
       tags: ["folklore", "narration", "traditional"],
       category: "folklore",
       is_public: true,
-      is_featured: true
+      is_featured: true,
+      license_type: "cc_by"
     },
     {
       id: "audio-2", 
@@ -43,7 +44,8 @@ const Explore = () => {
       tags: ["poetry", "modern", "emotional"],
       category: "poetry",
       is_public: true,
-      is_featured: false
+      is_featured: false,
+      license_type: "all_rights_reserved"
     },
     {
       id: "audio-3",
@@ -57,7 +59,8 @@ const Explore = () => {
       tags: ["history", "chronicles", "educational"],
       category: "historical",
       is_public: true,
-      is_featured: true
+      is_featured: true,
+      license_type: "cc_by_sa"
     },
     {
       id: "audio-4",
@@ -71,7 +74,8 @@ const Explore = () => {
       tags: ["ambient", "soundscape", "atmosphere"],
       category: "mixed-media",
       is_public: true,
-      is_featured: false
+      is_featured: false,
+      license_type: "cc0"
     },
     {
       id: "audio-5",
@@ -85,7 +89,8 @@ const Explore = () => {
       tags: ["children", "bedtime", "soothing"],
       category: "story",
       is_public: true,
-      is_featured: true
+      is_featured: true,
+      license_type: "cc_by_nc"
     },
     {
       id: "audio-6",
@@ -99,7 +104,8 @@ const Explore = () => {
       tags: ["music", "cultural", "traditional"],
       category: "other",
       is_public: true,
-      is_featured: false
+      is_featured: false,
+      license_type: "all_rights_reserved"
     }
   ];
 

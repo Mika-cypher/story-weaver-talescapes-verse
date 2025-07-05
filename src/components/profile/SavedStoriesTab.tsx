@@ -1,10 +1,9 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookmarkPlus } from "lucide-react";
-import StoryList from "@/components/stories/StoryList";
+import { StoryList } from "@/components/stories/StoryList";
 
 interface SavedStoriesTabProps {
   isOwnProfile: boolean;

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
@@ -6,7 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { BookOpen, PenSquare } from "lucide-react";
-import StoryList from "@/components/stories/StoryList";
+import { StoryList } from "@/components/stories/StoryList";
 
 interface StoriesTabProps {
   isOwnProfile: boolean;
