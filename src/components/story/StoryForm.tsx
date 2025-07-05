@@ -7,6 +7,7 @@ import { Save, Eye, Play, Settings, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { RichTextEditor } from "./RichTextEditor";
 
 interface StoryFormProps {
   title: string;
@@ -161,17 +162,12 @@ export const StoryForm = ({
             />
           </div>
 
-          {/* Content Editor */}
+          {/* Rich Text Content Editor */}
           <div className="min-h-[60vh]">
-            <Textarea
-              placeholder="Tell your story..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="text-lg leading-relaxed border-none shadow-none p-0 resize-none placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent min-h-[60vh]"
-              style={{
-                fontSize: '1.125rem',
-                lineHeight: '1.75rem'
-              }}
+            <RichTextEditor
+              content={content}
+              setContent={setContent}
+              placeholder="Tell your story... Use the toolbar above to add formatting, images, videos, audio, and more!"
             />
           </div>
         </div>
