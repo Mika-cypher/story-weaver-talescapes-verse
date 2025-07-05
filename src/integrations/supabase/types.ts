@@ -280,6 +280,44 @@ export type Database = {
           },
         ]
       }
+      cultural_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cultural_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "cultural_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media: {
         Row: {
           created_at: string
@@ -570,6 +608,7 @@ export type Database = {
       stories: {
         Row: {
           author_id: string
+          category_id: string | null
           cover_image_url: string | null
           created_at: string
           description: string | null
@@ -582,6 +621,7 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          category_id?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -594,6 +634,7 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          category_id?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -610,6 +651,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "cultural_categories"
             referencedColumns: ["id"]
           },
         ]
@@ -640,6 +688,67 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_story_progress: {
+        Row: {
+          choices_made: Json | null
+          completion_percentage: number | null
+          created_at: string
+          current_scene_id: string | null
+          id: string
+          last_read_at: string
+          scenes_visited: string[] | null
+          story_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          choices_made?: Json | null
+          completion_percentage?: number | null
+          created_at?: string
+          current_scene_id?: string | null
+          id?: string
+          last_read_at?: string
+          scenes_visited?: string[] | null
+          story_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          choices_made?: Json | null
+          completion_percentage?: number | null
+          created_at?: string
+          current_scene_id?: string | null
+          id?: string
+          last_read_at?: string
+          scenes_visited?: string[] | null
+          story_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_story_progress_current_scene_id_fkey"
+            columns: ["current_scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_story_progress_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_story_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_story_settings: {
         Row: {
