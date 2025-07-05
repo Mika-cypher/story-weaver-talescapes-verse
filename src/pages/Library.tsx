@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Play, Pause, Search, Music, Volume2, Mic } from "lucide-react";
+import { Play, Pause, Search, Music, Volume2, Mic, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface AudioItem {
@@ -18,6 +19,7 @@ interface AudioItem {
 }
 
 const Library: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeAudio, setActiveAudio] = useState<string | null>(null);
   const [audioItems, setAudioItems] = useState<AudioItem[]>([]);
@@ -184,6 +186,22 @@ const Library: React.FC = () => {
 
   return (
     <div className="container py-8">
+      {/* Return Button */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="mb-6"
+      >
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="hover:bg-accent"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+      </motion.div>
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
