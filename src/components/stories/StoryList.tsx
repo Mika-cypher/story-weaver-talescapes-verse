@@ -1,6 +1,6 @@
 
 import React from "react";
-import StoryCard from "./StoryCard";
+import EnhancedStoryCard from "./EnhancedStoryCard";
 import { Story } from "@/types/story";
 
 interface StoryListProps {
@@ -29,7 +29,7 @@ const StoryList: React.FC<StoryListProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {stories.map((story) => (
-        <StoryCard
+        <EnhancedStoryCard
           key={story.id}
           story={story}
           activeAudioId={activeAudioId}

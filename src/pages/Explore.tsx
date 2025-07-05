@@ -7,12 +7,16 @@ import StoryFilters from "@/components/stories/StoryFilters";
 import StoryList from "@/components/stories/StoryList";
 import SignUpReminder from "@/components/auth/SignUpReminder";
 import { storyService } from "@/services/storyService";
+import { mediaService } from "@/services/mediaService";
 import { Story } from "@/types/story";
+import { CreatorMedia } from "@/services/mediaService";
 import { useAuth } from "@/contexts/AuthContext";
 import { StoryCardSkeleton } from "@/components/common/LoadingStates";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Users, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
+import AudioLibraryTab from "@/components/explore/AudioLibraryTab";
 
 const Explore: React.FC = () => {
   const navigate = useNavigate();
@@ -22,18 +26,24 @@ const Explore: React.FC = () => {
   const [openSettingsId, setOpenSettingsId] = useState<string | null>(null);
   const [showSignUpReminder, setShowSignUpReminder] = useState(false);
   const [stories, setStories] = useState<Story[]>([]);
+  const [audioMedia, setAudioMedia] = useState<CreatorMedia[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("stories");
   const { isLoggedIn } = useAuth();
 
   // Dynamic categories based on actual stories
   const [categories, setCategories] = useState<string[]>(["All"]);
 
   useEffect(() => {
-    const loadStories = async () => {
+    const loadContent = async () => {
       try {
-        // Load published stories directly without sample data seeding
+        // Load published stories
         const publishedStories = await storyService.getPublishedStories();
         setStories(publishedStories);
+        
+        // Load public audio media
+        const publicAudio = await mediaService.getPublicMedia('audio');
+        setAudioMedia(publicAudio);
         
         // Extract unique categories from stories
         const storyCategories = new Set<string>();
@@ -45,13 +55,13 @@ const Explore: React.FC = () => {
         
         setCategories(["All", ...Array.from(storyCategories)]);
       } catch (error) {
-        console.error("Failed to load stories:", error);
+        console.error("Failed to load content:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadStories();
+    loadContent();
   }, []);
 
   useEffect(() => {
@@ -74,6 +84,14 @@ const Explore: React.FC = () => {
       return false;
     }
     
+    return true;
+  });
+
+  const filteredAudio = audioMedia.filter(audio => {
+    if (searchTerm && !audio.title.toLowerCase().includes(searchTerm.toLowerCase()) && 
+        !audio.description?.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
+    }
     return true;
   });
 
@@ -115,35 +133,66 @@ const Explore: React.FC = () => {
           </motion.div>
 
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Explore Stories</h1>
+            <h1 className="text-4xl font-bold mb-4">Explore</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover immersive stories created by our community of storytellers.
+              Discover stories, music, and audio creations from our community of talented creators. 
+              Connect, discuss, and explore the rich world of African storytelling and culture.
             </p>
+            <div className="flex items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span>Connect with Creators</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                <span>Join Discussions</span>
+              </div>
+            </div>
           </div>
 
-          <StoryFilters 
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-          />
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-              {[...Array(6)].map((_, index) => (
-                <StoryCardSkeleton key={index} />
-              ))}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="flex justify-center mb-8">
+              <TabsList className="grid grid-cols-2 md:w-auto w-full">
+                <TabsTrigger value="stories">Stories</TabsTrigger>
+                <TabsTrigger value="audio">Audio Library</TabsTrigger>
+              </TabsList>
             </div>
-          ) : (
-            <StoryList 
-              stories={filteredStories}
-              activeAudioId={activeAudioId}
-              openSettingsId={openSettingsId}
-              onToggleAudio={toggleAudio}
-              onToggleSettings={toggleSettings}
-            />
-          )}
+
+            <TabsContent value="stories" className="space-y-8">
+              <StoryFilters 
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+              />
+
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[...Array(6)].map((_, index) => (
+                    <StoryCardSkeleton key={index} />
+                  ))}
+                </div>
+              ) : (
+                <StoryList 
+                  stories={filteredStories}
+                  activeAudioId={activeAudioId}
+                  openSettingsId={openSettingsId}
+                  onToggleAudio={toggleAudio}
+                  onToggleSettings={toggleSettings}
+                />
+              )}
+            </TabsContent>
+
+            <TabsContent value="audio" className="space-y-8">
+              <AudioLibraryTab 
+                audioMedia={filteredAudio}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                loading={loading}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       <Footer />
