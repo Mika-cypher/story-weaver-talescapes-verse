@@ -132,21 +132,52 @@ export const sampleDataService = {
     try {
       console.log('Starting to seed sample stories...');
       
+      // Check if sample stories already exist
+      const existingSampleStories = await storyService.getStories();
+      const hasEnchantedForest = existingSampleStories.some(story => story.title === "The Enchanted Forest");
+      const hasSpaceStation = existingSampleStories.some(story => story.title === "The Space Station Mystery");
+      
+      if (hasEnchantedForest && hasSpaceStation) {
+        console.log('Sample stories already exist, skipping seeding.');
+        return;
+      }
+      
       for (const sampleStory of sampleStories) {
+        // Skip if this specific story already exists
+        const storyExists = existingSampleStories.some(story => story.title === sampleStory.title);
+        if (storyExists) {
+          console.log(`Story "${sampleStory.title}" already exists, skipping.`);
+          continue;
+        }
+        
         // Create story structure
         const storyId = uuidv4();
         const sceneIds = new Map<string, string>();
         
-        // Generate scene IDs
-        sampleStory.scenes.forEach((_, index) => {
+        // Generate scene IDs first
+        sampleStory.scenes.forEach((scene, index) => {
           const sceneKey = index === 0 ? 'start' : 
-                          sampleStory.scenes[index].title.toLowerCase().replace(/\s+/g, '-');
+                          scene.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
           sceneIds.set(sceneKey, uuidv4());
         });
         
-        // Build scenes with proper IDs
+        // Add specific scene key mappings for the sample stories to fix foreign key issues
+        sceneIds.set('main-path', sceneIds.get('the-main-path') || uuidv4());
+        sceneIds.set('undergrowth', sceneIds.get('into-the-undergrowth') || uuidv4());
+        sceneIds.set('magic-flowers', sceneIds.get('the-magic-flowers') || uuidv4());
+        sceneIds.set('across-stream', sceneIds.get('across-the-stream') || uuidv4());
+        sceneIds.set('stone-circle', sceneIds.get('the-stone-circle') || uuidv4());
+        sceneIds.set('rune-study', sceneIds.get('rune-study') || uuidv4());
+        sceneIds.set('command-center', sceneIds.get('command-center') || uuidv4());
+        sceneIds.set('crew-quarters', sceneIds.get('crew-quarters') || uuidv4());
+        sceneIds.set('life-support', sceneIds.get('life-support-restored') || uuidv4());
+        sceneIds.set('station-logs', sceneIds.get('the-truth-revealed') || uuidv4());
+        sceneIds.set('investigate-message', sceneIds.get('the-truth-revealed') || uuidv4());
+        sceneIds.set('search-survivors', sceneIds.get('hidden-survivors') || uuidv4());
+        
+        // Build scenes with proper IDs and valid choice references
         const scenes = sampleStory.scenes.map((scene, index) => {
-          const sceneKey = index === 0 ? 'start' : scene.title.toLowerCase().replace(/\s+/g, '-');
+          const sceneKey = index === 0 ? 'start' : scene.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
           const sceneId = sceneIds.get(sceneKey)!;
           
           return {
@@ -158,8 +189,8 @@ export const sampleDataService = {
             choices: scene.isEnding ? [] : scene.choices.map(choice => ({
               id: uuidv4(),
               text: choice.text,
-              nextSceneId: sceneIds.get(choice.nextSceneId) || sceneId
-            })),
+              nextSceneId: sceneIds.get(choice.nextSceneId) || null // Use null instead of invalid ID
+            })).filter(choice => choice.nextSceneId !== null), // Remove choices with invalid references
             isEnding: scene.isEnding || false
           };
         });
@@ -191,7 +222,11 @@ export const sampleDataService = {
   async checkIfSampleDataExists(): Promise<boolean> {
     try {
       const stories = await storyService.getStories();
-      return stories.some(story => story.author === 'Sample Stories');
+      // Check for the specific sample story titles instead of author field
+      return stories.some(story => 
+        story.title === "The Enchanted Forest" || 
+        story.title === "The Space Station Mystery"
+      );
     } catch (error) {
       console.error('Error checking sample data:', error);
       return false;

@@ -6,7 +6,6 @@ import StoryFilters from "@/components/stories/StoryFilters";
 import StoryList from "@/components/stories/StoryList";
 import SignUpReminder from "@/components/auth/SignUpReminder";
 import { storyService } from "@/services/storyService";
-import { sampleDataService } from "@/services/sampleDataService";
 import { Story } from "@/types/story";
 import { useAuth } from "@/contexts/AuthContext";
 import { StoryCardSkeleton } from "@/components/common/LoadingStates";
@@ -27,13 +26,7 @@ const Explore: React.FC = () => {
   useEffect(() => {
     const loadStories = async () => {
       try {
-        // Check if sample data exists, if not, seed it
-        const sampleDataExists = await sampleDataService.checkIfSampleDataExists();
-        if (!sampleDataExists) {
-          console.log('No sample data found, seeding...');
-          await sampleDataService.seedSampleStories();
-        }
-
+        // Load published stories directly without sample data seeding
         const publishedStories = await storyService.getPublishedStories();
         setStories(publishedStories);
         
