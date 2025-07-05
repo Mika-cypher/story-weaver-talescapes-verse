@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { EnhancedStoryPlayer } from "@/components/stories/EnhancedStoryPlayer";
 import { storyService } from "@/services/storyService";
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkCheck, Loader2 } from "lucide-react";
+import { Bookmark, BookmarkCheck, Loader2, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -95,6 +95,18 @@ const Story: React.FC = () => {
   
   return (
     <div className="relative">
+      {/* Return Button */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button 
+          variant="outline" 
+          size="icon"
+          className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+      </div>
+
       <EnhancedStoryPlayer />
       
       {isLoggedIn && (

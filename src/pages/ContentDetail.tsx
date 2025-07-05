@@ -1,10 +1,12 @@
 
 import React from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { africanStories, africanSongs, africanDialects } from '@/data/culturalData';
 import RatingDisplay from '@/components/discovery/RatingDisplay';
 import AddToListButton from '@/components/discovery/AddToListButton';
@@ -12,6 +14,7 @@ import ReviewSection from '@/components/discovery/ReviewSection';
 
 const ContentDetail: React.FC = () => {
   const { type, id } = useParams<{ type: string; id: string }>();
+  const navigate = useNavigate();
 
   if (!type || !id) {
     return <Navigate to="/archive" replace />;
@@ -40,6 +43,18 @@ const ContentDetail: React.FC = () => {
       <Navbar />
       <main className="flex-grow pt-24 pb-16 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Return Button */}
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/archive")}
+              className="hover:bg-accent"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Archive
+            </Button>
+          </div>
+
           <Card>
             <CardHeader>
               <div className="flex flex-col md:flex-row gap-6">

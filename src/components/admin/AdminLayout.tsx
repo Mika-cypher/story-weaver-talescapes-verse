@@ -26,7 +26,9 @@ import {
   Users, 
   Tag, 
   GalleryHorizontal,
-  Archive 
+  Archive,
+  ArrowLeft,
+  Home
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -54,6 +56,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <h1 className="text-xl font-bold">Story Admin</h1>
           </SidebarHeader>
           <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      onClick={() => navigate("/")}
+                      tooltip="Return to Main Site"
+                    >
+                      <Home />
+                      <span>Main Site</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
             <SidebarGroup>
               <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
               <SidebarGroupContent>

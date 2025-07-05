@@ -1,15 +1,17 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { StorySubmissionWizard } from "@/components/user/StorySubmissionWizard";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Users, Award } from "lucide-react";
+import { FileText, Users, Award, ArrowLeft } from "lucide-react";
 
 const Submit: React.FC = () => {
   const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
 
   if (!isLoggedIn) {
     return (
@@ -17,6 +19,18 @@ const Submit: React.FC = () => {
         <Navbar />
         <main className="flex-grow pt-24 pb-16 bg-background">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Return Button */}
+            <div className="mb-6">
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/")}
+                className="hover:bg-accent"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Home
+              </Button>
+            </div>
+
             <div className="text-center mb-12">
               <h1 className="text-4xl font-bold mb-4">Share Your Story</h1>
               <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -32,11 +46,11 @@ const Submit: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button asChild className="w-full">
-                  <a href="/login">Sign In</a>
+                <Button onClick={() => navigate('/login')} className="w-full">
+                  Sign In
                 </Button>
-                <Button variant="outline" asChild className="w-full">
-                  <a href="/signup">Create Account</a>
+                <Button variant="outline" onClick={() => navigate('/signup')} className="w-full">
+                  Create Account
                 </Button>
               </CardContent>
             </Card>
@@ -52,6 +66,18 @@ const Submit: React.FC = () => {
       <Navbar />
       <main className="flex-grow pt-24 pb-16 bg-background">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Return Button */}
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/")}
+              className="hover:bg-accent"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          </div>
+
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">Share Your Story</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
