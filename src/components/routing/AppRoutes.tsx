@@ -1,7 +1,6 @@
 
 import { Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
-import About from "@/pages/About";
 import Explore from "@/pages/Explore";
 import Community from "@/pages/Community";
 import Archive from "@/pages/Archive";
@@ -27,7 +26,6 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/about" element={<About />} />
       <Route path="/explore" element={<Explore />} />
       <Route path="/community" element={<Community />} />
       <Route path="/archive" element={<Archive />} />

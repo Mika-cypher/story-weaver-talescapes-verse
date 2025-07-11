@@ -4,7 +4,6 @@ import { betaAnalyticsService } from "@/services/betaAnalyticsService";
 import { featureToggleService } from "@/services/featureToggleService";
 import { performanceMonitoringService } from "@/services/performanceMonitoringService";
 import { sessionManagementService } from "@/services/sessionManagementService";
-import { accessibilityService } from "@/services/accessibilityService";
 import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 import AppRoutes from "@/components/routing/AppRoutes";
@@ -15,9 +14,6 @@ export const AppInitializer = () => {
   useEffect(() => {
     // Phase 3: Enhanced initialization
     console.log('Phase 3 services initialized');
-    
-    // Initialize accessibility features
-    accessibilityService.addSkipLink('main-content', 'Skip to main content');
     
     // Track initial page load performance
     performanceMonitoringService.recordMetric('app_initialization', performance.now());

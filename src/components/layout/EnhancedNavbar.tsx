@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -45,7 +44,6 @@ const EnhancedNavbar: React.FC = () => {
     { name: "Explore", path: "/explore", icon: Search },
     { name: "Community", path: "/community", icon: Users },
     { name: "Archive", path: "/archive", icon: Archive },
-    { name: "About", path: "/about", icon: Info },
   ];
 
   const handleLogout = async () => {
