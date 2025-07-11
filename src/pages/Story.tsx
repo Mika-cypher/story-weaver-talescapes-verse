@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { EnhancedStoryPlayer } from "@/components/stories/EnhancedStoryPlayer";
+import { AdaptiveStoryReader } from "@/components/story/AdaptiveStoryReader";
 import { storyService } from "@/services/storyService";
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkCheck, Loader2, ArrowLeft } from "lucide-react";
@@ -107,7 +107,7 @@ const Story: React.FC = () => {
         </Button>
       </div>
 
-      <EnhancedStoryPlayer />
+      <AdaptiveStoryReader />
       
       {isLoggedIn && (
         <div className="fixed top-4 right-4 z-50">
