@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,27 +12,27 @@ const EnhancedHero: React.FC = () => {
 
   const culturalHighlights = [
     {
-      title: "African Folktales",
-      description: "Ancient wisdom through storytelling",
-      icon: "🌍",
+      title: "West African Folktales",
+      description: "Anansi stories and Yoruba wisdom",
+      icon: "🕷️",
       color: "from-orange-500 to-red-500"
     },
     {
-      title: "Asian Mythology",
-      description: "Dragons, spirits, and legends",
-      icon: "🐉",
+      title: "East African Legends", 
+      description: "Swahili tales and Ethiopian myths",
+      icon: "🦁",
       color: "from-blue-500 to-purple-500"
     },
     {
-      title: "Indigenous Stories",
-      description: "Sacred narratives of the land",
-      icon: "🦅",
+      title: "Southern African Stories",
+      description: "Ubuntu philosophy and Zulu narratives",
+      icon: "🌍",
       color: "from-green-500 to-teal-500"
     },
     {
-      title: "European Fairy Tales",
-      description: "Enchanted realms and magic",
-      icon: "🏰",
+      title: "Ancient Wisdom",
+      description: "Ancestral knowledge and traditions",
+      icon: "⚡",
       color: "from-pink-500 to-purple-500"
     }
   ];
@@ -59,19 +58,19 @@ const EnhancedHero: React.FC = () => {
             >
               <Badge variant="secondary" className="mb-4 px-4 py-2 text-sm">
                 <Globe className="h-4 w-4 mr-2" />
-                Preserving Stories Across Cultures
+                Preserving African Heritage Through Stories
               </Badge>
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                Where Stories
+                African Stories
                 <span className="block bg-gradient-to-r from-heritage-purple to-cultural-gold bg-clip-text text-transparent">
-                  Bridge Cultures
+                  Come Alive
                 </span>
               </h1>
               
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Discover, create, and share stories that celebrate the rich tapestry of human culture. 
-                Connect with storytellers from around the world and preserve heritage through narrative.
+                Experience the rich tapestry of African storytelling traditions through 
+                interactive multimedia narratives that preserve culture and connect generations.
               </p>
             </motion.div>
 
@@ -86,13 +85,13 @@ const EnhancedHero: React.FC = () => {
                   <Button asChild size="lg" className="px-8 py-6 text-lg bg-gradient-to-r from-heritage-purple to-cultural-gold hover:from-heritage-purple/90 hover:to-cultural-gold/90">
                     <Link to="/explore">
                       <BookOpen className="h-5 w-5 mr-2" />
-                      Explore Stories
+                      Explore African Stories
                     </Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="px-8 py-6 text-lg">
                     <Link to="/create">
                       <Play className="h-5 w-5 mr-2" />
-                      Create Your Story
+                      Share Your Story
                     </Link>
                   </Button>
                 </>
@@ -123,15 +122,15 @@ const EnhancedHero: React.FC = () => {
             >
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-heritage-purple mb-2">500+</div>
-                <div className="text-muted-foreground">Cultural Stories</div>
+                <div className="text-muted-foreground">African Stories</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-cultural-gold mb-2">50+</div>
-                <div className="text-muted-foreground">Cultures Represented</div>
+                <div className="text-3xl md:text-4xl font-bold text-cultural-gold mb-2">54</div>
+                <div className="text-muted-foreground">African Countries</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-heritage-purple mb-2">1000+</div>
-                <div className="text-muted-foreground">Community Members</div>
+                <div className="text-muted-foreground">Storytellers</div>
               </div>
             </motion.div>
           </div>
@@ -178,13 +177,13 @@ const EnhancedHero: React.FC = () => {
           >
             <p className="text-lg text-muted-foreground mb-6">
               {isLoggedIn 
-                ? "Ready to discover amazing stories from around the world?"
-                : "Ready to become part of our global storytelling community?"
+                ? "Ready to discover amazing African stories and connect with storytellers?"
+                : "Ready to become part of our African storytelling community?"
               }
             </p>
             <Button asChild variant="ghost" className="group">
-              <Link to={isLoggedIn ? "/explore" : "/signup"}>
-                {isLoggedIn ? "Start Exploring" : "Get Started Today"}
+              <Link to={isLoggedIn ? "/explore" : "/about"}>
+                {isLoggedIn ? "Start Exploring" : "Learn More About Us"}
                 <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>

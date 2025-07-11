@@ -2,7 +2,6 @@
 import EnhancedHero from "@/components/home/EnhancedHero";
 import FeaturedStories from "@/components/home/FeaturedStories";
 import EnhancedFeatures from "@/components/home/EnhancedFeatures";
-import HowItWorks from "@/components/home/HowItWorks";
 import CallToAction from "@/components/home/CallToAction";
 import EnhancedNavbar from "@/components/layout/EnhancedNavbar";
 import Footer from "@/components/layout/Footer";
@@ -16,10 +15,10 @@ const Index = () => {
   const { showReminder, setShowReminder } = useSignUpReminder(15000);
 
   useEffect(() => {
-    // Welcome toast with cultural touch
+    // Welcome toast with African cultural touch
     toast({
-      title: "Welcome to Talescapes! 🌍",
-      description: "Discover stories that bridge cultures and preserve heritage.",
+      title: "Karibu to Talescapes! 🌍",
+      description: "Discover African stories that preserve heritage and connect cultures.",
       duration: 5000,
     });
   }, [toast]);
@@ -31,7 +30,6 @@ const Index = () => {
         <EnhancedHero />
         <EnhancedFeatures />
         <FeaturedStories />
-        <HowItWorks />
         <CallToAction />
       </main>
       <Footer />

@@ -1,62 +1,54 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Index from '@/pages/Index';
-import Explore from '@/pages/Explore';
-import Story from '@/pages/Story';
-import Create from '@/pages/Create';
-import CreateStudio from '@/pages/CreateStudio';
-import Profile from '@/pages/Profile';
-import Login from '@/pages/Login';
-import Signup from '@/pages/Signup';
-import ResetPassword from '@/pages/ResetPassword';
-import Archive from '@/pages/Archive';
-import Submit from '@/pages/Submit';
-import Library from '@/pages/Library';
-import NotFound from '@/pages/NotFound';
-import AdminLogin from '@/pages/AdminLogin';
-import AdminDashboard from '@/pages/AdminDashboard';
-import AdminStories from '@/pages/AdminStories';
-import StoryPreview from '@/pages/StoryPreview';
-import ContentDetail from '@/pages/ContentDetail';
-import { StoryEditor } from '@/components/admin/StoryEditor';
-import { CollaborativeEditor } from '@/components/story/CollaborativeEditor';
-import Community from "@/pages/Community";
 
-export const AppRoutes: React.FC = () => {
+import { Routes, Route } from "react-router-dom";
+import Index from "@/pages/Index";
+import About from "@/pages/About";
+import Explore from "@/pages/Explore";
+import Community from "@/pages/Community";
+import Archive from "@/pages/Archive";
+import Create from "@/pages/Create";
+import CreateStudio from "@/pages/CreateStudio";
+import Library from "@/pages/Library";
+import Story from "@/pages/Story";
+import StoryPreview from "@/pages/StoryPreview";
+import ContentDetail from "@/pages/ContentDetail";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import ResetPassword from "@/pages/ResetPassword";
+import Profile from "@/pages/Profile";
+import Submit from "@/pages/Submit";
+import AdminDashboard from "@/pages/AdminDashboard";
+import AdminLogin from "@/pages/AdminLogin";
+import AdminStories from "@/pages/AdminStories";
+import NotFound from "@/pages/NotFound";
+import ProtectedRoute from "@/components/admin/ProtectedRoute";
+import UserProtectedRoute from "@/components/user/UserProtectedRoute";
+
+const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/" element={<Index />} />
+      <Route path="/about" element={<About />} />
       <Route path="/explore" element={<Explore />} />
-      <Route path="/story/:id" element={<Story />} />
+      <Route path="/community" element={<Community />} />
       <Route path="/archive" element={<Archive />} />
+      <Route path="/create" element={<Create />} />
+      <Route path="/create-studio" element={<CreateStudio />} />
+      <Route path="/library" element={<Library />} />
+      <Route path="/story/:id" element={<Story />} />
+      <Route path="/story/:id/preview" element={<StoryPreview />} />
       <Route path="/content/:type/:id" element={<ContentDetail />} />
-      
-      {/* Authentication Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      
-      {/* User Routes */}
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/create" element={<Create />} />
-      <Route path="/create-studio" element={<CreateStudio />} />
-      <Route path="/collaborate/:id" element={<CollaborativeEditor />} />
+      <Route path="/profile" element={<UserProtectedRoute><Profile /></UserProtectedRoute>} />
+      <Route path="/profile/:username" element={<Profile />} />
       <Route path="/submit" element={<Submit />} />
-      <Route path="/library" element={<Library />} />
-      
-      {/* Admin Routes */}
+      <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/stories" element={<AdminStories />} />
-      <Route path="/admin/stories/:id/edit" element={<StoryEditor />} />
-      <Route path="/admin/stories/:id/preview" element={<StoryPreview />} />
-      
-      {/* Community Routes */}
-      <Route path="/community" element={<Community />} />
-      
-      {/* 404 Route */}
+      <Route path="/admin/stories" element={<ProtectedRoute><AdminStories /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
+
+export default AppRoutes;

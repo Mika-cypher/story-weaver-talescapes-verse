@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,11 @@ import {
   User,
   LogOut,
   Settings,
-  Library
+  Library,
+  Search,
+  Archive,
+  Info,
+  PenTool
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,27 +32,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const EnhancedNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isLoggedIn, user, profile, logout } = useAuth();
+  const { isLoggedIn, user, logout } = useAuth();
   const location = useLocation();
 
-  const navItems = [
+  const isActive = (path: string) => location.pathname === path;
+
+  const navigationItems = [
     { name: "Home", path: "/", icon: Home },
-    { name: "Explore", path: "/explore", icon: Compass },
-    { name: "Archive", path: "/archive", icon: BookOpen },
+    { name: "Explore", path: "/explore", icon: Search },
     { name: "Community", path: "/community", icon: Users },
+    { name: "Archive", path: "/archive", icon: Archive },
+    { name: "About", path: "/about", icon: Info },
   ];
-
-  const userNavItems = [
-    { name: "Create", path: "/create", icon: PlusCircle },
-    { name: "Library", path: "/library", icon: Library },
-  ];
-
-  const isActivePath = (path: string) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
-    return location.pathname.startsWith(path);
-  };
 
   const handleLogout = async () => {
     try {
@@ -60,13 +54,13 @@ const EnhancedNavbar: React.FC = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <nav className="fixed top-0 left-0 right-0 z-50 navigation-enhanced">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-heritage-purple to-cultural-gold rounded-lg flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-white" />
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-heritage-purple to-cultural-gold rounded-lg flex items-center justify-center">
+              <BookOpen className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-heritage-purple to-cultural-gold bg-clip-text text-transparent">
               Talescapes
@@ -75,153 +69,201 @@ const EnhancedNavbar: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
-              <Link key={item.name} to={item.path}>
-                <Button
-                  variant={isActivePath(item.path) ? "secondary" : "ghost"}
-                  className="flex items-center space-x-2"
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.name}</span>
-                </Button>
-              </Link>
-            ))}
-            
-            {isLoggedIn && userNavItems.map((item) => (
-              <Link key={item.name} to={item.path}>
-                <Button
-                  variant={isActivePath(item.path) ? "secondary" : "ghost"}
-                  className="flex items-center space-x-2"
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.name}</span>
-                </Button>
+            {navigationItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1 ${
+                  isActive(item.path)
+                    ? "bg-heritage-purple text-white"
+                    : "text-foreground hover:bg-heritage-purple/10 hover:text-heritage-purple"
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.name}</span>
               </Link>
             ))}
           </div>
 
-          {/* Right side actions */}
-          <div className="flex items-center space-x-4">
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
             
-            {isLoggedIn ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={profile?.avatar_url || ""} alt={profile?.display_name || user?.username || "User"} />
-                      <AvatarFallback>
-                        {(profile?.display_name || user?.username || "U").charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+            {isLoggedIn && user ? (
+              <div className="flex items-center space-x-3">
+                <Link to="/create" className="group">
+                  <Button 
+                    size="sm" 
+                    className="bg-cultural-gold hover:bg-cultural-gold/90 text-black font-medium"
+                  >
+                    <PenTool className="h-4 w-4 mr-2" />
+                    Create Story
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{profile?.display_name || user?.username}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/library" className="flex items-center">
-                      <Library className="mr-2 h-4 w-4" />
-                      <span>Library</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Link>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.avatar_url || ""} alt={user.username} />
+                        <AvatarFallback className="bg-heritage-purple text-white">
+                          {user.username?.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    className="w-56 bg-card border border-border shadow-lg" 
+                    align="end" 
+                    forceMount
+                  >
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {user.display_name || user.username}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          @{user.username}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/library" className="cursor-pointer">
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        My Library
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button asChild variant="ghost">
+              <div className="flex items-center space-x-3">
+                <Button variant="ghost" size="sm" asChild>
                   <Link to="/login">Sign In</Link>
                 </Button>
-                <Button asChild>
-                  <Link to="/signup">Sign Up</Link>
+                <Button 
+                  size="sm" 
+                  className="bg-heritage-purple hover:bg-heritage-purple/90 text-white"
+                  asChild
+                >
+                  <Link to="/signup">Join Community</Link>
                 </Button>
               </div>
             )}
+          </div>
 
-            {/* Mobile menu button */}
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-foreground"
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-border py-4">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="md:hidden bg-card border border-border rounded-lg mt-2 p-4 shadow-lg"
+          >
             <div className="flex flex-col space-y-2">
-              {navItems.map((item) => (
-                <Link 
-                  key={item.name} 
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.name}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${
+                    isActive(item.path)
+                      ? "bg-heritage-purple text-white"
+                      : "text-foreground hover:bg-heritage-purple/10 hover:text-heritage-purple"
+                  }`}
                 >
-                  <Button
-                    variant={isActivePath(item.path) ? "secondary" : "ghost"}
-                    className="w-full justify-start"
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    {item.name}
-                  </Button>
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.name}</span>
                 </Link>
               ))}
               
-              {isLoggedIn && userNavItems.map((item) => (
-                <Link 
-                  key={item.name} 
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Button
-                    variant={isActivePath(item.path) ? "secondary" : "ghost"}
-                    className="w-full justify-start"
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    {item.name}
-                  </Button>
-                </Link>
-              ))}
-              
-              {!isLoggedIn && (
-                <div className="flex flex-col space-y-2 pt-4 border-t">
-                  <Button asChild variant="ghost" className="justify-start">
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                      <User className="h-4 w-4 mr-2" />
-                      Sign In
+              <div className="border-t pt-2 mt-2">
+                {isLoggedIn && user ? (
+                  <div className="space-y-2">
+                    <Link
+                      to="/create"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block"
+                    >
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-cultural-gold hover:bg-cultural-gold/90 text-black"
+                      >
+                        <PenTool className="h-4 w-4 mr-2" />
+                        Create Story
+                      </Button>
                     </Link>
-                  </Button>
-                  <Button asChild className="justify-start">
-                    <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Sign Up
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center space-x-2 px-3 py-2 text-sm"
+                    >
+                      <User className="h-4 w-4" />
+                      <span>Profile</span>
                     </Link>
-                  </Button>
-                </div>
-              )}
+                    <Link
+                      to="/library"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center space-x-2 px-3 py-2 text-sm"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      <span>My Library</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center space-x-2 px-3 py-2 text-sm w-full text-left text-red-600"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Button variant="ghost" size="sm" className="w-full justify-start" asChild>
+                      <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                        Sign In
+                      </Link>
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      className="w-full bg-heritage-purple hover:bg-heritage-purple/90 text-white"
+                      asChild
+                    >
+                      <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
+                        Join Community
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </nav>
