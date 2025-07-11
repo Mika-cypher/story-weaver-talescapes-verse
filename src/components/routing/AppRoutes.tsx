@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
@@ -21,6 +20,7 @@ import StoryPreview from '@/pages/StoryPreview';
 import ContentDetail from '@/pages/ContentDetail';
 import { StoryEditor } from '@/components/admin/StoryEditor';
 import { CollaborativeEditor } from '@/components/story/CollaborativeEditor';
+import Community from "@/pages/Community";
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -51,6 +51,9 @@ export const AppRoutes: React.FC = () => {
       <Route path="/admin/stories" element={<AdminStories />} />
       <Route path="/admin/stories/:id/edit" element={<StoryEditor />} />
       <Route path="/admin/stories/:id/preview" element={<StoryPreview />} />
+      
+      {/* Community Routes */}
+      <Route path="/community" element={<Community />} />
       
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />

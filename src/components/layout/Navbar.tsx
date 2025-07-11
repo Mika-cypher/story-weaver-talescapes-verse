@@ -1,190 +1,188 @@
-
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Menu, X, BookOpen, PenSquare, Archive, User, LogOut } from "lucide-react";
-import { useState } from "react";
-import ThemeToggle from "@/components/theme/ThemeToggle";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
+import { Menu, Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/theme-provider"
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { user, profile, isLoggedIn, logout } = useAuth();
+  const { user, logout, isLoggedIn, profile } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { setTheme } = useTheme();
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Get username from profile or user metadata or default to "U"
-  const username = profile?.username || user?.user_metadata?.username || "User";
-  const displayInitials = getInitials(username);
-
   return (
-    <nav className="fixed w-full bg-background/80 backdrop-blur-md z-50 border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="flex items-center">
-                <span className="text-2xl font-bold text-primary">
-                  Talescapes
-                </span>
-              </Link>
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link
-                to="/explore"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
-              >
-                <BookOpen className="mr-2 h-4 w-4" />
-                Explore
-              </Link>
-              <Link
-                to="/create"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
-              >
-                <PenSquare className="mr-2 h-4 w-4" />
-                Create
-              </Link>
-              <Link
-                to="/archive"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
-              >
-                <Archive className="mr-2 h-4 w-4" />
-                Cultural Archive
-              </Link>
-            </div>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border/40">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="text-2xl font-bold bg-gradient-to-r from-heritage-purple to-cultural-gold bg-clip-text text-transparent">
+              Talescapes
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-foreground hover:text-heritage-purple transition-colors">
+              Home
+            </Link>
+            <Link to="/explore" className="text-foreground hover:text-heritage-purple transition-colors">
+              Explore
+            </Link>
+            <Link to="/community" className="text-foreground hover:text-heritage-purple transition-colors">
+              Community
+            </Link>
+            <Link to="/archive" className="text-foreground hover:text-heritage-purple transition-colors">
+              Archive
+            </Link>
+            <Link to="/create" className="text-foreground hover:text-heritage-purple transition-colors">
+              Create
+            </Link>
+            
+            {isLoggedIn && profile ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0 data-[state=open]:bg-muted">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.username}`} alt={profile.username} />
+                      <AvatarFallback>{profile.username?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <span className="sr-only">Open user menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => navigate(`/profile/${profile.username}`)}>
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/settings")}>
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={() => navigate("/login")}>
+                  Sign In
+                </Button>
+                <Button onClick={() => navigate("/signup")}>
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <div className="ml-3 relative flex items-center space-x-2">
-              <ThemeToggle />
-              {isLoggedIn ? (
+
+          {/* Mobile Menu */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
+                onClick={toggleMobileMenu}
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sm:w-64">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+                <SheetDescription>
+                  Navigate Talescapes
+                </SheetDescription>
+              </SheetHeader>
+              <div className="grid gap-4 py-4">
+                <Link to="/" className="text-foreground hover:text-heritage-purple transition-colors block py-2">
+                  Home
+                </Link>
+                <Link to="/explore" className="text-foreground hover:text-heritage-purple transition-colors block py-2">
+                  Explore
+                </Link>
+                 <Link to="/community" className="text-foreground hover:text-heritage-purple transition-colors block py-2">
+                  Community
+                </Link>
+                <Link to="/archive" className="text-foreground hover:text-heritage-purple transition-colors block py-2">
+                  Archive
+                </Link>
+                <Link to="/create" className="text-foreground hover:text-heritage-purple transition-colors block py-2">
+                  Create
+                </Link>
+                {!isLoggedIn ? (
+                  <>
+                    <Button variant="ghost" onClick={() => { navigate("/login"); setIsMobileMenuOpen(false); }} className="w-full justify-start">
+                      Sign In
+                    </Button>
+                    <Button onClick={() => { navigate("/signup"); setIsMobileMenuOpen(false); }} className="w-full justify-start">
+                      Sign Up
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to={`/profile/${profile?.username}`} className="text-foreground hover:text-heritage-purple transition-colors block py-2">
+                      Profile
+                    </Link>
+                    <Link to="/settings" className="text-foreground hover:text-heritage-purple transition-colors block py-2">
+                      Settings
+                    </Link>
+                    <Button variant="destructive" onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full justify-start">
+                      Log out
+                    </Button>
+                  </>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>{displayInitials}</AvatarFallback>
-                      </Avatar>
+                    <Button variant="outline" className="w-full justify-start gap-2">
+                      Theme
+                      <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                      <Moon className="h-4 w-4 absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                      <span className="sr-only">Toggle theme</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Link to="/profile" className="flex items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        <span>My Profile</span>
-                      </Link>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem onClick={() => setTheme("light")}>
+                      Light
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                    <DropdownMenuItem onClick={() => setTheme("dark")}>
+                      Dark
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("system")}>
+                      System
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (
-                <div className="flex space-x-2">
-                  <Button variant="outline" asChild>
-                    <Link to="/login">Sign In</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link to="/signup">Sign Up</Link>
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="-mr-2 flex items-center sm:hidden">
-            <ThemeToggle />
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              type="button"
-              className="bg-background inline-flex items-center justify-center p-2 rounded-md text-foreground hover:text-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary transition-colors"
-              aria-controls="mobile-menu"
-              aria-expanded="false"
-            >
-              <span className="sr-only">Open main menu</span>
-              {isOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
-              ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
-              )}
-            </button>
-          </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-
-      {isOpen && (
-        <div className="sm:hidden" id="mobile-menu">
-          <div className="pt-2 pb-3 space-y-1">
-            <Link
-              to="/explore"
-              className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
-            >
-              <BookOpen className="inline-block mr-2 h-4 w-4" />
-              Explore
-            </Link>
-            <Link
-              to="/create"
-              className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
-            >
-              <PenSquare className="inline-block mr-2 h-4 w-4" />
-              Create
-            </Link>
-            <Link
-              to="/archive"
-              className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
-            >
-              <Archive className="inline-block mr-2 h-4 w-4" />
-              Cultural Archive
-            </Link>
-            {isLoggedIn && (
-              <Link
-                to="/profile"
-                className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-muted transition-colors"
-              >
-                <User className="inline-block mr-2 h-4 w-4" />
-                My Profile
-              </Link>
-            )}
-          </div>
-          <div className="pt-4 pb-3 border-t border-border">
-            <div className="flex items-center px-4">
-              {isLoggedIn ? (
-                <>
-                  <div className="flex-shrink-0">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>{displayInitials}</AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="ml-3">
-                    <div className="text-base font-medium">{username}</div>
-                    <div className="text-sm text-muted-foreground">{user?.email}</div>
-                  </div>
-                  <Button variant="ghost" className="ml-auto" onClick={logout}>
-                    <LogOut className="h-5 w-5" />
-                  </Button>
-                </>
-              ) : (
-                <div className="flex space-x-2 w-full">
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link to="/login">Sign In</Link>
-                  </Button>
-                  <Button className="w-full" asChild>
-                    <Link to="/signup">Sign Up</Link>
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </nav>
   );
 };
