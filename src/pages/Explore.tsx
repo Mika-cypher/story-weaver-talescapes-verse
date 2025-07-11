@@ -1,16 +1,18 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, TrendingUp, Users, Globe } from "lucide-react";
+import { Search, TrendingUp, Users, Globe, ArrowLeft } from "lucide-react";
 import { StoryList } from "@/components/stories/StoryList";
 import AudioLibraryTab from "@/components/explore/AudioLibraryTab";
 import { CreatorMedia } from "@/services/mediaService";
 
 const Explore = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [audioSearchTerm, setAudioSearchTerm] = useState("");
@@ -126,6 +128,19 @@ const Explore = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Return Button */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="bg-background/80 backdrop-blur-sm hover:bg-background/90"
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Home
+        </Button>
+      </div>
+
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-muted/50 to-background py-16">
         <div className="container mx-auto px-4">
