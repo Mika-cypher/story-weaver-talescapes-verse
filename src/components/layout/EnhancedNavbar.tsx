@@ -1,5 +1,7 @@
+
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ThemeToggle from "@/components/theme/ThemeToggle";
@@ -27,12 +29,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const EnhancedNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isLoggedIn, user, logout } = useAuth();
+  const { isLoggedIn, user, profile, logout } = useAuth();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -105,9 +108,9 @@ const EnhancedNavbar: React.FC = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatar_url || ""} alt={user.username} />
+                        <AvatarImage src={profile?.avatar_url || user.avatar_url || ""} alt={profile?.username || user.username || ""} />
                         <AvatarFallback className="bg-heritage-purple text-white">
-                          {user.username?.slice(0, 2).toUpperCase()}
+                          {(profile?.username || user.username || "U")?.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -120,10 +123,10 @@ const EnhancedNavbar: React.FC = () => {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
-                          {user.display_name || user.username}
+                          {profile?.display_name || user.display_name || profile?.username || user.username}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
-                          @{user.username}
+                          @{profile?.username || user.username}
                         </p>
                       </div>
                     </DropdownMenuLabel>

@@ -7,7 +7,7 @@ import { sessionManagementService } from "@/services/sessionManagementService";
 import { accessibilityService } from "@/services/accessibilityService";
 import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
-import { AppRoutes } from "@/components/routing/AppRoutes";
+import AppRoutes from "@/components/routing/AppRoutes";
 
 export const AppInitializer = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);

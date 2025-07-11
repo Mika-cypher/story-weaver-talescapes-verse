@@ -14,6 +14,8 @@ export interface Profile {
 
 export interface ExtendedUser extends User {
   username?: string;
+  display_name?: string;
+  avatar_url?: string;
 }
 
 export interface AuthContextType {

@@ -20,8 +20,8 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminStories from "@/pages/AdminStories";
 import NotFound from "@/pages/NotFound";
-import ProtectedRoute from "@/components/admin/ProtectedRoute";
-import UserProtectedRoute from "@/components/user/UserProtectedRoute";
+import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
+import { UserProtectedRoute } from "@/components/user/UserProtectedRoute";
 
 const AppRoutes = () => {
   return (
