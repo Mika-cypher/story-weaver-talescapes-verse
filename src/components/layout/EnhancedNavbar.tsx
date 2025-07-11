@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   Menu, 
