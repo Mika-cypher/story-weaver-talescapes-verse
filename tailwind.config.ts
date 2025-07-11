@@ -63,6 +63,17 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				// Cultural heritage colors - properly defined for Tailwind utilities
+				'heritage-purple': 'hsl(var(--heritage-purple))',
+				'cultural-gold': 'hsl(var(--cultural-gold))',
+				'warm-parchment': 'hsl(var(--warm-parchment))',
+				'story-shadow': 'hsl(var(--story-shadow))',
+				'earth-brown': 'hsl(var(--earth-brown))',
+				'sunset-orange': 'hsl(var(--sunset-orange))',
+				'deep-purple': 'hsl(var(--deep-purple))',
+				'golden-yellow': 'hsl(var(--golden-yellow))',
+				'forest-green': 'hsl(var(--forest-green))',
+				'clay-red': 'hsl(var(--clay-red))',
 				tale: {
 					purple: '#9b87f5',
 					'dark-purple': '#6E59A5',
