@@ -1,35 +1,35 @@
 
-import Hero from "@/components/home/Hero";
+import EnhancedHero from "@/components/home/EnhancedHero";
 import FeaturedStories from "@/components/home/FeaturedStories";
-import Features from "@/components/home/Features";
+import EnhancedFeatures from "@/components/home/EnhancedFeatures";
 import HowItWorks from "@/components/home/HowItWorks";
 import CallToAction from "@/components/home/CallToAction";
-import Navbar from "@/components/layout/Navbar";
+import EnhancedNavbar from "@/components/layout/EnhancedNavbar";
 import Footer from "@/components/layout/Footer";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { useSignUpReminder } from "@/hooks/useSignUpReminder";
 import SignUpReminder from "@/components/auth/SignUpReminder";
 
 const Index = () => {
   const { toast } = useToast();
-  const { showReminder, setShowReminder } = useSignUpReminder(15000); // Show after 15 seconds
+  const { showReminder, setShowReminder } = useSignUpReminder(15000);
 
   useEffect(() => {
-    // Welcome toast when landing on the home page
+    // Welcome toast with cultural touch
     toast({
-      title: "Welcome to Talescapes!",
-      description: "Explore and create immersive interactive stories.",
+      title: "Welcome to Talescapes! 🌍",
+      description: "Discover stories that bridge cultures and preserve heritage.",
       duration: 5000,
     });
   }, [toast]);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <EnhancedNavbar />
       <main className="flex-grow">
-        <Hero />
-        <Features />
+        <EnhancedHero />
+        <EnhancedFeatures />
         <FeaturedStories />
         <HowItWorks />
         <CallToAction />

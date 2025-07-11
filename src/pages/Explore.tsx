@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import ExploreHero from "@/components/explore/ExploreHero";
+import EnhancedExploreHero from "@/components/explore/EnhancedExploreHero";
 import ExploreCategoryFilter from "@/components/explore/ExploreCategoryFilter";
 import ExploreContentTabs from "@/components/explore/ExploreContentTabs";
 import { sampleAudioMedia } from "@/data/sampleAudioMedia";
@@ -26,11 +26,11 @@ const Explore = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Return Button */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-20 left-4 z-50">
         <Button 
           variant="outline" 
           size="sm"
-          className="bg-background/80 backdrop-blur-sm hover:bg-background/90"
+          className="bg-background/80 backdrop-blur-sm hover:bg-heritage-purple/10 hover:border-heritage-purple/30 hover:text-heritage-purple transition-colors"
           onClick={() => navigate("/")}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -38,7 +38,7 @@ const Explore = () => {
         </Button>
       </div>
 
-      <ExploreHero 
+      <EnhancedExploreHero 
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />

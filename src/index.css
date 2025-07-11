@@ -1,38 +1,55 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
 @layer base {
   :root {
-    --background: 260 60% 98%;
-    --foreground: 260 10% 15%;
+    --background: 25 35% 98%;
+    --foreground: 20 14% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 260 10% 15%;
+    --card-foreground: 20 14% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 260 10% 15%;
+    --popover-foreground: 20 14% 12%;
 
-    --primary: 260 60% 75%;
+    --primary: 280 65% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 30% 90%;
-    --secondary-foreground: 260 30% 30%;
+    --secondary: 35 25% 90%;
+    --secondary-foreground: 20 14% 20%;
 
-    --muted: 260 20% 90%;
-    --muted-foreground: 260 10% 40%;
+    --muted: 35 15% 92%;
+    --muted-foreground: 20 9% 45%;
 
-    --accent: 40 100% 67%;
-    --accent-foreground: 260 10% 15%;
+    --accent: 42 88% 65%;
+    --accent-foreground: 20 14% 12%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 260 30% 86%;
-    --input: 260 30% 86%;
-    --ring: 260 60% 75%;
+    --border: 35 20% 88%;
+    --input: 35 20% 88%;
+    --ring: 280 65% 60%;
 
     --radius: 0.75rem;
+
+    /* Cultural Heritage Colors */
+    --earth-brown: 25 45% 35%;
+    --sunset-orange: 25 85% 55%;
+    --deep-purple: 280 65% 35%;
+    --golden-yellow: 42 95% 55%;
+    --forest-green: 140 45% 35%;
+    --clay-red: 15 75% 45%;
+    
+    /* Story Ambience Colors */
+    --warm-parchment: 35 25% 95%;
+    --story-shadow: 280 20% 25%;
+    --cultural-gold: 42 88% 65%;
+    --heritage-purple: 280 65% 60%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -45,33 +62,46 @@
   }
 
   .dark {
-    --background: 260 20% 10%;
-    --foreground: 260 10% 98%;
+    --background: 20 20% 8%;
+    --foreground: 35 15% 95%;
 
-    --card: 260 20% 12%;
-    --card-foreground: 260 10% 98%;
+    --card: 20 20% 10%;
+    --card-foreground: 35 15% 95%;
 
-    --popover: 260 20% 12%;
-    --popover-foreground: 260 10% 98%;
+    --popover: 20 20% 10%;
+    --popover-foreground: 35 15% 95%;
 
-    --primary: 260 60% 75%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 280 65% 70%;
+    --primary-foreground: 20 20% 8%;
 
-    --secondary: 260 30% 20%;
-    --secondary-foreground: 260 10% 98%;
+    --secondary: 25 25% 15%;
+    --secondary-foreground: 35 15% 95%;
 
-    --muted: 260 20% 20%;
-    --muted-foreground: 260 10% 85%;
+    --muted: 25 15% 18%;
+    --muted-foreground: 35 10% 65%;
 
-    --accent: 40 100% 67%;
-    --accent-foreground: 260 20% 10%;
+    --accent: 42 88% 65%;
+    --accent-foreground: 20 20% 8%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 260 20% 25%;
-    --input: 260 20% 25%;
-    --ring: 260 60% 75%;
+    --border: 25 20% 20%;
+    --input: 25 20% 20%;
+    --ring: 280 65% 70%;
+
+    /* Dark mode cultural colors */
+    --earth-brown: 25 35% 45%;
+    --sunset-orange: 25 75% 65%;
+    --deep-purple: 280 55% 45%;
+    --golden-yellow: 42 85% 65%;
+    --forest-green: 140 35% 45%;
+    --clay-red: 15 65% 55%;
+    
+    --warm-parchment: 25 15% 12%;
+    --story-shadow: 280 30% 85%;
+    --cultural-gold: 42 88% 65%;
+    --heritage-purple: 280 65% 70%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -92,20 +122,198 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif font-medium;
+    font-family: 'Playfair Display', serif;
+    line-height: 1.2;
+  }
+
+  .story-text {
+    font-family: 'Crimson Text', serif;
+    line-height: 1.8;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/50 backdrop-blur-md rounded-lg border border-white/20 shadow-lg;
+    @apply bg-white/80 dark:bg-card/80 backdrop-blur-md rounded-lg border border-white/20 dark:border-border/20 shadow-lg;
   }
   
   .story-link {
     @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
   }
+
+  .cultural-gradient {
+    background: linear-gradient(135deg, hsl(var(--heritage-purple)) 0%, hsl(var(--cultural-gold)) 100%);
+  }
+
+  .story-ambient {
+    background: linear-gradient(135deg, hsl(var(--warm-parchment)) 0%, hsl(var(--background)) 100%);
+  }
+
+  .heritage-card {
+    @apply bg-gradient-to-br from-heritage-purple/5 to-cultural-gold/5 border border-heritage-purple/20 rounded-xl p-6 transition-all duration-300 hover:shadow-lg hover:border-heritage-purple/30;
+  }
+
+  .creator-spotlight {
+    @apply bg-gradient-to-r from-cultural-gold/10 to-heritage-purple/10 border-l-4 border-cultural-gold;
+  }
+
+  .story-card-enhanced {
+    @apply relative overflow-hidden rounded-xl border border-border/50 bg-card transition-all duration-300 hover:shadow-xl hover:border-primary/30 group;
+  }
+
+  .story-card-enhanced::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-heritage-purple/5 to-cultural-gold/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100;
+  }
+
+  .immersive-reader {
+    @apply min-h-screen bg-gradient-to-br from-warm-parchment to-background;
+  }
+
+  .navigation-enhanced {
+    @apply bg-background/80 backdrop-blur-md border-b border-border/50 transition-all duration-300;
+  }
+
+  .cultural-pattern {
+    background-image: 
+      radial-gradient(circle at 25% 25%, hsl(var(--heritage-purple)/.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(var(--cultural-gold)/.1) 0%, transparent 50%);
+  }
+
+  .floating-action {
+    @apply fixed bottom-6 right-6 z-50 bg-primary text-primary-foreground rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110;
+  }
+
+  /* Enhanced micro-interactions */
+  .story-element {
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-md;
+  }
+
+  .cultural-accent {
+    border-image: linear-gradient(45deg, hsl(var(--heritage-purple)), hsl(var(--cultural-gold))) 1;
+  }
 }
 
+/* Cultural storytelling enhancements */
+@layer utilities {
+  .text-story {
+    @apply text-base leading-relaxed story-text;
+  }
+
+  .text-cultural-heading {
+    @apply text-2xl md:text-3xl font-serif font-semibold text-heritage-purple;
+  }
+
+  .text-cultural-subheading {
+    @apply text-lg md:text-xl font-serif font-medium text-cultural-gold;
+  }
+
+  .bg-heritage-purple {
+    background-color: hsl(var(--heritage-purple));
+  }
+
+  .bg-cultural-gold {
+    background-color: hsl(var(--cultural-gold));
+  }
+
+  .text-heritage-purple {
+    color: hsl(var(--heritage-purple));
+  }
+
+  .text-cultural-gold {
+    color: hsl(var(--cultural-gold));
+  }
+
+  .border-heritage-purple {
+    border-color: hsl(var(--heritage-purple));
+  }
+
+  .border-cultural-gold {
+    border-color: hsl(var(--cultural-gold));
+  }
+
+  /* Animation utilities for storytelling */
+  .animate-story-entrance {
+    animation: storyEntrance 0.8s ease-out forwards;
+  }
+
+  .animate-cultural-glow {
+    animation: culturalGlow 2s ease-in-out infinite alternate;
+  }
+
+  .animate-page-turn {
+    animation: pageTurn 0.6s ease-in-out;
+  }
+}
+
+@keyframes storyEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes culturalGlow {
+  from {
+    box-shadow: 0 0 20px hsl(var(--heritage-purple)/.2);
+  }
+  to {
+    box-shadow: 0 0 30px hsl(var(--cultural-gold)/.3);
+  }
+}
+
+@keyframes pageTurn {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(-15deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  .text-cultural-heading {
+    @apply text-xl;
+  }
+  
+  .text-cultural-subheading {
+    @apply text-lg;
+  }
+}
+
+/* Enhanced accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-story-entrance,
+  .animate-cultural-glow,
+  .animate-page-turn {
+    animation: none;
+  }
+  
+  .story-element {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass-card {
+    @apply bg-card border-2 border-foreground/20;
+  }
+  
+  .heritage-card {
+    @apply border-2 border-heritage-purple;
+  }
+}
