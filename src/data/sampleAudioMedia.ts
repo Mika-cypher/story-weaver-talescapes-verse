@@ -1,0 +1,95 @@
+
+import { CreatorMedia } from "@/services/mediaService";
+
+export const sampleAudioMedia: CreatorMedia[] = [
+  {
+    id: "audio-1",
+    title: "Ancient Folklore Narration",
+    description: "A beautiful narration of traditional folklore passed down through generations",
+    file_url: "https://example.com/audio1.mp3",
+    media_type: "audio",
+    user_id: "user-1",
+    created_at: "2024-01-15T10:00:00Z",
+    updated_at: "2024-01-15T10:00:00Z",
+    tags: ["folklore", "narration", "traditional"],
+    category: "folklore",
+    is_public: true,
+    is_featured: true,
+    license_type: "cc_by"
+  },
+  {
+    id: "audio-2", 
+    title: "Modern Poetry Reading",
+    description: "Contemporary poetry with emotional depth and modern themes",
+    file_url: "https://example.com/audio2.mp3",
+    media_type: "audio",
+    user_id: "user-2",
+    created_at: "2024-01-16T14:30:00Z",
+    updated_at: "2024-01-16T14:30:00Z",
+    tags: ["poetry", "modern", "emotional"],
+    category: "poetry",
+    is_public: true,
+    is_featured: false,
+    license_type: "all_rights_reserved"
+  },
+  {
+    id: "audio-3",
+    title: "Historical Chronicles",
+    description: "Engaging historical accounts brought to life through voice",
+    file_url: "https://example.com/audio3.mp3", 
+    media_type: "audio",
+    user_id: "user-3",
+    created_at: "2024-01-17T09:15:00Z",
+    updated_at: "2024-01-17T09:15:00Z",
+    tags: ["history", "chronicles", "educational"],
+    category: "historical",
+    is_public: true,
+    is_featured: true,
+    license_type: "cc_by_sa"
+  },
+  {
+    id: "audio-4",
+    title: "Ambient Story Soundscape",
+    description: "Atmospheric audio that complements storytelling with natural sounds",
+    file_url: "https://example.com/audio4.mp3",
+    media_type: "audio", 
+    user_id: "user-4",
+    created_at: "2024-01-18T16:45:00Z",
+    updated_at: "2024-01-18T16:45:00Z",
+    tags: ["ambient", "soundscape", "atmosphere"],
+    category: "mixed-media",
+    is_public: true,
+    is_featured: false,
+    license_type: "cc0"
+  },
+  {
+    id: "audio-5",
+    title: "Children's Bedtime Stories",
+    description: "Gentle and soothing narrations perfect for bedtime",
+    file_url: "https://example.com/audio5.mp3",
+    media_type: "audio",
+    user_id: "user-5", 
+    created_at: "2024-01-19T20:00:00Z",
+    updated_at: "2024-01-19T20:00:00Z",
+    tags: ["children", "bedtime", "soothing"],
+    category: "story",
+    is_public: true,
+    is_featured: true,
+    license_type: "cc_by_nc"
+  },
+  {
+    id: "audio-6",
+    title: "Cultural Music & Chants",
+    description: "Traditional musical pieces and cultural chants from around the world",
+    file_url: "https://example.com/audio6.mp3",
+    media_type: "audio",
+    user_id: "user-6",
+    created_at: "2024-01-20T11:30:00Z", 
+    updated_at: "2024-01-20T11:30:00Z",
+    tags: ["music", "cultural", "traditional"],
+    category: "other",
+    is_public: true,
+    is_featured: false,
+    license_type: "all_rights_reserved"
+  }
+];
