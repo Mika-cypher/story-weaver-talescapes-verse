@@ -94,7 +94,38 @@ const EnhancedNavbar = () => {
               <NavigationMenuList>
                 {mainNavItems.map((item) => (
                   <NavigationMenuItem key={item.id}>
-                    <NavigationMenuTrigger asChild>
+                    {item.id === "explore" ? (
+                      <>
+                        <NavigationMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors text-foreground hover:text-heritage-purple hover:bg-heritage-purple/5">
+                          <item.icon className="mr-2 h-4 w-4" />
+                          {item.label}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <div className="grid gap-3 p-6 w-[400px]">
+                            <div className="row-span-3">
+                              <div className="grid gap-1">
+                                <h4 className="text-sm font-medium text-cultural-gold">
+                                  Discover Stories
+                                </h4>
+                                <p className="text-sm text-muted-foreground">
+                                  Explore narratives from diverse cultures and traditions
+                                </p>
+                              </div>
+                            </div>
+                            {communityItems.map((communityItem) => (
+                              <Link
+                                key={communityItem.label}
+                                to={communityItem.path}
+                                className="flex items-center space-x-3 p-3 rounded-md hover:bg-heritage-purple/5 transition-colors"
+                              >
+                                <communityItem.icon className="h-4 w-4 text-heritage-purple" />
+                                <span className="text-sm font-medium">{communityItem.label}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </NavigationMenuContent>
+                      </>
+                    ) : (
                       <Link
                         to={item.path}
                         className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
@@ -106,32 +137,6 @@ const EnhancedNavbar = () => {
                         <item.icon className="mr-2 h-4 w-4" />
                         {item.label}
                       </Link>
-                    </NavigationMenuTrigger>
-                    {item.id === "explore" && (
-                      <NavigationMenuContent>
-                        <div className="grid gap-3 p-6 w-[400px]">
-                          <div className="row-span-3">
-                            <div className="grid gap-1">
-                              <h4 className="text-sm font-medium text-cultural-gold">
-                                Discover Stories
-                              </h4>
-                              <p className="text-sm text-muted-foreground">
-                                Explore narratives from diverse cultures and traditions
-                              </p>
-                            </div>
-                          </div>
-                          {communityItems.map((communityItem) => (
-                            <Link
-                              key={communityItem.label}
-                              to={communityItem.path}
-                              className="flex items-center space-x-3 p-3 rounded-md hover:bg-heritage-purple/5 transition-colors"
-                            >
-                              <communityItem.icon className="h-4 w-4 text-heritage-purple" />
-                              <span className="text-sm font-medium">{communityItem.label}</span>
-                            </Link>
-                          ))}
-                        </div>
-                      </NavigationMenuContent>
                     )}
                   </NavigationMenuItem>
                 ))}
