@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Palette, Camera, Music, PenTool } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthPrompt } from '@/components/auth/AuthPrompt';
 
 interface CollaborationRequestButtonProps {
   storyId: string;
@@ -19,7 +20,7 @@ const CollaborationRequestButton: React.FC<CollaborationRequestButtonProps> = ({
   isPublished
 }) => {
   const [showCollabTypes, setShowCollabTypes] = useState(false);
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const { toast } = useToast();
 
   const collaborationTypes = [
@@ -30,7 +31,7 @@ const CollaborationRequestButton: React.FC<CollaborationRequestButtonProps> = ({
   ];
 
   const handleCollaborationRequest = (type: string) => {
-    if (!user) {
+    if (!isLoggedIn) {
       toast({
         title: "Sign in required",
         description: "Please sign in to request collaboration",
@@ -54,7 +55,7 @@ const CollaborationRequestButton: React.FC<CollaborationRequestButtonProps> = ({
   }
 
   return (
-    <Card>
+    <Card className="relative">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
@@ -62,7 +63,19 @@ const CollaborationRequestButton: React.FC<CollaborationRequestButtonProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {!showCollabTypes ? (
+        {!isLoggedIn ? (
+          <AuthPrompt
+            feature="Story Collaboration"
+            description="Join our community to collaborate with other creators on amazing stories."
+            benefits={[
+              "Offer your creative skills to story projects",
+              "Connect with writers and creators",
+              "Build your portfolio through collaboration",
+              "Be part of unique storytelling projects"
+            ]}
+            variant="inline"
+          />
+        ) : !showCollabTypes ? (
           <Button 
             onClick={() => setShowCollabTypes(true)}
             className="w-full"

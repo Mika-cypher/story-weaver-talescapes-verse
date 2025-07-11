@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +18,8 @@ import {
   User
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { AuthPrompt } from "@/components/auth/AuthPrompt";
 
 interface Mentor {
   id: string;
@@ -51,6 +52,7 @@ interface MentorshipRequest {
 export const MentorshipProgram: React.FC = () => {
   const [selectedMentor, setSelectedMentor] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("find-mentor");
+  const { isLoggedIn } = useAuth();
 
   const mentors: Mentor[] = [
     {
@@ -160,6 +162,21 @@ export const MentorshipProgram: React.FC = () => {
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           Connect with experienced storytellers to grow your craft and cultural storytelling skills
         </p>
+        {!isLoggedIn && (
+          <div className="mt-6">
+            <AuthPrompt
+              feature="Mentorship Program"
+              description="Connect with experienced mentors to develop your storytelling skills and cultural authenticity."
+              benefits={[
+                "Get personalized feedback from expert mentors",
+                "Learn cultural storytelling techniques",
+                "Build your writing career with guidance",
+                "Join a supportive community of writers"
+              ]}
+              variant="inline"
+            />
+          </div>
+        )}
       </div>
 
       {/* Benefits Section */}
@@ -197,6 +214,7 @@ export const MentorshipProgram: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
+                className="relative"
               >
                 <Card className="h-full hover:shadow-lg transition-all duration-300 group">
                   <CardHeader>
@@ -296,92 +314,113 @@ export const MentorshipProgram: React.FC = () => {
                       <Button 
                         size="sm" 
                         className="flex-1"
-                        disabled={!mentor.isAvailable}
+                        disabled={!mentor.isAvailable || !isLoggedIn}
                       >
                         Request Mentorship
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
+
+                {!isLoggedIn && (
+                  <AuthPrompt
+                    feature="Mentorship Requests"
+                    description="Sign up to connect with mentors and get personalized guidance."
+                    variant="overlay"
+                  />
+                )}
               </motion.div>
             ))}
           </div>
         </TabsContent>
 
         <TabsContent value="my-requests" className="mt-8">
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">Your Mentorship Requests</h2>
-              <p className="text-muted-foreground">
-                Track your mentorship requests and upcoming sessions
-              </p>
-            </div>
+          {!isLoggedIn ? (
+            <AuthPrompt
+              feature="Mentorship Requests"
+              description="Track your mentorship requests and manage your learning journey."
+              benefits={[
+                "Track all your mentorship applications",
+                "Schedule sessions with accepted mentors",
+                "View feedback and progress reports",
+                "Access exclusive mentorship resources"
+              ]}
+            />
+          ) : (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold mb-2">Your Mentorship Requests</h2>
+                <p className="text-muted-foreground">
+                  Track your mentorship requests and upcoming sessions
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {mentorshipRequests.map((request, index) => (
-                <motion.div
-                  key={request.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <Avatar>
-                            <AvatarImage src={request.mentorAvatar} alt={request.mentorName} />
-                            <AvatarFallback>{request.mentorName.slice(0, 2)}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <CardTitle className="text-lg">{request.mentorName}</CardTitle>
-                            <p className="text-sm text-muted-foreground">{request.sessionType}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {mentorshipRequests.map((request, index) => (
+                  <motion.div
+                    key={request.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <Avatar>
+                              <AvatarImage src={request.mentorAvatar} alt={request.mentorName} />
+                              <AvatarFallback>{request.mentorName.slice(0, 2)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <CardTitle className="text-lg">{request.mentorName}</CardTitle>
+                              <p className="text-sm text-muted-foreground">{request.sessionType}</p>
+                            </div>
                           </div>
+                          <Badge 
+                            className={
+                              request.status === "accepted" 
+                                ? "bg-green-100 text-green-800"
+                                : request.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-red-100 text-red-800"
+                            }
+                          >
+                            {request.status}
+                          </Badge>
                         </div>
-                        <Badge 
-                          className={
-                            request.status === "accepted" 
-                              ? "bg-green-100 text-green-800"
-                              : request.status === "pending"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                          }
-                        >
-                          {request.status}
-                        </Badge>
-                      </div>
-                    </CardHeader>
+                      </CardHeader>
 
-                    <CardContent className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">Your Message</h4>
-                        <p className="text-muted-foreground text-sm">
-                          {request.message}
-                        </p>
-                      </div>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <h4 className="text-sm font-medium mb-2">Your Message</h4>
+                          <p className="text-muted-foreground text-sm">
+                            {request.message}
+                          </p>
+                        </div>
 
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">
-                          Requested: {new Date(request.requestDate).toLocaleDateString()}
-                        </span>
-                        {request.status === "accepted" && (
-                          <Button size="sm">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Schedule Session
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">
+                            Requested: {new Date(request.requestDate).toLocaleDateString()}
+                          </span>
+                          {request.status === "accepted" && (
+                            <Button size="sm">
+                              <Calendar className="h-4 w-4 mr-2" />
+                              Schedule Session
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </TabsContent>
 
         <TabsContent value="become-mentor" className="mt-8">
           <div className="max-w-3xl mx-auto">
-            <Card>
+            <Card className="relative">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">Become a Mentor</CardTitle>
                 <p className="text-muted-foreground">
@@ -427,7 +466,7 @@ export const MentorshipProgram: React.FC = () => {
                 </div>
 
                 <div className="text-center pt-6 border-t">
-                  <Button size="lg" className="px-8">
+                  <Button size="lg" className="px-8" disabled={!isLoggedIn}>
                     <User className="h-4 w-4 mr-2" />
                     Apply to Become a Mentor
                   </Button>
@@ -436,6 +475,14 @@ export const MentorshipProgram: React.FC = () => {
                   </p>
                 </div>
               </CardContent>
+
+              {!isLoggedIn && (
+                <AuthPrompt
+                  feature="Mentor Application"
+                  description="Join our community of mentors and help shape the next generation of storytellers."
+                  variant="overlay"
+                />
+              )}
             </Card>
           </div>
         </TabsContent>
