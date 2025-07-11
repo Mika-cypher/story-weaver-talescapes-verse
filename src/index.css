@@ -163,12 +163,16 @@
   }
 
   .story-card-enhanced {
-    @apply relative overflow-hidden rounded-xl border border-border/50 bg-card transition-all duration-300 hover:shadow-xl hover:border-primary/30 group;
+    @apply relative overflow-hidden rounded-xl border border-border/50 bg-card transition-all duration-300 hover:shadow-xl hover:border-primary/30;
   }
 
   .story-card-enhanced::before {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-br from-heritage-purple/5 to-cultural-gold/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100;
+    @apply absolute inset-0 bg-gradient-to-br from-heritage-purple/5 to-cultural-gold/5 opacity-0 transition-opacity duration-300;
+  }
+
+  .story-card-enhanced:hover::before {
+    @apply opacity-100;
   }
 
   .immersive-reader {
