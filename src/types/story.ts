@@ -27,4 +27,5 @@ export interface Story {
   featured: boolean;
   startSceneId: string;
   scenes: StoryScene[];
+  category?: string;
 }
