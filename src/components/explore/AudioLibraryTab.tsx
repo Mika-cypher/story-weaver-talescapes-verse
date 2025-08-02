@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Play, Pause, Search, Music, MessageSquare, Heart, Share, User } from 'lucide-react';
+import { Play, Pause, Search, Music, MessageSquare, Heart, Share, User, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { CreatorMedia } from '@/services/mediaService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -95,12 +95,27 @@ const AudioLibraryTab: React.FC<AudioLibraryTabProps> = ({
 
       {/* Audio Grid */}
       {audioMedia.length === 0 ? (
-        <div className="text-center py-12">
-          <Music className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No audio found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm ? "Try adjusting your search terms." : "No audio content available yet."}
+        <div className="text-center py-16">
+          <div className="bg-gradient-to-br from-heritage-purple/10 to-cultural-gold/10 rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+            <Music className="h-16 w-16 text-heritage-purple" />
+          </div>
+          <h3 className="text-2xl font-bold mb-4">
+            {searchTerm ? "No Audio Found" : "Be the First to Share"}
+          </h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            {searchTerm 
+              ? "Try adjusting your search terms or browse our categories." 
+              : "Help us build a rich library of African audio content. Share traditional songs, stories, or spoken word that celebrates our heritage."
+            }
           </p>
+          {!searchTerm && (
+            <Button size="lg" asChild>
+              <a href="/create">
+                <Plus className="h-5 w-5 mr-2" />
+                Share Your Audio
+              </a>
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

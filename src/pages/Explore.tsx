@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import EnhancedExploreHero from "@/components/explore/EnhancedExploreHero";
 import ExploreCategoryFilter from "@/components/explore/ExploreCategoryFilter";
 import ExploreContentTabs from "@/components/explore/ExploreContentTabs";
-import { sampleAudioMedia } from "@/data/sampleAudioMedia";
+
 
 const Explore = () => {
   const navigate = useNavigate();
@@ -14,7 +14,9 @@ const Explore = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [audioSearchTerm, setAudioSearchTerm] = useState("");
 
-  const filteredAudioMedia = sampleAudioMedia.filter(media => {
+  const [audioMedia] = useState([]);
+
+  const filteredAudioMedia = audioMedia.filter(media => {
     const matchesSearch = !audioSearchTerm || 
       media.title.toLowerCase().includes(audioSearchTerm.toLowerCase()) ||
       media.description?.toLowerCase().includes(audioSearchTerm.toLowerCase()) ||

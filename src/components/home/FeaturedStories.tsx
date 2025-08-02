@@ -1,17 +1,16 @@
-
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { BookOpen, Headphones, Heart, Settings } from "lucide-react";
+import { BookOpen, Headphones, Heart, Settings, Plus, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import StoryBackgroundControls from "@/components/StoryBackgroundControls";
 import { storyService } from "@/services/storyService";
-import { sampleDataService } from "@/services/sampleDataService";
 import { Story } from "@/types/story";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
 import { StoryCardSkeleton } from "@/components/common/LoadingStates";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Collapsible,
   CollapsibleContent,
@@ -23,19 +22,13 @@ const FeaturedStories = () => {
   const [loading, setLoading] = useState(true);
   const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
   const [openSettingsId, setOpenSettingsId] = useState<string | null>(null);
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     const loadFeaturedStories = async () => {
       try {
-        // Check if sample data exists, if not, seed it
-        const sampleDataExists = await sampleDataService.checkIfSampleDataExists();
-        if (!sampleDataExists) {
-          console.log('No sample data found, seeding...');
-          await sampleDataService.seedSampleStories();
-        }
-
         const stories = await storyService.getFeaturedStories();
-        setFeaturedStories(stories.slice(0, 3)); // Show only 3 featured stories
+        setFeaturedStories(stories.slice(0, 3));
       } catch (error) {
         console.error("Failed to load featured stories:", error);
       } finally {
@@ -69,7 +62,7 @@ const FeaturedStories = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground mb-4">Featured Stories</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Immerse yourself in our handpicked collection of extraordinary tales created by talented storytellers.
+              Discover extraordinary tales that celebrate African heritage and storytelling traditions.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -88,16 +81,36 @@ const FeaturedStories = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-foreground mb-4">Featured Stories</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Immerse yourself in our handpicked collection of extraordinary tales created by talented storytellers.
+            Discover extraordinary tales that celebrate African heritage and storytelling traditions.
           </p>
         </div>
 
         {featuredStories.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-muted-foreground mb-4">No featured stories available yet.</p>
-            <Button variant="outline" asChild>
-              <Link to="/explore">Explore All Stories</Link>
-            </Button>
+            <div className="max-w-md mx-auto">
+              <div className="bg-gradient-to-br from-heritage-purple/10 to-cultural-gold/10 rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+                <Sparkles className="h-16 w-16 text-heritage-purple" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Be the First to Share</h3>
+              <p className="text-muted-foreground mb-6">
+                Help us build the world's most comprehensive collection of African stories. 
+                Your tale could be the first to inspire countless others.
+              </p>
+              <div className="space-y-3">
+                <Button size="lg" asChild className="w-full">
+                  <Link to={isLoggedIn ? "/create" : "/signup"}>
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create Your Story
+                  </Link>
+                </Button>
+                <Button variant="outline" size="lg" asChild className="w-full">
+                  <Link to="/explore">
+                    <BookOpen className="h-5 w-5 mr-2" />
+                    Explore Platform
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

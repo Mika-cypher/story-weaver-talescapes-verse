@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, BookOpen, Users, Heart, Star, Plus, Eye } from "lucide-react";
+import { Search, Filter, BookOpen, Users, Heart, Star, Plus, Eye, Sparkles } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 interface Collection {
@@ -27,54 +29,9 @@ interface Collection {
 export const StoryCollections: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const { isLoggedIn } = useAuth();
 
-  const collections: Collection[] = [
-    {
-      id: "1",
-      title: "Voices of the Ancestors",
-      description: "Traditional stories passed down through generations, preserving ancient wisdom and cultural values.",
-      creator: "Elena Rodriguez",
-      creatorAvatar: "/api/placeholder/40/40",
-      storyCount: 15,
-      followers: 1200,
-      likes: 890,
-      coverImage: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?q=80&w=400",
-      tags: ["Traditional", "Folklore", "Wisdom"],
-      cultural_theme: "Latin American",
-      created_at: "2024-01-15",
-      isFollowing: false
-    },
-    {
-      id: "2", 
-      title: "Modern Myths",
-      description: "Contemporary stories that explore timeless themes through a modern lens, bridging past and present.",
-      creator: "James Chen",
-      creatorAvatar: "/api/placeholder/40/40",
-      storyCount: 22,
-      followers: 850,
-      likes: 1100,
-      coverImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400",
-      tags: ["Contemporary", "Urban", "Mythology"],
-      cultural_theme: "Asian",
-      created_at: "2024-01-20",
-      isFollowing: true
-    },
-    {
-      id: "3",
-      title: "Bridges Between Worlds",
-      description: "Stories that connect different cultures, showing universal human experiences across traditions.",
-      creator: "Amara Okafor",
-      creatorAvatar: "/api/placeholder/40/40",
-      storyCount: 18,
-      followers: 950,
-      likes: 750,
-      coverImage: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=400",
-      tags: ["Cross-Cultural", "Unity", "Diversity"],
-      cultural_theme: "Multi-Cultural",
-      created_at: "2024-01-25",
-      isFollowing: false
-    }
-  ];
+  const collections: Collection[] = [];
 
   const filteredCollections = collections.filter(collection => {
     const matchesSearch = collection.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -148,8 +105,25 @@ export const StoryCollections: React.FC = () => {
         </TabsList>
         
         <TabsContent value="featured" className="mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCollections.map((collection, index) => (
+          {filteredCollections.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="bg-gradient-to-br from-heritage-purple/10 to-cultural-gold/10 rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+                <Sparkles className="h-16 w-16 text-heritage-purple" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Create the First Collection</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                Help us start building a rich library of African story collections. Curate themes, preserve traditions, and share cultural heritage.
+              </p>
+              <Button size="lg" asChild>
+                <Link to={isLoggedIn ? "/create" : "/signup"}>
+                  <Plus className="h-5 w-5 mr-2" />
+                  Start a Collection
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCollections.map((collection, index) => (
               <motion.div
                 key={collection.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -236,34 +210,44 @@ export const StoryCollections: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </TabsContent>
         
         <TabsContent value="trending" className="mt-8">
           <div className="text-center py-12">
-            <h3 className="text-xl font-semibold mb-2">Trending Collections</h3>
+            <div className="bg-gradient-to-br from-heritage-purple/10 to-cultural-gold/10 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+              <Star className="h-12 w-12 text-heritage-purple" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No Trending Collections Yet</h3>
             <p className="text-muted-foreground">
-              Collections that are gaining popularity in the community
+              Be among the first to create collections that the community will love and share.
             </p>
           </div>
         </TabsContent>
         
         <TabsContent value="newest" className="mt-8">
           <div className="text-center py-12">
-            <h3 className="text-xl font-semibold mb-2">Newest Collections</h3>
+            <div className="bg-gradient-to-br from-heritage-purple/10 to-cultural-gold/10 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+              <BookOpen className="h-12 w-12 text-heritage-purple" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No Collections Yet</h3>
             <p className="text-muted-foreground">
-              Recently created collections from our community
+              Start building our community library by creating the first collection of African stories.
             </p>
           </div>
         </TabsContent>
         
         <TabsContent value="following" className="mt-8">
           <div className="text-center py-12">
-            <h3 className="text-xl font-semibold mb-2">Collections You Follow</h3>
+            <div className="bg-gradient-to-br from-heritage-purple/10 to-cultural-gold/10 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+              <Users className="h-12 w-12 text-heritage-purple" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No Followed Collections</h3>
             <p className="text-muted-foreground">
-              Stay updated with your favorite collections
+              Discover and follow collections that inspire you to stay updated with new stories.
             </p>
           </div>
         </TabsContent>

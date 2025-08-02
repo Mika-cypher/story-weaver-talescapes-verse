@@ -20,6 +20,7 @@ import {
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthPrompt } from "@/components/auth/AuthPrompt";
+import EmptyMentorCard from "./EmptyMentorCard";
 
 interface Mentor {
   id: string;
@@ -54,80 +55,9 @@ export const MentorshipProgram: React.FC = () => {
   const [activeTab, setActiveTab] = useState("find-mentor");
   const { isLoggedIn } = useAuth();
 
-  const mentors: Mentor[] = [
-    {
-      id: "1",
-      name: "elena_rodriguez",
-      displayName: "Elena Rodriguez",
-      avatar: "/api/placeholder/80/80",
-      bio: "Award-winning storyteller specializing in Latin American folklore and magical realism. I've been sharing stories for over 15 years and love helping new voices find their unique style.",
-      specialties: ["Magical Realism", "Folklore", "Character Development", "Cultural Authenticity"],
-      culturalBackground: ["Mexican", "Colombian"],
-      experience: "15+ years",
-      menteeCount: 23,
-      rating: 4.9,
-      responseTime: "< 24 hours",
-      availableSlots: 3,
-      languages: ["Spanish", "English"],
-      achievements: ["Cultural Heritage Award", "Best Mentor 2023", "Featured Author"],
-      isAvailable: true
-    },
-    {
-      id: "2",
-      name: "james_chen",
-      displayName: "James Chen",
-      avatar: "/api/placeholder/80/80",
-      bio: "Contemporary fiction writer with expertise in cross-cultural narratives. I help writers explore identity, belonging, and the immigrant experience through storytelling.",
-      specialties: ["Contemporary Fiction", "Identity Themes", "Cross-Cultural Stories", "Dialogue Writing"],
-      culturalBackground: ["Chinese-American"],
-      experience: "12+ years",
-      menteeCount: 18,
-      rating: 4.8,
-      responseTime: "< 12 hours",
-      availableSlots: 2,
-      languages: ["English", "Mandarin"],
-      achievements: ["Emerging Voices Award", "Community Choice Winner"],
-      isAvailable: true
-    },
-    {
-      id: "3",
-      name: "amara_okafor",
-      displayName: "Amara Okafor",
-      avatar: "/api/placeholder/80/80",
-      bio: "Poet and oral tradition keeper focusing on African storytelling techniques. I specialize in helping writers find their authentic voice and connect with their cultural roots.",
-      specialties: ["Oral Tradition", "Poetry", "Voice Development", "Cultural Research"],
-      culturalBackground: ["Nigerian", "Igbo"],
-      experience: "10+ years",
-      menteeCount: 15,
-      rating: 4.9,
-      responseTime: "< 6 hours",
-      availableSlots: 1,
-      languages: ["English", "Igbo"],
-      achievements: ["Oral Tradition Master", "Cultural Ambassador"],
-      isAvailable: false
-    }
-  ];
+  const mentors: Mentor[] = [];
 
-  const mentorshipRequests: MentorshipRequest[] = [
-    {
-      id: "1",
-      mentorName: "Elena Rodriguez",
-      mentorAvatar: "/api/placeholder/40/40",
-      requestDate: "2024-01-15",
-      status: "accepted",
-      sessionType: "Story Review",
-      message: "I'd love feedback on my magical realism short story about family traditions."
-    },
-    {
-      id: "2",
-      mentorName: "James Chen",
-      mentorAvatar: "/api/placeholder/40/40",
-      requestDate: "2024-01-20",
-      status: "pending",
-      sessionType: "Career Guidance",
-      message: "Seeking advice on developing my writing career and finding my unique voice."
-    }
-  ];
+  const mentorshipRequests: MentorshipRequest[] = [];
 
   const mentorshipBenefits = [
     {
@@ -207,8 +137,11 @@ export const MentorshipProgram: React.FC = () => {
         </TabsList>
 
         <TabsContent value="find-mentor" className="mt-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {mentors.map((mentor, index) => (
+          {mentors.length === 0 ? (
+            <EmptyMentorCard />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {mentors.map((mentor, index) => (
               <motion.div
                 key={mentor.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -329,9 +262,10 @@ export const MentorshipProgram: React.FC = () => {
                     variant="overlay"
                   />
                 )}
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="my-requests" className="mt-8">
@@ -355,8 +289,24 @@ export const MentorshipProgram: React.FC = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {mentorshipRequests.map((request, index) => (
+              {mentorshipRequests.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="bg-gradient-to-br from-heritage-purple/10 to-cultural-gold/10 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                    <MessageCircle className="h-12 w-12 text-heritage-purple" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">No Requests Yet</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Start your mentorship journey by connecting with experienced storytellers.
+                  </p>
+                  <Button asChild>
+                    <span onClick={() => setActiveTab("find-mentor")}>
+                      Find Your First Mentor
+                    </span>
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {mentorshipRequests.map((request, index) => (
                   <motion.div
                     key={request.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -411,9 +361,10 @@ export const MentorshipProgram: React.FC = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  </motion.div>
-                ))}
-              </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </TabsContent>
